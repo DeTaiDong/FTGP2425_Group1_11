@@ -1,0 +1,171 @@
+% This is samplepaper.tex, a sample chapter demonstrating the
+% LLNCS macro package for Springer Computer Science proceedings;
+% Version 2.21 of 2022/01/12
+%
+\documentclass[runningheads]{llncs}
+%
+\usepackage[T1]{fontenc}
+% T1 fonts will be used to generate the final print and online PDFs,
+% so please use T1 fonts in your manuscript whenever possible.
+% Other font encondings may result in incorrect characters.
+%
+\usepackage{graphicx}
+\usepackage{hyperref}
+% Used for displaying a sample figure. If possible, figure files should
+% be included in EPS format.
+%
+% If you use the hyperref package, please uncomment the following two lines
+% to display URLs in blue roman font according to Springer's eBook style:
+%\usepackage{color}
+%\renewcommand\UrlFont{\color{blue}\rmfamily}
+%\urlstyle{rm}
+%
+\begin{document}
+	%
+	\title{EcoPassEU: A Privacy-Aware Digital Product Passport DApp for Sustainable Consumer Goods in Europe}
+	
+	\titlerunning{EcoPassEU: A Privacy-Aware Digital Product Passport DApp}
+	
+	\author{Fuyu Cao\inst{1} \and
+		Luxiao Cao\inst{1} \and
+		Detai Dong\inst{1} \and
+		Akshansh Rajora\inst{1} \and
+		Tianwei Yu\inst{1}}
+	
+	\authorrunning{F. Cao et al.}
+	
+	\institute{University of Bristol, Bristol, UK \\
+		\email{\{1d25515, ne25392, mz25325, tk25240, np25024\}@bristol.ac.uk}}
+	%
+	\maketitle              % typeset the header of the contribution
+	%
+
+	%
+	%
+	\section{Introduction}
+	% What exactly is your application? What can it do?
+	% Why is it important?
+	% Who is your target user group?
+	In this section, introduce the DApp and explain its importance without being overly technical. Focus on its uses and applications, addressing what EcoPassEU is, why combating greenwashing is important, and identifying the target user groups (e.g., European manufacturers, SMEs, consumers, and regulators).
+	
+	\section{Background}
+	% Describe the topic of your application in more detail.
+	% Similar applications, competitors, or research.
+	% Business side: how such an application could be profitable.
+	Describe the landscape of sustainable consumer goods and the Ecodesign for Sustainable Products Regulation (ESPR). Detail the necessity of DPPs, present similar traceability applications or research, and discuss the business and financial viability of the DApp as a potential startup. Remember to include citations.
+	
+	\section{Design Documentation}
+	% System's design, overall architecture, UI designs.
+	% Use Case diagrams, Sequence/Flow diagrams, State diagrams.
+	Outline the system architecture of EcoPassEU. Include your justifications for using EVM-compatible networks like Polygon, ERC-1155 tokens, IPFS, and DIDs/VCs. Insert your Use Case diagrams, Sequence/Flow diagrams, and front-end wireframes here.
+	
+	\section{Project Execution}
+	% Core code analysis, description of system functions, testing strategy, UI showcase, User Manual.
+	Detail the implementation process of the DApp. This should feature core code analysis, data structures, your testing strategy, final UI screenshots, and a brief user manual on how to interact with the application.
+	
+	\subsection{Critical Evaluation}
+	% Technical analysis: gas usage, security, runtime performance.
+	Provide a technical analysis of EcoPassEU, evaluating the gas usage of your smart contracts, security considerations (especially regarding the separation of on-chain and off-chain data), and runtime performance.
+	
+	\section{Conclusion}
+	% Concise overview of findings, achievements, limitations, and future work.
+	Summarize the main theoretical and technical findings. Detail what the group achieved, acknowledge limitations (e.g., the physical-to-digital bridge vulnerabilities), and propose future work.
+	
+	%
+	% ---- Bibliography ----
+	%
+	% BibTeX users should specify bibliography style 'splncs04'.
+	% References will then be sorted and formatted in the correct style.
+	%
+	% \bibliographystyle{splncs04}
+	% \bibliography{mybibliography}
+	%
+	\begin{thebibliography}{8}
+		\bibitem{ref_espr}
+		European Parliament and Council: Regulation (EU) 2024/1781 establishing a framework for the setting of ecodesign requirements for sustainable products. Official Journal of the European Union (2024).
+		
+		\bibitem{ref_greenforum}
+		European Commission: Implementing the Ecodesign for Sustainable Products Regulation. European Commission Green Forum (2026).
+		
+		\bibitem{ref_wallet}
+		European Commission: The EU Digital Identity Framework Regulation Enters into Force. EU Digital Identity Wallet (2024).
+		
+		\bibitem{ref_ebsi}
+		European Commission: European Blockchain Services Infrastructure (EBSI) Homepage. (2026).
+		
+		\bibitem{ref_did}
+		W3C: Decentralized Identifiers (DIDs) v1.0. W3C Recommendation (2022).
+		
+		\bibitem{ref_vc}
+		W3C: Verifiable Credentials Data Model v2.0. W3C Recommendation (2025).
+	\end{thebibliography}
+	
+	\newpage
+	\appendix
+	\section{Appendix}
+	% The appendix has no page limit and must include specific items in order.
+	This appendix includes the mandatory materials required for the FTGP summative assessment.
+	
+	\subsection{Smart Contract Deployment}
+	\begin{itemize}
+		\item \textbf{Smart Contract Address(es):} [Insert Sepolia testnet addresses here]
+		\item \textbf{Etherscan Links:} [Insert links to verified contracts on Etherscan]
+	\end{itemize}
+	
+	\subsection{Project Links}
+	\begin{itemize}
+		\item \textbf{Deployed Website:} [Insert URL]
+		\item \textbf{GitHub Repository:} \url{https://github.com/DeTaiDong/FTGP2425_Group1_11} 
+	\end{itemize}
+	
+	\subsection{Transaction Hashes}
+	% Any deploy/test transaction hashes along with brief explanations.
+	\begin{itemize}
+		\item \textbf{Deployment TX:} [Insert Hash] - Explanation.
+	\end{itemize}
+	
+	\subsection{Equity Shares \& Contributions}
+	% Distribution of equity shares and screenshot of GitHub Insights
+	\begin{itemize}
+		\item Luxiao Cao: [Weight]
+		\item Akshansh Rajora: [Weight]
+		\item Fuyu Cao: [Weight]
+		\item Tianwei Yu: [Weight]
+		\item Detai Dong: [Weight]
+	\end{itemize}
+	\noindent \textit{[Insert Screenshot of GitHub - Insights - Contributor here]}
+	
+	\subsection{JIRA Project Board}
+	% Required screenshot(s) for your JIRA project board.
+	\noindent \textit{[Insert screenshots of 'Summary', 'timeline', and 'backlog' pages here]}
+	
+	\subsection{Individual Reflection Essays}
+	% Each group member's individual reflection essay.
+	\subsubsection{Luxiao Cao}
+	[Insert 500-word reflection here]
+	\subsubsection{Akshansh Rajora}
+	[Insert 500-word reflection here]
+	\subsubsection{Fuyu Cao}
+	[Insert 500-word reflection here]
+	\subsubsection{Tianwei Yu}
+	[Insert 500-word reflection here]
+	\subsubsection{Detai Dong}
+	[Insert 500-word reflection here]
+	
+	\subsection{Team Sprint Reports}
+	% All team sprint reports in chronological order.
+	[Insert chronological sprint reports here]
+	
+	\subsection{Complete Source Code}
+	% The complete DApp Solidity smart contract code and testing codes. All in text format.
+	\subsubsection{Smart Contracts}
+	\begin{verbatim}
+		// Insert complete Solidity code here
+	\end{verbatim}
+	
+	\subsubsection{Frontend Core Files}
+	\begin{verbatim}
+		// Insert modified/relevant frontend files (e.g., page.js) here
+	\end{verbatim}
+	
+\end{document}
