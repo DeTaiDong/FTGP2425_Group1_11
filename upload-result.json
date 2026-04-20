@@ -1,5 +1,17 @@
-{
-  "productId": "ECO-TX-2025-001",
-  "ipfsCID": "QmZQpFPywrZTYk14o7uTN31ZZpZPbznYkqsj8yDBNLME5B",
-  "metadataHash": "0x2d02e5286585634791c971b0eb8cfbd934df2b5cf96a71c292f0f1ed4adac473"
-}
+[
+  {
+    "productId": "ECO-TX-2025-001",
+    "ipfsCID": "QmPxeUgSQsNK9cLLAu59551Djw5DvGK43K4e1UgPbBkEUW",
+    "metadataHash": "0x90e1197efc7b1fc70b7bac30ab52badfc655c03a79d50836505afb6a4373ceee"
+  },
+  {
+    "productId": "ECO-EL-2025-001",
+    "ipfsCID": "QmPehQuve7LRfbckktL7t1JUdrQgJJu3z2QwYiGtA1QURo",
+    "metadataHash": "0x20645ab0a8917eeb6c6f092715dc261e3d3d9e43133b15e4150982b89281d969"
+  },
+  {
+    "productId": "ECO-FN-2025-001",
+    "ipfsCID": "QmUjZNro2BKvv9zU4qddxPFdoMSmLqfs14rBQ2QEPrmLot",
+    "metadataHash": "0x47f43405790b1b7024574c16a874af6a8d06bf2ada819cb178e989f9dd447854"
+  }
+]

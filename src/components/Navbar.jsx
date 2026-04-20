@@ -8,7 +8,7 @@ function Navbar() {
       <div style={styles.links}>
         <Link to="/" style={styles.link}>Home</Link>
         <Link to="/register" style={styles.link}>Register Product</Link>
-        <Link to="/scan" style={styles.link}>Scan Product</Link>
+        <Link to="/scan" style={styles.link}>Search Product</Link>
       </div>
       <WalletConnect />
     </nav>
@@ -23,6 +23,9 @@ const styles = {
     padding: '1rem 2rem',
     backgroundColor: '#2d6a4f',
     color: 'white',
+    position: 'sticky',
+    top: 0,
+    zIndex: 1000,
   },
   logo: { fontSize: '1.5rem', fontWeight: 'bold' },
   links: { display: 'flex', alignItems: 'center' },
