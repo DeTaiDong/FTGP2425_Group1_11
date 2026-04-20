@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ethers } from 'ethers'
 import { getContract } from '../utils/contract'
+import SupplyChainMap from '../components/SupplyChainMap'
 
 function ProductDetail() {
   const { id } = useParams()
@@ -18,8 +19,12 @@ function ProductDetail() {
   const fetchPassport = async () => {
     try {
       setLoading(true)
-      if (!window.ethereum) throw new Error('MetaMask not found')
-      const provider = new ethers.BrowserProvider(window.ethereum)
+      let provider
+      if (window.ethereum) {
+        provider = new ethers.BrowserProvider(window.ethereum)
+      } else {
+        provider = new ethers.JsonRpcProvider('https://ethereum-sepolia-rpc.publicnode.com')
+      }
       const contract = getContract(provider)
 
       const exists = await contract.passportExists(id)
@@ -30,14 +35,10 @@ function ProductDetail() {
 
       const [ipfsCID, metadataHash, issuer, timestamp] = await contract.getPassport(id)
       setPassport({
-        productId: id,
-        ipfsCID,
-        metadataHash,
-        issuer,
+        productId: id, ipfsCID, metadataHash, issuer,
         timestamp: new Date(Number(timestamp) * 1000).toLocaleString()
       })
 
-      // 如果有 IPFS 数据就获取
       if (ipfsCID && ipfsCID !== 'ipfs://placeholder') {
         const cid = ipfsCID.replace('ipfs://', '')
         const res = await fetch('https://gateway.pinata.cloud/ipfs/' + cid)
@@ -46,7 +47,6 @@ function ProductDetail() {
           setIpfsData(data)
         }
       }
-
     } catch (err) {
       setStatus({ type: 'error', msg: 'Error: ' + err.message })
     } finally {
@@ -63,21 +63,16 @@ function ProductDetail() {
   if (status) return (
     <div style={styles.center}>
       <p style={{ color: '#c62828' }}>{status.msg}</p>
-      <button style={styles.backBtn} onClick={() => navigate('/scan')}>
-        ← Back to Scan
-      </button>
+      <button style={styles.backBtn} onClick={() => navigate('/scan')}>← Back to Search</button>
     </div>
   )
 
   return (
     <div style={styles.container}>
-      <button style={styles.backBtn} onClick={() => navigate('/scan')}>
-        ← Back
-      </button>
-
+      <button style={styles.backBtn} onClick={() => navigate('/scan')}>← Back</button>
       <h2 style={styles.title}>📋 Product Passport Detail</h2>
 
-      {/* 区块链信息 */}
+      {/* Blockchain Record */}
       <div style={styles.section}>
         <h3 style={styles.sectionTitle}>🔗 Blockchain Record</h3>
         <div style={styles.row}>
@@ -98,9 +93,9 @@ function ProductDetail() {
         </div>
       </div>
 
-      {/* IPFS 产品详情 */}
       {ipfsData && (
         <>
+          {/* Product Information */}
           <div style={styles.section}>
             <h3 style={styles.sectionTitle}>🏷️ Product Information</h3>
             <div style={styles.row}>
@@ -125,7 +120,7 @@ function ProductDetail() {
             )}
           </div>
 
-          {/* 材料信息 */}
+          {/* Material Composition */}
           {ipfsData.materials && (
             <div style={styles.section}>
               <h3 style={styles.sectionTitle}>🧵 Material Composition</h3>
@@ -148,7 +143,7 @@ function ProductDetail() {
             </div>
           )}
 
-          {/* 供应链信息 */}
+          {/* Supply Chain Provenance */}
           {ipfsData.provenance && (
             <div style={styles.section}>
               <h3 style={styles.sectionTitle}>🌍 Supply Chain Provenance</h3>
@@ -165,12 +160,20 @@ function ProductDetail() {
               ))}
             </div>
           )}
+
+          {/* Supply Chain Map */}
+          {ipfsData.provenance && ipfsData.provenance.length > 0 && (
+            <div style={styles.section}>
+              <h3 style={styles.sectionTitle}>🗺️ Supply Chain Map</h3>
+              <SupplyChainMap provenance={ipfsData.provenance} />
+            </div>
+          )}
         </>
       )}
 
       {!ipfsData && (
         <div style={styles.section}>
-          <p style={{ color: '#888' }}>No detailed product data available (no IPFS document attached).</p>
+          <p style={{ color: '#888' }}>No detailed product data available.</p>
         </div>
       )}
     </div>
@@ -210,47 +213,11 @@ const styles = {
   value: { color: '#222', fontSize: '0.95rem' },
   valueSmall: { color: '#666', fontSize: '0.75rem', fontFamily: 'monospace', wordBreak: 'break-all', maxWidth: '60%', textAlign: 'right' },
   link: { color: '#2d6a4f', textDecoration: 'underline' },
-  badge: {
-    backgroundColor: '#2d6a4f',
-    color: 'white',
-    padding: '0.2rem 0.6rem',
-    borderRadius: '12px',
-    fontSize: '0.85rem',
-  },
-  certBadge: {
-    backgroundColor: '#e8f5e9',
-    color: '#2d6a4f',
-    padding: '0.2rem 0.6rem',
-    borderRadius: '12px',
-    fontSize: '0.85rem',
-    border: '1px solid #a5d6a7',
-  },
-  materialCard: {
-    backgroundColor: 'white',
-    borderRadius: '8px',
-    padding: '0.8rem',
-    marginBottom: '0.8rem',
-  },
-  provenanceRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '1rem',
-    padding: '0.8rem 0',
-    borderBottom: '1px solid #d0e8d8',
-  },
-  stepNumber: {
-    backgroundColor: '#2d6a4f',
-    color: 'white',
-    width: '28px',
-    height: '28px',
-    borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '0.85rem',
-    fontWeight: 'bold',
-    flexShrink: 0,
-  },
+  badge: { backgroundColor: '#2d6a4f', color: 'white', padding: '0.2rem 0.6rem', borderRadius: '12px', fontSize: '0.85rem' },
+  certBadge: { backgroundColor: '#e8f5e9', color: '#2d6a4f', padding: '0.2rem 0.6rem', borderRadius: '12px', fontSize: '0.85rem', border: '1px solid #a5d6a7' },
+  materialCard: { backgroundColor: 'white', borderRadius: '8px', padding: '0.8rem', marginBottom: '0.8rem' },
+  provenanceRow: { display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.8rem 0', borderBottom: '1px solid #d0e8d8' },
+  stepNumber: { backgroundColor: '#2d6a4f', color: 'white', width: '28px', height: '28px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 'bold', flexShrink: 0 },
 }
 
 export default ProductDetail
