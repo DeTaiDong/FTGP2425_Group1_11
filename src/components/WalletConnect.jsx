@@ -1,46 +1,56 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+
+export function getConnectedAccount() {
+  return localStorage.getItem('connectedAccount')
+}
 
 function WalletConnect() {
   const [account, setAccount] = useState(null)
   const [error, setError] = useState(null)
 
+  useEffect(() => {
+    const saved = localStorage.getItem('connectedAccount')
+    if (saved) setAccount(saved)
+
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', (accounts) => {
+        if (accounts.length === 0) {
+          setAccount(null)
+          localStorage.removeItem('connectedAccount')
+        } else {
+          setAccount(accounts[0])
+          localStorage.setItem('connectedAccount', accounts[0])
+        }
+      })
+    }
+  }, [])
+
   const connectWallet = async () => {
     setError(null)
-
-    // check MetaMask status
     if (!window.ethereum) {
-      setError('Please install MetaMask first!')
+      setError('Please install MetaMask!')
       return
     }
-
     try {
-      // Ask user permission
-      const accounts = await window.ethereum.request({
-        method: 'eth_requestAccounts'
-      })
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
       setAccount(accounts[0])
-
-      // check if user in Sepolia 
-      const chainId = await window.ethereum.request({
-        method: 'eth_chainId'
-      })
+      localStorage.setItem('connectedAccount', accounts[0])
+      const chainId = await window.ethereum.request({ method: 'eth_chainId' })
       if (chainId !== '0xaa36a7') {
-        setError('⚠️ Please switch MetaMask to Sepolia Testnet!')
+        setError('⚠️ Please switch to Sepolia Testnet!')
       }
-
     } catch (err) {
-      setError('Connection rejected by user.')
+      setError('Connection rejected.')
     }
   }
 
   const disconnectWallet = () => {
     setAccount(null)
+    localStorage.removeItem('connectedAccount')
     setError(null)
   }
 
-
-  const shortAddress = (addr) =>
-    addr ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : ''
+  const shortAddress = (addr) => addr ? addr.slice(0, 6) + '...' + addr.slice(-4) : ''
 
   return (
     <div>
@@ -50,7 +60,7 @@ function WalletConnect() {
         </button>
       ) : (
         <div style={styles.connected}>
-          <span style={styles.dot}>🟢</span>
+          <span>🟢</span>
           <span style={styles.address}>{shortAddress(account)}</span>
           <button onClick={disconnectWallet} style={styles.disconnectBtn}>
             Disconnect
@@ -82,12 +92,7 @@ const styles = {
     borderRadius: '8px',
     border: '1px solid #a5d6a7',
   },
-  dot: { fontSize: '0.8rem' },
-  address: {
-    fontWeight: 'bold',
-    fontSize: '0.9rem',
-    color: '#2d6a4f',
-  },
+  address: { fontWeight: 'bold', fontSize: '0.9rem', color: '#2d6a4f' },
   disconnectBtn: {
     backgroundColor: 'transparent',
     border: '1px solid #ccc',
@@ -97,11 +102,7 @@ const styles = {
     fontSize: '0.8rem',
     color: '#888',
   },
-  error: {
-    color: 'red',
-    fontSize: '0.8rem',
-    marginTop: '0.3rem',
-  }
+  error: { color: 'red', fontSize: '0.8rem', marginTop: '0.3rem' }
 }
 
 export default WalletConnect

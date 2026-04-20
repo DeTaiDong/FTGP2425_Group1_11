@@ -20,8 +20,14 @@ function ScanProduct() {
     try {
       setLoading(true)
       setStatus({ type: 'info', msg: 'Searching blockchain...' })
-      if (!window.ethereum) throw new Error('MetaMask not found, please connect wallet first.')
-      const provider = new ethers.BrowserProvider(window.ethereum)
+    let provider
+    if (window.ethereum) {
+      provider = new ethers.BrowserProvider(window.ethereum)
+    } else {
+      provider = new ethers.JsonRpcProvider('https://ethereum-sepolia-rpc.publicnode.com')
+    }
+
+
       const contract = getContract(provider)
       const exists = await contract.passportExists(productId.trim())
       if (!exists) {
