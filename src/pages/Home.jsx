@@ -17,11 +17,8 @@ function Home() {
       const provider = new ethers.BrowserProvider(window.ethereum)
       const contract = getContract(provider)
       const testIds = [
-        'ECO-TX-2025-001',
-        'ECO-EL-2025-001',
-        'ECO-FN-2025-001',
-        'SKU-2026-001',
-        'SKU-TEST-001'
+        'ECO-TX-2025-001', 'ECO-EL-2025-001', 'ECO-FN-2025-001',
+        'SKU-2026-001', 'SKU-TEST-001'
       ]
       let count = 0
       for (const id of testIds) {
@@ -36,11 +33,62 @@ function Home() {
 
   return (
     <div style={styles.page}>
+      <style>{`
+        .hero-primary-btn:hover {
+          background-color: #f0f0f0 !important;
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(0,0,0,0.2) !important;
+        }
+        .hero-primary-btn:active {
+          transform: translateY(0px);
+        }
+        .hero-primary-btn { transition: all 0.2s ease !important; }
+
+        .hero-secondary-btn:hover {
+          background-color: rgba(255,255,255,0.15) !important;
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+        }
+        .hero-secondary-btn:active {
+          transform: translateY(0px);
+        }
+        .hero-secondary-btn { transition: all 0.2s ease !important; }
+
+        .cta-primary-btn:hover {
+          background-color: #1b4332 !important;
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(45,106,79,0.4) !important;
+        }
+        .cta-primary-btn:active { transform: translateY(0px); }
+        .cta-primary-btn { transition: all 0.2s ease !important; }
+
+        .cta-secondary-btn:hover {
+          background-color: #2d6a4f !important;
+          color: white !important;
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(45,106,79,0.3) !important;
+        }
+        .cta-secondary-btn:active { transform: translateY(0px); }
+        .cta-secondary-btn { transition: all 0.2s ease !important; }
+
+        .feature-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 12px 30px rgba(0,0,0,0.1) !important;
+          border-color: #a5d6a7 !important;
+        }
+        .feature-card { transition: all 0.25s ease !important; }
+
+        .step-card:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 8px 25px rgba(45,106,79,0.15) !important;
+        }
+        .step-card { transition: all 0.25s ease !important; }
+      `}</style>
 
       {/* Hero Section */}
       <div style={styles.hero}>
         <div style={styles.heroContent}>
-          <div style={styles.badge}>★ EU ESPR Compliant</div>
+          <div style={styles.badge}>🇪🇺 EU ESPR Compliant</div>
           <h1 style={styles.heroTitle}>
             Digital Product Passports<br />for a Sustainable Europe
           </h1>
@@ -50,10 +98,18 @@ function Home() {
             consumers, and regulators navigate the EU's sustainability requirements.
           </p>
           <div style={styles.heroBtns}>
-            <button style={styles.primaryBtn} onClick={() => navigate('/register')}>
+            <button
+              className="hero-primary-btn"
+              style={styles.primaryBtn}
+              onClick={() => navigate('/register')}
+            >
               🏭 Register Product
             </button>
-            <button style={styles.secondaryBtn} onClick={() => navigate('/scan')}>
+            <button
+              className="hero-secondary-btn"
+              style={styles.secondaryBtn}
+              onClick={() => navigate('/scan')}
+            >
               🔍 Search Product
             </button>
           </div>
@@ -89,7 +145,7 @@ function Home() {
       <div style={styles.section}>
         <h2 style={styles.sectionTitle}>How It Works</h2>
         <div style={styles.steps}>
-          <div style={styles.step}>
+          <div className="step-card" style={styles.step}>
             <div style={styles.stepIcon}>1️⃣</div>
             <h3 style={styles.stepTitle}>Manufacturer Registers</h3>
             <p style={styles.stepDesc}>
@@ -98,7 +154,7 @@ function Home() {
             </p>
           </div>
           <div style={styles.stepArrow}>→</div>
-          <div style={styles.step}>
+          <div className="step-card" style={styles.step}>
             <div style={styles.stepIcon}>2️⃣</div>
             <h3 style={styles.stepTitle}>Data Stored Securely</h3>
             <p style={styles.stepDesc}>
@@ -108,7 +164,7 @@ function Home() {
             </p>
           </div>
           <div style={styles.stepArrow}>→</div>
-          <div style={styles.step}>
+          <div className="step-card" style={styles.step}>
             <div style={styles.stepIcon}>3️⃣</div>
             <h3 style={styles.stepTitle}>Anyone Can Verify</h3>
             <p style={styles.stepDesc}>
@@ -121,40 +177,42 @@ function Home() {
       </div>
 
       {/* Feature Cards */}
-      <div style={styles.section}>
-        <h2 style={styles.sectionTitle}>Why EcoPassEU?</h2>
-        <div style={styles.features}>
-          <div style={styles.featureCard}>
-            <div style={styles.featureIcon}>🔒</div>
-            <h3 style={styles.featureTitle}>Privacy-Aware</h3>
-            <p style={styles.featureDesc}>
-              Sensitive supply chain data stays off-chain. Only verifiable
-              hashes are stored on the public ledger.
-            </p>
-          </div>
-          <div style={styles.featureCard}>
-            <div style={styles.featureIcon}>✅</div>
-            <h3 style={styles.featureTitle}>Anti-Greenwashing</h3>
-            <p style={styles.featureDesc}>
-              Cryptographic proofs make it impossible to fake or alter
-              sustainability claims after registration.
-            </p>
-          </div>
-          <div style={styles.featureCard}>
-            <div style={styles.featureIcon}>🏛️</div>
-            <h3 style={styles.featureTitle}>ESPR Aligned</h3>
-            <p style={styles.featureDesc}>
-              Built to meet the EU Ecodesign for Sustainable Products
-              Regulation requirements for digital product passports.
-            </p>
-          </div>
-          <div style={styles.featureCard}>
-            <div style={styles.featureIcon}>💸</div>
-            <h3 style={styles.featureTitle}>SME Friendly</h3>
-            <p style={styles.featureDesc}>
-              Low gas costs via batch registration. No need to build
-              bespoke infrastructure — plug in and comply.
-            </p>
+      <div style={styles.featureSection}>
+        <div style={styles.featureSectionInner}>
+          <h2 style={styles.sectionTitle}>Why EcoPassEU?</h2>
+          <div style={styles.features}>
+            <div className="feature-card" style={styles.featureCard}>
+              <div style={styles.featureIcon}>🔒</div>
+              <h3 style={styles.featureTitle}>Privacy-Aware</h3>
+              <p style={styles.featureDesc}>
+                Sensitive supply chain data stays off-chain. Only verifiable
+                hashes are stored on the public ledger.
+              </p>
+            </div>
+            <div className="feature-card" style={styles.featureCard}>
+              <div style={styles.featureIcon}>✅</div>
+              <h3 style={styles.featureTitle}>Anti-Greenwashing</h3>
+              <p style={styles.featureDesc}>
+                Cryptographic proofs make it impossible to fake or alter
+                sustainability claims after registration.
+              </p>
+            </div>
+            <div className="feature-card" style={styles.featureCard}>
+              <div style={styles.featureIcon}>🏛️</div>
+              <h3 style={styles.featureTitle}>ESPR Aligned</h3>
+              <p style={styles.featureDesc}>
+                Built to meet the EU Ecodesign for Sustainable Products
+                Regulation requirements for digital product passports.
+              </p>
+            </div>
+            <div className="feature-card" style={styles.featureCard}>
+              <div style={styles.featureIcon}>💸</div>
+              <h3 style={styles.featureTitle}>SME Friendly</h3>
+              <p style={styles.featureDesc}>
+                Low gas costs via batch registration. No need to build
+                bespoke infrastructure — plug in and comply.
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -166,10 +224,18 @@ function Home() {
           Register your first product passport or search for an existing one.
         </p>
         <div style={styles.heroBtns}>
-          <button style={styles.primaryBtn} onClick={() => navigate('/register')}>
+          <button
+            className="cta-primary-btn"
+            style={styles.ctaPrimaryBtn}
+            onClick={() => navigate('/register')}
+          >
             🏭 Register Product
           </button>
-          <button style={styles.secondaryBtn} onClick={() => navigate('/scan')}>
+          <button
+            className="cta-secondary-btn"
+            style={styles.ctaSecondaryBtn}
+            onClick={() => navigate('/scan')}
+          >
             🔍 Search Product
           </button>
         </div>
@@ -210,7 +276,12 @@ const styles = {
     maxWidth: '600px',
     margin: '0 auto 2.5rem',
   },
-  heroBtns: { display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' },
+  heroBtns: {
+    display: 'flex',
+    gap: '1rem',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+  },
   primaryBtn: {
     backgroundColor: 'white',
     color: '#2d6a4f',
@@ -220,6 +291,7 @@ const styles = {
     fontSize: '1rem',
     fontWeight: 'bold',
     cursor: 'pointer',
+    boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
   },
   secondaryBtn: {
     backgroundColor: 'transparent',
@@ -246,14 +318,42 @@ const styles = {
   statDivider: { width: '1px', height: '40px', backgroundColor: '#ddd' },
   section: { maxWidth: '1000px', margin: '0 auto', padding: '4rem 2rem' },
   sectionTitle: { textAlign: 'center', fontSize: '2rem', marginBottom: '3rem', color: '#1b4332' },
-  steps: { display: 'flex', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' },
-  step: { flex: 1, minWidth: '200px', maxWidth: '260px', textAlign: 'center', padding: '1.5rem', backgroundColor: '#f0f7f4', borderRadius: '12px' },
+  steps: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: '1rem',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+  },
+  step: {
+    flex: 1,
+    minWidth: '200px',
+    maxWidth: '260px',
+    textAlign: 'center',
+    padding: '1.5rem',
+    backgroundColor: '#f0f7f4',
+    borderRadius: '12px',
+    cursor: 'default',
+  },
   stepIcon: { fontSize: '2rem', marginBottom: '1rem' },
   stepTitle: { fontSize: '1.1rem', fontWeight: 'bold', color: '#2d6a4f', marginBottom: '0.8rem' },
   stepDesc: { fontSize: '0.9rem', color: '#555', lineHeight: 1.6 },
   stepArrow: { fontSize: '2rem', color: '#2d6a4f', paddingTop: '3rem' },
-  features: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem' },
-  featureCard: { padding: '2rem', border: '1px solid #e0e0e0', borderRadius: '12px', textAlign: 'center' },
+  featureSection: { backgroundColor: '#f8faf9', padding: '1rem 0 4rem' },
+  featureSectionInner: { maxWidth: '1000px', margin: '0 auto', padding: '0 2rem' },
+  features: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+    gap: '1.5rem',
+  },
+  featureCard: {
+    padding: '2rem',
+    border: '1px solid #e0e0e0',
+    borderRadius: '12px',
+    textAlign: 'center',
+    backgroundColor: 'white',
+    cursor: 'default',
+  },
   featureIcon: { fontSize: '2.5rem', marginBottom: '1rem' },
   featureTitle: { fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '0.8rem', color: '#1b4332' },
   featureDesc: { fontSize: '0.9rem', color: '#555', lineHeight: 1.6 },
@@ -264,6 +364,27 @@ const styles = {
   },
   ctaTitle: { fontSize: '2rem', color: '#1b4332', marginBottom: '1rem' },
   ctaDesc: { color: '#555', marginBottom: '2rem', fontSize: '1.1rem' },
+  ctaPrimaryBtn: {
+    backgroundColor: '#2d6a4f',
+    color: 'white',
+    border: 'none',
+    padding: '0.9rem 2rem',
+    borderRadius: '8px',
+    fontSize: '1rem',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    boxShadow: '0 4px 15px rgba(45,106,79,0.3)',
+  },
+  ctaSecondaryBtn: {
+    backgroundColor: 'transparent',
+    color: '#2d6a4f',
+    border: '2px solid #2d6a4f',
+    padding: '0.9rem 2rem',
+    borderRadius: '8px',
+    fontSize: '1rem',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+  },
 }
 
 export default Home
