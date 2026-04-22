@@ -51,32 +51,67 @@ This approach keeps gas costs low while protecting commercially sensitive supply
 ---
 
 ## Project Structure
-ecopasseu-frontend/
-├── contracts/
-│   └── PassportRegistry.sol      # Smart contract source code
-├── scripts/
-│   ├── uploadToIPFS.js           # Batch IPFS upload script
-│   ├── productsData.js           # Sample product data
-│   └── deploy.js                 # Hardhat deployment script
-├── src/
-│   ├── components/
-│   │   ├── Navbar.jsx            # Navigation bar with wallet connect
-│   │   ├── WalletConnect.jsx     # MetaMask wallet connection logic
-│   │   ├── SupplyChainMap.jsx    # Interactive Leaflet map component
-│   │   └── LocationPicker.jsx   # Cascading continent/country/city picker
-│   ├── pages/
-│   │   ├── Home.jsx              # Landing page with live stats
-│   │   ├── RegisterProduct.jsx  # Full product registration with IPFS upload
-│   │   ├── ScanProduct.jsx       # Product search and verification
-│   │   └── ProductDetail.jsx    # Full passport detail with map
-│   ├── utils/
-│   │   ├── contract.js           # Contract address, ABI, helpers
-│   │   └── locationData.js      # City coordinates database
-│   ├── App.jsx                   # Root component with routing
-│   └── main.jsx                  # Entry point
-├── hardhat.config.js             # Hardhat configuration
-├── upload-result.json            # Latest IPFS upload results
-└── README.md
+
+## Project Structure
+
+| Directory / File | Description |
+|-----------------|-------------|
+| `contracts/` | Solidity smart contract source code |
+| `scripts/` | IPFS upload and deployment scripts |
+| `src/components/` | Reusable UI components (Navbar, WalletConnect, Map, LocationPicker) |
+| `src/pages/` | Page components (Home, Register, Search, ProductDetail) |
+| `src/utils/` | Contract ABI, address helpers, city coordinates database |
+| `hardhat.config.js` | Hardhat local development configuration |
+| `upload-result.json` | Latest IPFS upload results |
+
+---
+
+## System Architecture
+
+```mermaid
+graph LR
+    User([👤 User])
+    MM([🦊 MetaMask])
+    FE([⚛️ React Frontend\nVercel])
+    SC([📜 PassportRegistry\nSepolia Testnet])
+    IPFS([🌐 IPFS\nPinata])
+    BC[(⛓️ Blockchain\nSepolia)]
+
+    User -->|Connect Wallet| MM
+    MM -->|Sign Transaction| FE
+    FE -->|Register Product| SC
+    FE -->|Upload Documents| IPFS
+    SC -->|Store Hash + CID| BC
+    BC -->|Read Passport| FE
+    IPFS -->|Retrieve Full Data| FE
+    User -->|Search Product| FE
+```
+
+## Data Flow
+
+```mermaid
+sequenceDiagram
+    participant M as 🏭 Manufacturer
+    participant F as ⚛️ Frontend
+    participant I as 🌐 IPFS
+    participant C as 📜 Contract
+    participant U as 🛒 Consumer
+
+    M->>F: Fill product details
+    F->>I: Upload JSON to IPFS
+    I-->>F: Return CID
+    F->>F: Compute metadataHash
+    F->>C: registerPassport(id, CID, hash)
+    C-->>F: Transaction confirmed ✅
+
+    U->>F: Search Product ID
+    F->>C: getPassport(id)
+    C-->>F: Return CID + hash + issuer
+    F->>I: Fetch document from IPFS
+    I-->>F: Return full product data
+    F-->>U: Display verified passport 🎉
+```
+
 
 
 ---
