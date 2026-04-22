@@ -1,15 +1,50 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import WalletConnect from './WalletConnect'
 
 function Navbar() {
+  const location = useLocation()
+
+  const isActive = (path) => location.pathname === path
+
   return (
     <nav style={styles.nav}>
-      <span style={styles.logo}>🌿 EcoPassEU</span>
+      <style>{`
+        .nav-link:hover {
+          background-color: rgba(255,255,255,0.15) !important;
+          transform: translateY(-1px);
+        }
+        .nav-link { transition: all 0.2s ease !important; }
+        .nav-link-active {
+          background-color: rgba(255,255,255,0.2) !important;
+        }
+      `}</style>
+
+      <Link to="/" style={styles.logo}>🌿 EcoPassEU</Link>
+
       <div style={styles.links}>
-        <Link to="/" style={styles.link}>Home</Link>
-        <Link to="/register" style={styles.link}>Register Product</Link>
-        <Link to="/scan" style={styles.link}>Search Product</Link>
+        <Link
+          to="/"
+          className={'nav-link' + (isActive('/') ? ' nav-link-active' : '')}
+          style={styles.navBtn}
+        >
+          🏠 Home
+        </Link>
+        <Link
+          to="/register"
+          className={'nav-link' + (isActive('/register') ? ' nav-link-active' : '')}
+          style={styles.navBtn}
+        >
+          🏭 Register
+        </Link>
+        <Link
+          to="/scan"
+          className={'nav-link' + (isActive('/scan') ? ' nav-link-active' : '')}
+          style={styles.navBtn}
+        >
+          🔍 Search
+        </Link>
       </div>
+
       <WalletConnect />
     </nav>
   )
@@ -20,21 +55,35 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '1rem 2rem',
+    padding: '0.8rem 2rem',
     backgroundColor: '#2d6a4f',
     color: 'white',
     position: 'sticky',
     top: 0,
     zIndex: 1000,
+    boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
   },
-  logo: { fontSize: '1.5rem', fontWeight: 'bold' },
-  links: { display: 'flex', alignItems: 'center' },
-  link: {
+  logo: {
+    fontSize: '1.4rem',
+    fontWeight: 'bold',
     color: 'white',
-    marginLeft: '1.5rem',
     textDecoration: 'none',
-    fontSize: '1rem',
-  }
+  },
+  links: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.4rem',
+  },
+  navBtn: {
+    color: 'white',
+    textDecoration: 'none',
+    fontSize: '0.92rem',
+    fontWeight: '600',
+    padding: '0.5rem 1rem',
+    borderRadius: '8px',
+    border: '1.5px solid rgba(255,255,255,0.25)',
+    display: 'inline-block',
+  },
 }
 
 export default Navbar

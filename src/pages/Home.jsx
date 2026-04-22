@@ -6,6 +6,7 @@ import { getContract } from '../utils/contract'
 function Home() {
   const navigate = useNavigate()
   const [productCount, setProductCount] = useState(null)
+  const [counting, setCounting] = useState(false)
 
   useEffect(() => {
     fetchStats()
@@ -13,23 +14,88 @@ function Home() {
 
   const fetchStats = async () => {
     try {
-      if (!window.ethereum) return
-      const provider = new ethers.BrowserProvider(window.ethereum)
-      const contract = getContract(provider)
-      const testIds = [
-        'ECO-TX-2025-001', 'ECO-EL-2025-001', 'ECO-FN-2025-001',
-        'SKU-2026-001', 'SKU-TEST-001'
-      ]
-      let count = 0
-      for (const id of testIds) {
-        const exists = await contract.passportExists(id)
-        if (exists) count++
+      setCounting(true)
+      let provider
+      if (window.ethereum) {
+        provider = new ethers.BrowserProvider(window.ethereum)
+      } else {
+        provider = new ethers.JsonRpcProvider('https://ethereum-sepolia-rpc.publicnode.com')
       }
-      setProductCount(count)
+      const contract = getContract(provider)
+
+      // 修复：通过事件日志统计真实注册数量
+      const filter = contract.filters.PassportIssued()
+      const events = await contract.queryFilter(filter, 0, 'latest')
+      setProductCount(events.length)
     } catch (err) {
       console.log('Stats fetch failed:', err.message)
+      setProductCount('—')
+    } finally {
+      setCounting(false)
     }
   }
+
+
+
+
+
+
+
+
+
+
+
+
+  const features = [
+    {
+      icon: '🔒',
+      title: 'Privacy-Aware',
+      desc: 'Sensitive supply chain data stays off-chain. Only verifiable hashes are stored on the public ledger.',
+      color: '#e8f5e9',
+    },
+    {
+      icon: '✅',
+      title: 'Anti-Greenwashing',
+      desc: 'Cryptographic proofs make it impossible to fake or alter sustainability claims after registration.',
+      color: '#e3f2fd',
+    },
+    {
+      icon: '🏛️',
+      title: 'ESPR Aligned',
+      desc: 'Built to meet the EU Ecodesign for Sustainable Products Regulation requirements for digital product passports.',
+      color: '#f3e5f5',
+    },
+    {
+      icon: '💸',
+      title: 'SME Friendly',
+      desc: 'Low gas costs via batch registration. No need to build bespoke infrastructure — plug in and comply.',
+      color: '#fff8e1',
+    },
+    {
+      icon: '📱',
+      title: 'Mobile Compatible',
+      desc: 'Fully responsive design works seamlessly on smartphones and tablets — no app download required.',
+      color: '#fce4ec',
+    },
+    {
+      icon: '🗺️',
+      title: 'Supply Chain Map',
+      desc: 'Interactive map visualises your product\'s entire journey from raw material to finished product.',
+      color: '#e0f7fa',
+    },
+    {
+      icon: '🌐',
+      title: 'Decentralised Storage',
+      desc: 'Product documents are stored on IPFS — no single point of failure, permanently accessible.',
+      color: '#f1f8e9',
+    },
+    {
+      icon: '🔍',
+      title: 'Instant Verification',
+      desc: 'Anyone can verify any product passport in seconds — no account or blockchain knowledge needed.',
+      color: '#ede7f6',
+    },
+  ]
 
   return (
     <div style={styles.page}>
@@ -39,56 +105,78 @@ function Home() {
           transform: translateY(-2px);
           box-shadow: 0 8px 25px rgba(0,0,0,0.2) !important;
         }
-        .hero-primary-btn:active {
-          transform: translateY(0px);
-        }
         .hero-primary-btn { transition: all 0.2s ease !important; }
-
         .hero-secondary-btn:hover {
           background-color: rgba(255,255,255,0.15) !important;
           transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
-        }
-        .hero-secondary-btn:active {
-          transform: translateY(0px);
         }
         .hero-secondary-btn { transition: all 0.2s ease !important; }
-
         .cta-primary-btn:hover {
           background-color: #1b4332 !important;
           transform: translateY(-2px);
           box-shadow: 0 8px 25px rgba(45,106,79,0.4) !important;
         }
-        .cta-primary-btn:active { transform: translateY(0px); }
         .cta-primary-btn { transition: all 0.2s ease !important; }
-
         .cta-secondary-btn:hover {
           background-color: #2d6a4f !important;
           color: white !important;
           transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(45,106,79,0.3) !important;
         }
-        .cta-secondary-btn:active { transform: translateY(0px); }
         .cta-secondary-btn { transition: all 0.2s ease !important; }
-
-        .feature-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 12px 30px rgba(0,0,0,0.1) !important;
-          border-color: #a5d6a7 !important;
-        }
-        .feature-card { transition: all 0.25s ease !important; }
-
         .step-card:hover {
           transform: translateY(-3px);
           box-shadow: 0 8px 25px rgba(45,106,79,0.15) !important;
         }
         .step-card { transition: all 0.25s ease !important; }
+        .refresh-btn:hover {
+          background-color: #1b4332 !important;
+          transform: rotate(180deg);
+        }
+        .refresh-btn { transition: all 0.4s ease !important; }
+
+        /* Horizontal scroll for features */
+        .features-scroll {
+          display: flex;
+          gap: 1.2rem;
+          overflow-x: auto;
+          padding: 1rem 0.5rem 1.5rem;
+          scroll-snap-type: x mandatory;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: thin;
+          scrollbar-color: #a5d6a7 #f0f0f0;
+        }
+        .features-scroll::-webkit-scrollbar {
+          height: 6px;
+        }
+        .features-scroll::-webkit-scrollbar-track {
+          background: #f0f0f0;
+          border-radius: 3px;
+        }
+        .features-scroll::-webkit-scrollbar-thumb {
+          background: #a5d6a7;
+          border-radius: 3px;
+        }
+        .feature-card-scroll {
+          min-width: 240px;
+          max-width: 240px;
+          scroll-snap-align: start;
+          padding: 1.8rem 1.5rem;
+          border-radius: 16px;
+          border: 1px solid #e0e0e0;
+          text-align: center;
+          flex-shrink: 0;
+          transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+        }
+        .feature-card-scroll:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 12px 30px rgba(0,0,0,0.1) !important;
+        }
       `}</style>
 
       {/* Hero Section */}
       <div style={styles.hero}>
         <div style={styles.heroContent}>
-          <div style={styles.badge}>🇪🇺 EU ESPR Compliant</div>
+          <div style={styles.badge}> EU ESPR Compliant</div>
           <h1 style={styles.heroTitle}>
             Digital Product Passports<br />for a Sustainable Europe
           </h1>
@@ -98,18 +186,10 @@ function Home() {
             consumers, and regulators navigate the EU's sustainability requirements.
           </p>
           <div style={styles.heroBtns}>
-            <button
-              className="hero-primary-btn"
-              style={styles.primaryBtn}
-              onClick={() => navigate('/register')}
-            >
+            <button className="hero-primary-btn" style={styles.primaryBtn} onClick={() => navigate('/register')}>
               🏭 Register Product
             </button>
-            <button
-              className="hero-secondary-btn"
-              style={styles.secondaryBtn}
-              onClick={() => navigate('/scan')}
-            >
+            <button className="hero-secondary-btn" style={styles.secondaryBtn} onClick={() => navigate('/scan')}>
               🔍 Search Product
             </button>
           </div>
@@ -119,9 +199,19 @@ function Home() {
       {/* Stats Bar */}
       <div style={styles.statsBar}>
         <div style={styles.stat}>
-          <span style={styles.statNumber}>
-            {productCount !== null ? productCount : '...'}
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+            <span style={styles.statNumber}>
+              {counting ? '...' : (productCount !== null ? productCount : '—')}
+            </span>
+            <button
+              className="refresh-btn"
+              style={styles.refreshBtn}
+              onClick={fetchStats}
+              title="Refresh count"
+            >
+              🔄
+            </button>
+          </div>
           <span style={styles.statLabel}>Products Registered</span>
         </div>
         <div style={styles.statDivider} />
@@ -176,43 +266,23 @@ function Home() {
         </div>
       </div>
 
-      {/* Feature Cards */}
+      {/* Why EcoPassEU - Horizontal Scroll */}
       <div style={styles.featureSection}>
         <div style={styles.featureSectionInner}>
           <h2 style={styles.sectionTitle}>Why EcoPassEU?</h2>
-          <div style={styles.features}>
-            <div className="feature-card" style={styles.featureCard}>
-              <div style={styles.featureIcon}>🔒</div>
-              <h3 style={styles.featureTitle}>Privacy-Aware</h3>
-              <p style={styles.featureDesc}>
-                Sensitive supply chain data stays off-chain. Only verifiable
-                hashes are stored on the public ledger.
-              </p>
-            </div>
-            <div className="feature-card" style={styles.featureCard}>
-              <div style={styles.featureIcon}>✅</div>
-              <h3 style={styles.featureTitle}>Anti-Greenwashing</h3>
-              <p style={styles.featureDesc}>
-                Cryptographic proofs make it impossible to fake or alter
-                sustainability claims after registration.
-              </p>
-            </div>
-            <div className="feature-card" style={styles.featureCard}>
-              <div style={styles.featureIcon}>🏛️</div>
-              <h3 style={styles.featureTitle}>ESPR Aligned</h3>
-              <p style={styles.featureDesc}>
-                Built to meet the EU Ecodesign for Sustainable Products
-                Regulation requirements for digital product passports.
-              </p>
-            </div>
-            <div className="feature-card" style={styles.featureCard}>
-              <div style={styles.featureIcon}>💸</div>
-              <h3 style={styles.featureTitle}>SME Friendly</h3>
-              <p style={styles.featureDesc}>
-                Low gas costs via batch registration. No need to build
-                bespoke infrastructure — plug in and comply.
-              </p>
-            </div>
+          <p style={styles.featureHint}>← Scroll to explore all features →</p>
+          <div className="features-scroll">
+            {features.map((f, i) => (
+              <div
+                key={i}
+                className="feature-card-scroll"
+                style={{ backgroundColor: f.color }}
+              >
+                <div style={styles.featureIcon}>{f.icon}</div>
+                <h3 style={styles.featureTitle}>{f.title}</h3>
+                <p style={styles.featureDesc}>{f.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -224,23 +294,14 @@ function Home() {
           Register your first product passport or search for an existing one.
         </p>
         <div style={styles.heroBtns}>
-          <button
-            className="cta-primary-btn"
-            style={styles.ctaPrimaryBtn}
-            onClick={() => navigate('/register')}
-          >
+          <button className="cta-primary-btn" style={styles.ctaPrimaryBtn} onClick={() => navigate('/register')}>
             🏭 Register Product
           </button>
-          <button
-            className="cta-secondary-btn"
-            style={styles.ctaSecondaryBtn}
-            onClick={() => navigate('/scan')}
-          >
+          <button className="cta-secondary-btn" style={styles.ctaSecondaryBtn} onClick={() => navigate('/scan')}>
             🔍 Search Product
           </button>
         </div>
       </div>
-
     </div>
   )
 }
@@ -262,128 +323,61 @@ const styles = {
     fontSize: '0.9rem',
     marginBottom: '1.5rem',
   },
-  heroTitle: {
-    fontSize: '2.8rem',
-    fontWeight: 'bold',
-    marginBottom: '1.5rem',
-    lineHeight: 1.2,
-  },
+  heroTitle: { fontSize: '2.8rem', fontWeight: 'bold', marginBottom: '1.5rem', lineHeight: 1.2 },
   heroSubtitle: {
-    fontSize: '1.1rem',
-    opacity: 0.9,
-    marginBottom: '2.5rem',
-    lineHeight: 1.7,
-    maxWidth: '600px',
-    margin: '0 auto 2.5rem',
+    fontSize: '1.1rem', opacity: 0.9, marginBottom: '2.5rem',
+    lineHeight: 1.7, maxWidth: '600px', margin: '0 auto 2.5rem',
   },
-  heroBtns: {
-    display: 'flex',
-    gap: '1rem',
-    justifyContent: 'center',
-    flexWrap: 'wrap',
-  },
+  heroBtns: { display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' },
   primaryBtn: {
-    backgroundColor: 'white',
-    color: '#2d6a4f',
-    border: 'none',
-    padding: '0.9rem 2rem',
-    borderRadius: '8px',
-    fontSize: '1rem',
-    fontWeight: 'bold',
-    cursor: 'pointer',
-    boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
+    backgroundColor: 'white', color: '#2d6a4f', border: 'none',
+    padding: '0.9rem 2rem', borderRadius: '8px', fontSize: '1rem',
+    fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
   },
   secondaryBtn: {
-    backgroundColor: 'transparent',
-    color: 'white',
-    border: '2px solid white',
-    padding: '0.9rem 2rem',
-    borderRadius: '8px',
-    fontSize: '1rem',
-    fontWeight: 'bold',
-    cursor: 'pointer',
+    backgroundColor: 'transparent', color: 'white', border: '2px solid white',
+    padding: '0.9rem 2rem', borderRadius: '8px', fontSize: '1rem',
+    fontWeight: 'bold', cursor: 'pointer',
   },
   statsBar: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: '2rem',
-    padding: '2rem',
-    backgroundColor: '#f8f9fa',
-    flexWrap: 'wrap',
+    display: 'flex', justifyContent: 'center', alignItems: 'center',
+    gap: '2rem', padding: '2rem', backgroundColor: '#f8f9fa', flexWrap: 'wrap',
   },
   stat: { textAlign: 'center' },
   statNumber: { display: 'block', fontSize: '1.8rem', fontWeight: 'bold', color: '#2d6a4f' },
   statLabel: { fontSize: '0.85rem', color: '#666' },
   statDivider: { width: '1px', height: '40px', backgroundColor: '#ddd' },
+  refreshBtn: {
+    background: '#2d6a4f', border: 'none', borderRadius: '50%',
+    width: '28px', height: '28px', cursor: 'pointer', fontSize: '0.85rem',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+  },
   section: { maxWidth: '1000px', margin: '0 auto', padding: '4rem 2rem' },
-  sectionTitle: { textAlign: 'center', fontSize: '2rem', marginBottom: '3rem', color: '#1b4332' },
-  steps: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    gap: '1rem',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-  },
-  step: {
-    flex: 1,
-    minWidth: '200px',
-    maxWidth: '260px',
-    textAlign: 'center',
-    padding: '1.5rem',
-    backgroundColor: '#f0f7f4',
-    borderRadius: '12px',
-    cursor: 'default',
-  },
+  sectionTitle: { textAlign: 'center', fontSize: '2rem', marginBottom: '0.5rem', color: '#1b4332' },
+  featureHint: { textAlign: 'center', color: '#888', fontSize: '0.88rem', marginBottom: '1.2rem' },
+  steps: { display: 'flex', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center', marginTop: '2.5rem' },
+  step: { flex: 1, minWidth: '200px', maxWidth: '260px', textAlign: 'center', padding: '1.5rem', backgroundColor: '#f0f7f4', borderRadius: '12px', cursor: 'default' },
   stepIcon: { fontSize: '2rem', marginBottom: '1rem' },
   stepTitle: { fontSize: '1.1rem', fontWeight: 'bold', color: '#2d6a4f', marginBottom: '0.8rem' },
   stepDesc: { fontSize: '0.9rem', color: '#555', lineHeight: 1.6 },
   stepArrow: { fontSize: '2rem', color: '#2d6a4f', paddingTop: '3rem' },
-  featureSection: { backgroundColor: '#f8faf9', padding: '1rem 0 4rem' },
-  featureSectionInner: { maxWidth: '1000px', margin: '0 auto', padding: '0 2rem' },
-  features: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-    gap: '1.5rem',
-  },
-  featureCard: {
-    padding: '2rem',
-    border: '1px solid #e0e0e0',
-    borderRadius: '12px',
-    textAlign: 'center',
-    backgroundColor: 'white',
-    cursor: 'default',
-  },
+  featureSection: { backgroundColor: '#f8faf9', padding: '3rem 0' },
+  featureSectionInner: { maxWidth: '1100px', margin: '0 auto', padding: '0 2rem' },
   featureIcon: { fontSize: '2.5rem', marginBottom: '1rem' },
-  featureTitle: { fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '0.8rem', color: '#1b4332' },
-  featureDesc: { fontSize: '0.9rem', color: '#555', lineHeight: 1.6 },
-  cta: {
-    backgroundColor: '#f0f7f4',
-    padding: '4rem 2rem',
-    textAlign: 'center',
-  },
+  featureTitle: { fontSize: '1.05rem', fontWeight: 'bold', marginBottom: '0.8rem', color: '#1b4332' },
+  featureDesc: { fontSize: '0.88rem', color: '#555', lineHeight: 1.6 },
+  cta: { backgroundColor: '#f0f7f4', padding: '4rem 2rem', textAlign: 'center' },
   ctaTitle: { fontSize: '2rem', color: '#1b4332', marginBottom: '1rem' },
   ctaDesc: { color: '#555', marginBottom: '2rem', fontSize: '1.1rem' },
   ctaPrimaryBtn: {
-    backgroundColor: '#2d6a4f',
-    color: 'white',
-    border: 'none',
-    padding: '0.9rem 2rem',
-    borderRadius: '8px',
-    fontSize: '1rem',
-    fontWeight: 'bold',
-    cursor: 'pointer',
-    boxShadow: '0 4px 15px rgba(45,106,79,0.3)',
+    backgroundColor: '#2d6a4f', color: 'white', border: 'none',
+    padding: '0.9rem 2rem', borderRadius: '8px', fontSize: '1rem',
+    fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 15px rgba(45,106,79,0.3)',
   },
   ctaSecondaryBtn: {
-    backgroundColor: 'transparent',
-    color: '#2d6a4f',
-    border: '2px solid #2d6a4f',
-    padding: '0.9rem 2rem',
-    borderRadius: '8px',
-    fontSize: '1rem',
-    fontWeight: 'bold',
-    cursor: 'pointer',
+    backgroundColor: 'transparent', color: '#2d6a4f', border: '2px solid #2d6a4f',
+    padding: '0.9rem 2rem', borderRadius: '8px', fontSize: '1rem',
+    fontWeight: 'bold', cursor: 'pointer',
   },
 }
 

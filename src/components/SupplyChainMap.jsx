@@ -42,7 +42,12 @@ const CITY_COORDS = {
   'IN': [20.5937, 78.9629],
 }
 
-function getCoords(location) {
+function getCoords(step) {
+  if (!step) return null
+  // 优先用 LocationPicker 传入的坐标
+  if (step.coords) return step.coords
+  // 其次用城市数据库查询
+  const location = step.location
   if (!location) return null
   if (CITY_COORDS[location]) return CITY_COORDS[location]
   for (const key of Object.keys(CITY_COORDS)) {
@@ -64,10 +69,11 @@ function SupplyChainMap({ provenance }) {
   }, [])
 
   if (!provenance || provenance.length === 0) return null
-
+  
   const points = provenance
-    .map((step, i) => ({ ...step, coords: getCoords(step.location), index: i }))
-    .filter(p => p.coords)
+  .map((step, i) => ({ ...step, coords: getCoords(step), index: i }))
+  .filter(p => p.coords)
+
 
   if (points.length === 0) return (
     <div style={styles.noMap}>

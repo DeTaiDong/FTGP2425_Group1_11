@@ -1,5 +1,5 @@
 import { ethers } from 'ethers'
-// input your contract address here
+
 export const CONTRACT_ADDRESS = '0x0617635eA34a7835807EbC6D0A7aECC9de8E1Cf0'
 
 export const CONTRACT_ABI = [
@@ -49,6 +49,18 @@ export const CONTRACT_ABI = [
     ],
     "stateMutability": "view",
     "type": "function"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "string", "name": "productId", "type": "string" },
+      { "internalType": "string", "name": "ipfsCID", "type": "string" },
+      { "internalType": "bytes32", "name": "metadataHash", "type": "bytes32" },
+      { "indexed": true, "internalType": "address", "name": "issuer", "type": "address" },
+      { "internalType": "uint256", "name": "timestamp", "type": "uint256" }
+    ],
+    "name": "PassportIssued",
+    "type": "event"
   }
 ]
 

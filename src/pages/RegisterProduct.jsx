@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { ethers } from 'ethers'
 import { getContract, getProviderAndSigner } from '../utils/contract'
+import LocationPicker from '../components/LocationPicker'
 import { getConnectedAccount } from '../components/WalletConnect'
+
 
 const PINATA_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiJkNDg1MzhmMC0zMmEzLTQ4Y2MtODIwMi02ZDNlNWQ0NzczOTYiLCJlbWFpbCI6ImRldGFpX2RvbmdAMTYzLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaW5fcG9saWN5Ijp7InJlZ2lvbnMiOlt7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6IkZSQTEifSx7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6Ik5ZQzEifV0sInZlcnNpb24iOjF9LCJtZmFfZW5hYmxlZCI6ZmFsc2UsInN0YXR1cyI6IkFDVElWRSJ9LCJhdXRoZW50aWNhdGlvblR5cGUiOiJzY29wZWRLZXkiLCJzY29wZWRLZXlLZXkiOiIzMDk5ZmMwYmU4ZDg1ODRmMDUxMCIsInNjb3BlZEtleVNlY3JldCI6ImNkMzhlNGMzOTkwMjNlOTYyNjI2YTg2YjUzZmMxZjRhYjExMzk1NGIyZjRhYzFlZmU2ODM5ZmViMGNlMWIxYTkiLCJleHAiOjE4MDgyMzk2MDl9.Cuh58MqUvHoHgvPvOiFVAgvveXySQtq1RHxpuc8fQ_U'
 
 const emptyMaterial = { name: '', percentage: '', origin: '', certified: '' }
-const emptyStage = { stage: '', location: '', date: '' }
+const emptyStage = { stage: '', location: '', coords: null, date: '' }
 
 function RegisterProduct() {
   const account = getConnectedAccount()
@@ -21,7 +23,10 @@ function RegisterProduct() {
   const [loading, setLoading] = useState(false)
   const [ipfsResult, setIpfsResult] = useState(null)
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value.trim() })
+  const handleChange = (e) => {
+  const { name, value } = e.target
+  setForm({ ...form, [name]: name === 'productId' ? value.replace(/\s/g, '') : value })
+  }
 
   const handleMaterialChange = (i, e) => {
     const updated = [...form.materials]
@@ -34,6 +39,14 @@ function RegisterProduct() {
     updated[i][e.target.name] = e.target.value
     setForm({ ...form, provenance: updated })
   }
+
+  const handleLocationChange = (i, locationStr, coords) => {
+    const updated = [...form.provenance]
+    updated[i].location = locationStr
+    updated[i].coords = coords
+    setForm({ ...form, provenance: updated })
+  }
+
 
   const addMaterial = () => setForm({ ...form, materials: [...form.materials, { ...emptyMaterial }] })
   const removeMaterial = (i) => setForm({ ...form, materials: form.materials.filter((_, idx) => idx !== i) })
@@ -300,10 +313,16 @@ function RegisterProduct() {
                       <label style={styles.labelSm}>Stage Name</label>
                       <input className="field-input" style={styles.input} name="stage" value={stage.stage} onChange={(e) => handleStageChange(i, e)} placeholder="e.g. Raw material" />
                     </div>
+
                     <div style={styles.field}>
                       <label style={styles.labelSm}>Location</label>
-                      <input className="field-input" style={styles.input} name="location" value={stage.location} onChange={(e) => handleStageChange(i, e)} placeholder="e.g. Hamburg, DE" />
+                      <LocationPicker
+                        value={stage.location}
+                        onChange={(locationStr, coords) => handleLocationChange(i, locationStr, coords)}
+                      />
                     </div>
+
+
                     <div style={styles.field}>
                       <label style={styles.labelSm}>Date</label>
                       <input className="field-input" style={styles.input} name="date" type="date" value={stage.date} onChange={(e) => handleStageChange(i, e)} />
