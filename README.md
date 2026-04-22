@@ -1,41 +1,118 @@
-# EcoPassEU - Digital Product Passport DApp
+# EcoPassEU — Digital Product Passport DApp
 
-A privacy-aware Digital Product Passport (DPP) DApp for sustainable consumer goods in Europe.
+> A privacy-aware, blockchain-powered Digital Product Passport (DPP) platform for sustainable consumer goods in Europe, built for the EU's Ecodesign for Sustainable Products Regulation (ESPR).
+
+🌐 **Live Demo:** [https://your-vercel-url.vercel.app](https://your-vercel-url.vercel.app)  
+📜 **Smart Contract:** [0x0617635eA34a7835807EbC6D0A7aECC9de8E1Cf0](https://sepolia.etherscan.io/address/0x0617635eA34a7835807EbC6D0A7aECC9de8E1Cf0)  
+🔗 **Network:** Ethereum Sepolia Testnet
+
+---
+
+## Overview
+
+EcoPassEU allows manufacturers to issue tamper-proof digital product passports on the blockchain. Consumers, regulators, and auditors can instantly verify any product's sustainability credentials — including material composition, supply chain provenance, recycling guidance, and certifications — without requiring any blockchain knowledge.
+
+The platform is designed around a **hybrid on-chain / off-chain architecture**:
+- **On-chain (Sepolia):** Product ID, IPFS document pointer (CID), cryptographic metadata hash, issuer address, timestamp
+- **Off-chain (IPFS via Pinata):** Full product details — materials, supply chain stages, repair guides, recycling instructions
+
+This approach keeps gas costs low while protecting commercially sensitive supply chain data.
+
+---
+
+## Key Features
+
+| Feature | Description |
+|---------|-------------|
+| 🔒 Privacy-Aware | Sensitive data stays off-chain; only verifiable hashes on the ledger |
+| ✅ Anti-Greenwashing | Cryptographic proofs prevent falsification of sustainability claims |
+| 🏛️ ESPR Aligned | Built to meet EU Digital Product Passport regulation requirements |
+| 🗺️ Supply Chain Map | Interactive map visualises the product's full journey |
+| 📱 Mobile Compatible | Fully responsive design for smartphones and tablets |
+| 💸 SME Friendly | Batch registration support keeps gas costs minimal |
+| 🌐 Decentralised Storage | Documents stored on IPFS — no single point of failure |
+| 🔍 Instant Verification | Anyone can verify any product in seconds, no account needed |
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend Framework | React + Vite |
+| Routing | React Router DOM |
+| Blockchain Interaction | Ethers.js v6 |
+| Wallet | MetaMask |
+| Smart Contract | Solidity ^0.8.20 |
+| Decentralised Storage | IPFS via Pinata |
+| Supply Chain Map | Leaflet.js + OpenStreetMap |
+| Deployment | Vercel (frontend) + Sepolia Testnet (contract) |
 
 ---
 
 ## Project Structure
-![
-](image.png)
+ecopasseu-frontend/
+├── contracts/
+│   └── PassportRegistry.sol      # Smart contract source code
+├── scripts/
+│   ├── uploadToIPFS.js           # Batch IPFS upload script
+│   ├── productsData.js           # Sample product data
+│   └── deploy.js                 # Hardhat deployment script
+├── src/
+│   ├── components/
+│   │   ├── Navbar.jsx            # Navigation bar with wallet connect
+│   │   ├── WalletConnect.jsx     # MetaMask wallet connection logic
+│   │   ├── SupplyChainMap.jsx    # Interactive Leaflet map component
+│   │   └── LocationPicker.jsx   # Cascading continent/country/city picker
+│   ├── pages/
+│   │   ├── Home.jsx              # Landing page with live stats
+│   │   ├── RegisterProduct.jsx  # Full product registration with IPFS upload
+│   │   ├── ScanProduct.jsx       # Product search and verification
+│   │   └── ProductDetail.jsx    # Full passport detail with map
+│   ├── utils/
+│   │   ├── contract.js           # Contract address, ABI, helpers
+│   │   └── locationData.js      # City coordinates database
+│   ├── App.jsx                   # Root component with routing
+│   └── main.jsx                  # Entry point
+├── hardhat.config.js             # Hardhat configuration
+├── upload-result.json            # Latest IPFS upload results
+└── README.md
 
----
-
-## Pages
-
-| Page | Route | Status |
-|------|-------|--------|
-| Homepage | `/` | ✅ Done |
-| Register Product | `/register` | 🔨 In Progress |
-| Scan Product | `/scan` | 🔨 In Progress |
-| Product Detail | `/product/:id` | 🔨 In Progress |
 
 ---
 
 ## Smart Contract
 
-- Language: Solidity
-- Network: Sepolia Testnet
-- Development Tool: Remix IDE
-- After deployment, fill in the contract address and ABI in `src/utils/contract.js`
+**Contract Address (Sepolia):**
+0x0617635eA34a7835807EbC6D0A7aECC9de8E1Cf0
+
+**Key Functions:**
+
+| Function | Description |
+|----------|-------------|
+| `registerPassport(productId, ipfsCID, metadataHash)` | Register a single product passport |
+| `batchRegisterPassports(ids[], CIDs[], hashes[])` | Register multiple products in one transaction |
+| `getPassport(productId)` | Retrieve a product's passport data |
+| `passportExists(productId)` | Check if a passport exists |
 
 ---
 
-## Notes for Teammates
+## Getting Started
 
-### Frontend
+### Prerequisites
+- Node.js >= 18 ([Download](https://nodejs.org))
+- MetaMask browser extension
+- MetaMask switched to **Sepolia Testnet**
+- Free test ETH from [Google Sepolia Faucet](https://cloud.google.com/application/web3/faucet/ethereum/sepolia)
+
+### Installation
+
 ```bash
 # Clone the repository
 git clone https://github.com/DeTaiDong/FTGP2425_Group1_11.git
+
+# Navigate to frontend
+cd FTGP2425_Group1_11
 
 # Install dependencies
 npm install
@@ -44,31 +121,63 @@ npm install
 npm run dev
 ```
 
-### Smart Contract
-1. Write Solidity contract in Remix IDE
-2. Deploy to Sepolia Testnet
-3. Fill in the contract address and ABI into `src/utils/contract.js`
-4. Verify and publish the contract code on Etherscan Sepolia
+Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 
-## Tech Stack
+## Usage
 
-| Layer | Technology |
-|-------|------------|
-| Frontend Framework | React + Vite |
-| Routing | React Router DOM |
-| Blockchain Interaction | Ethers.js |
-| Wallet | MetaMask |
-| Smart Contract | Solidity (ERC-1155) |
-| Decentralised Storage | IPFS |
-| Test Network | Ethereum Sepolia |
+### For Manufacturers — Register a Product
+1. Connect your MetaMask wallet (Sepolia Testnet)
+2. Navigate to **Register Product**
+3. Fill in product details: basic info, material composition, supply chain stages
+4. Click **Upload to IPFS** — your data is stored on IPFS
+5. Click **Register on Blockchain** — confirm the MetaMask transaction
+6. Your product passport is now permanently on-chain ✅
+
+### For Consumers & Regulators — Verify a Product
+1. Navigate to **Search Product**
+2. Enter the Product ID (e.g. `ECO-TX-2025-001`)
+3. View the verified passport — issuer, timestamp, IPFS document link
+4. Click **View Full Detail** to see full material composition, supply chain map, and certifications
 
 ---
 
-## Requirements
+## IPFS Upload Script
 
-- Node.js >= 18
-- MetaMask browser extension
-- MetaMask switched to **Sepolia Testnet**
-- Test ETH (get for free at: https://sepoliafaucet.com)
+To upload product data to IPFS before registering:
+
+```bash
+# Set your Pinata API credentials
+$env:PINATA_API_KEY="your_api_key"
+$env:PINATA_SECRET_API_KEY="your_secret_key"
+
+# Run the upload script
+node scripts/uploadToIPFS.js
+```
+
+Results are saved to `upload-result.json`.
+
+---
+
+## Team
+
+**Group 11 — University of Bristol, SEMTM0029 Financial Technology**
+
+| Name | Role |
+|------|------|
+| Detai Dong | Frontend Development, UI/UX, Deployment |
+| Akshansh Rajora | Smart Contract, IPFS Integration |
+| Luxiao Cao | Backend Scripts, Testing |
+| Fuyu Cao | Research, Documentation |
+| Tianwei Yu | Data Design, Product Passport Schema |
+
+---
+
+## Acknowledgements
+
+- [EU ESPR Regulation](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32024R1781)
+- [Pinata IPFS](https://pinata.cloud)
+- [OpenStreetMap](https://www.openstreetmap.org)
+- [Sepolia Testnet](https://sepolia.etherscan.io)
+
