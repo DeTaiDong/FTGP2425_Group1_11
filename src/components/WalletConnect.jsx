@@ -104,8 +104,8 @@ function WalletConnect() {
 const styles = {
   connectBtn: {
     backgroundColor: '#f6851b', color: 'white', border: 'none',
-    padding: '0.5rem 1.2rem', borderRadius: '8px', cursor: 'pointer',
-    fontSize: '0.95rem', fontWeight: 'bold',
+    padding: '0.5rem 1rem', borderRadius: '8px', cursor: 'pointer',
+    fontSize: '0.88rem', fontWeight: 'bold', whiteSpace: 'nowrap',
   },
   connected: {
     display: 'flex', alignItems: 'center', gap: '0.5rem',

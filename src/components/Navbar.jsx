@@ -9,7 +9,7 @@ function Navbar() {
   const isActive = (path) => location.pathname === path
 
   return (
-    <nav style={{ ...styles.nav, position: 'sticky', top: 0 }}>
+    <nav className="navbar" style={{ ...styles.nav, position: 'sticky', top: 0 }}>
       <style>{`
         .nav-link:hover {
           background-color: rgba(255,255,255,0.15) !important;
@@ -19,6 +19,20 @@ function Navbar() {
         .nav-link-active {
           background-color: rgba(255,255,255,0.2) !important;
         }
+        @media (max-width: 768px) {
+          .navbar { flex-wrap: wrap !important; padding: 0.6rem 1rem !important; gap: 0 !important; }
+          .nav-center {
+            position: static !important;
+            transform: none !important;
+            order: 3;
+            width: 100%;
+            justify-content: center;
+            padding: 0.4rem 0 0.2rem;
+            gap: 0 !important;
+          }
+          .nav-btn-text { display: none; }
+          .nav-link { padding: 0.5rem 0.7rem !important; }
+        }
       `}</style>
 
       <Link to="/home" style={styles.logo}>
@@ -26,19 +40,19 @@ function Navbar() {
         EcoPassEU
       </Link>
 
-      <div style={styles.navCenter}>
+      <div className="nav-center" style={styles.navCenter}>
         <Link to="/home" className={'nav-link' + (isActive('/home') ? ' nav-link-active' : '')} style={styles.navBtn}>
-          <House size={14} style={styles.navIcon} /> Home
+          <House size={14} style={styles.navIcon} /><span className="nav-btn-text"> Home</span>
         </Link>
         <Link to="/register" className={'nav-link' + (isActive('/register') ? ' nav-link-active' : '')} style={styles.navBtn}>
-          <ClipboardPlus size={14} style={styles.navIcon} /> Register
+          <ClipboardPlus size={14} style={styles.navIcon} /><span className="nav-btn-text"> Register</span>
         </Link>
         <Link to="/scan" className={'nav-link' + (isActive('/scan') ? ' nav-link-active' : '')} style={styles.navBtn}>
-          <Search size={14} style={styles.navIcon} /> Search
+          <Search size={14} style={styles.navIcon} /><span className="nav-btn-text"> Search</span>
         </Link>
         {account && (
           <Link to="/my-products" className={'nav-link' + (isActive('/my-products') ? ' nav-link-active' : '')} style={styles.navBtn}>
-            <Package size={14} style={styles.navIcon} /> My Products
+            <Package size={14} style={styles.navIcon} /><span className="nav-btn-text"> My Products</span>
           </Link>
         )}
       </div>
