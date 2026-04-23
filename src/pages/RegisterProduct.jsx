@@ -267,7 +267,7 @@ function RegisterProduct() {
           </div>
         )}
 
-        {step < 4 && (
+        {account && step < 4 && (
           <>
             {/* Basic Info */}
             <div style={styles.card}>
