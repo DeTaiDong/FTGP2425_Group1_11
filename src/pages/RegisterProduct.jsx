@@ -3,7 +3,8 @@ import { ethers } from 'ethers'
 import { getContract, getProviderAndSigner } from '../utils/contract'
 import LocationPicker from '../components/LocationPicker'
 import { getConnectedAccount } from '../components/WalletConnect'
-import { Factory, Layers, Route, CloudUpload, Link2, CircleCheck, WalletMinimal, Loader, CircleX, X, Plus } from 'lucide-react'
+import { Factory, Layers, Route, CloudUpload, Link2, CircleCheck, WalletMinimal, Loader, CircleX, X, Plus, Download } from 'lucide-react'
+import { QRCodeCanvas } from 'qrcode.react'
 
 
 const PINATA_JWT = import.meta.env.VITE_PINATA_JWT
@@ -142,6 +143,15 @@ function RegisterProduct() {
     }
   }
 
+  const downloadQR = () => {
+    const canvas = document.getElementById('product-qr-canvas')
+    const url = canvas.toDataURL('image/png')
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `passport-qr-${form.productId}.png`
+    a.click()
+  }
+
   const resetForm = () => {
     setForm({
       productId: '', productName: '', brand: '', category: '',
@@ -202,9 +212,29 @@ function RegisterProduct() {
             <h2 style={{ color: '#2d6a4f', marginBottom: '0.5rem' }}>Registration Complete!</h2>
             <p style={{ color: '#555', marginBottom: '0.5rem' }}>Product ID: <strong>{form.productId}</strong></p>
             <p style={{ color: '#555', marginBottom: '0.5rem' }}>IPFS CID: <code style={{ fontSize: '0.8rem' }}>{ipfsResult?.cid}</code></p>
-            <p style={{ color: '#888', fontSize: '0.9rem', marginBottom: '1rem' }}>
+            <p style={{ color: '#888', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
               Your product passport is now permanently recorded on the Sepolia blockchain.
             </p>
+
+            {/* QR Code */}
+            <div style={styles.qrSection}>
+              <p style={styles.qrLabel}>Scan to view product passport</p>
+              <div style={styles.qrWrapper}>
+                <QRCodeCanvas
+                  id="product-qr-canvas"
+                  value={window.location.origin + '/product/' + form.productId}
+                  size={180}
+                  level="H"
+                  includeMargin={true}
+                />
+              </div>
+              <p style={styles.qrUrl}>{window.location.origin}/product/{form.productId}</p>
+              <button style={styles.downloadBtn} onClick={downloadQR}>
+                <Download size={14} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />
+                Download QR Code
+              </button>
+            </div>
+
             {txHash && (
               <a
                 href={'https://sepolia.etherscan.io/tx/' + txHash}
@@ -447,6 +477,11 @@ const styles = {
   tipsTitle: { color: '#f57f17', marginBottom: '0.6rem' },
   tipsList: { margin: 0, paddingLeft: '1.2rem', color: '#555', fontSize: '0.88rem', lineHeight: 2.2 },
   successCard: { backgroundColor: 'white', borderRadius: '16px', padding: '3rem', textAlign: 'center', boxShadow: '0 2px 20px rgba(0,0,0,0.08)' },
+  qrSection: { backgroundColor: '#f0f7f4', borderRadius: '16px', padding: '1.5rem', marginBottom: '1.5rem', border: '1px solid #a5d6a7' },
+  qrLabel: { color: '#2d6a4f', fontWeight: '600', fontSize: '0.95rem', marginBottom: '1rem', marginTop: 0 },
+  qrWrapper: { display: 'inline-block', padding: '0.5rem', backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 2px 12px rgba(0,0,0,0.1)', marginBottom: '0.8rem' },
+  qrUrl: { color: '#888', fontSize: '0.78rem', fontFamily: 'monospace', wordBreak: 'break-all', marginBottom: '1rem', marginTop: 0 },
+  downloadBtn: { display: 'inline-flex', alignItems: 'center', padding: '0.5rem 1.2rem', backgroundColor: 'white', color: '#2d6a4f', border: '1.5px solid #2d6a4f', borderRadius: '8px', cursor: 'pointer', fontWeight: '600', fontSize: '0.9rem' },
   etherscanLink: { display: 'inline-flex', alignItems: 'center', color: '#2d6a4f', fontSize: '0.9rem', fontWeight: '600', textDecoration: 'none', backgroundColor: '#e8f5e9', padding: '0.5rem 1.2rem', borderRadius: '8px', border: '1px solid #a5d6a7', marginBottom: '2rem' },
   walletWarning: {
     backgroundColor: '#fffbeb',
