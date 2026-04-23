@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { Analytics } from '@vercel/analytics/react'
 import Navbar from './components/Navbar'
 import Landing from './pages/Landing'
 import Home from './pages/Home'
@@ -10,6 +11,7 @@ import MyProducts from './pages/MyProducts'
 function App() {
   return (
     <BrowserRouter>
+      <Analytics />
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/home" element={<><Navbar /><Home /></>} />
