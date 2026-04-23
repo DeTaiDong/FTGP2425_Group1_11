@@ -116,7 +116,7 @@ function ScanProduct() {
               onClick={handleSearch}
               disabled={loading}
             >
-              {loading ? <Loader size={18} /> : <><Search size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Search</>}
+              {loading ? <Loader size={18} className="spin" /> : <><Search size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Search</>}
             </button>
           </div>
 
@@ -143,7 +143,7 @@ function ScanProduct() {
             status.type === 'info' ? styles.info : styles.success
           }>
             {status.type === 'error' && <CircleX size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />}
-            {status.type === 'info' && <Loader size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />}
+            {status.type === 'info' && <Loader size={16} className="spin" style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />}
             {status.msg}
           </div>
         )}

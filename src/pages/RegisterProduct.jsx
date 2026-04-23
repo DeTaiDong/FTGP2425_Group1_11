@@ -367,7 +367,7 @@ function RegisterProduct() {
                 status.type === 'info' ? styles.statusInfo : styles.statusError
               }>
                 {status.type === 'success' && <CircleCheck size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />}
-                {status.type === 'info' && <Loader size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />}
+                {status.type === 'info' && <Loader size={16} className="spin" style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />}
                 {status.type === 'error' && <CircleX size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />}
                 {status.msg}
               </div>
@@ -377,7 +377,7 @@ function RegisterProduct() {
             <div style={styles.actionRow}>
               {!ipfsResult ? (
                 <button className="btn-green" style={loading ? styles.btnDisabled : styles.btnGreen} onClick={uploadToIPFS} disabled={loading}>
-                  {loading ? <><Loader size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Uploading...</> : <><CloudUpload size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Upload to IPFS</>}
+                  {loading ? <><Loader size={16} className="spin" style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Uploading...</> : <><CloudUpload size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Upload to IPFS</>}
                 </button>
               ) : (
                 <>
@@ -385,7 +385,7 @@ function RegisterProduct() {
                     ✅ IPFS uploaded! CID: <code style={{ fontSize: '0.8rem' }}>{ipfsResult.cid.slice(0, 20)}...</code>
                   </div>
                   <button className="btn-green" style={loading ? styles.btnDisabled : styles.btnGreen} onClick={registerOnChain} disabled={loading}>
-                    {loading ? <><Loader size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Processing...</> : <><Link2 size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Register on Blockchain</>}
+                    {loading ? <><Loader size={16} className="spin" style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Processing...</> : <><Link2 size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Register on Blockchain</>}
                   </button>
                 </>
               )}

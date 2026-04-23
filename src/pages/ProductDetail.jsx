@@ -57,7 +57,7 @@ function ProductDetail() {
 
   if (loading) return (
     <div style={styles.center}>
-      <Loader size={28} color="#2d6a4f" style={{ marginBottom: '0.5rem' }} />
+      <Loader size={28} color="#2d6a4f" className="spin" style={{ marginBottom: '0.5rem' }} />
       <p style={{ color: '#888' }}>Loading passport data from blockchain...</p>
     </div>
   )
