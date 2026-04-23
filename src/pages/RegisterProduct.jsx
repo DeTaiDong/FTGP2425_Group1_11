@@ -126,7 +126,7 @@ function RegisterProduct() {
       setStatus({ type: 'info', msg: 'Transaction submitted, waiting for confirmation...' })
       await tx.wait()
       setStatus({ type: 'success', msg: 'Product registered successfully! Tx: ' + tx.hash.slice(0, 20) + '...' })
-      setStep(3)
+      setStep(4)
     } catch (err) {
       if (err.message.includes('Passport already exists')) {
         setStatus({ type: 'error', msg: 'This Product ID already exists on the blockchain!' })
@@ -192,8 +192,8 @@ function RegisterProduct() {
 
       <div style={styles.container}>
 
-        {/* Step 3: Success */}
-        {step === 3 && (
+        {/* Step 4: Success */}
+        {step === 4 && (
           <div style={styles.successCard}>
             <div style={{ marginBottom: '1rem' }}><CircleCheck size={56} color="#2d6a4f" strokeWidth={1.5} /></div>
             <h2 style={{ color: '#2d6a4f', marginBottom: '0.5rem' }}>Registration Complete!</h2>
@@ -223,7 +223,7 @@ function RegisterProduct() {
           </div>
         )}
 
-        {step < 3 && (
+        {step < 4 && (
           <>
             {/* Basic Info */}
             <div style={styles.card}>
