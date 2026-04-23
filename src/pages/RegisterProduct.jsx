@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ethers } from 'ethers'
 import { getContract, getProviderAndSigner } from '../utils/contract'
 import LocationPicker from '../components/LocationPicker'
@@ -11,7 +11,7 @@ const emptyMaterial = { name: '', percentage: '', origin: '', certified: '' }
 const emptyStage = { stage: '', location: '', coords: null, date: '' }
 
 function RegisterProduct() {
-  const account = getConnectedAccount()
+  const [account, setAccount] = useState(() => getConnectedAccount())
   const [step, setStep] = useState(1)
   const [form, setForm] = useState({
     productId: '', productName: '', brand: '', category: '',
@@ -22,6 +22,16 @@ function RegisterProduct() {
   const [status, setStatus] = useState(null)
   const [loading, setLoading] = useState(false)
   const [ipfsResult, setIpfsResult] = useState(null)
+
+  useEffect(() => {
+    const sync = () => setAccount(getConnectedAccount())
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', sync)
+    }
+    return () => {
+      if (window.ethereum) window.ethereum.removeListener('accountsChanged', sync)
+    }
+  }, [])
 
   const handleChange = (e) => {
   const { name, value } = e.target

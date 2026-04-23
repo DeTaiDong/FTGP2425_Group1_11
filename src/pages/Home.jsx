@@ -23,7 +23,7 @@ function Home() {
       }
       const contract = getContract(provider)
 
-      // 修复：通过事件日志统计真实注册数量
+      // Fix： update function： real registered products number
       const filter = contract.filters.PassportIssued()
       const events = await contract.queryFilter(filter, 0, 'latest')
       setProductCount(events.length)
@@ -38,13 +38,7 @@ function Home() {
 
 
 
-
-
-
-
-
-
-
+    {/* Icon list here */}
 
   const features = [
     {
