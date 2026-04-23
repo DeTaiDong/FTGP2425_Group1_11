@@ -23,6 +23,7 @@ function RegisterProduct() {
   const [status, setStatus] = useState(null)
   const [loading, setLoading] = useState(false)
   const [ipfsResult, setIpfsResult] = useState(null)
+  const [txHash, setTxHash] = useState(null)
 
   useEffect(() => {
     const sync = () => setAccount(getConnectedAccount())
@@ -125,7 +126,8 @@ function RegisterProduct() {
       )
       setStatus({ type: 'info', msg: 'Transaction submitted, waiting for confirmation...' })
       await tx.wait()
-      setStatus({ type: 'success', msg: 'Product registered successfully! Tx: ' + tx.hash.slice(0, 20) + '...' })
+      setTxHash(tx.hash)
+      setStatus({ type: 'success', msg: 'Product registered successfully!' })
       setStep(4)
     } catch (err) {
       if (err.message.includes('Passport already exists')) {
@@ -149,6 +151,7 @@ function RegisterProduct() {
     })
     setStatus(null)
     setIpfsResult(null)
+    setTxHash(null)
     setStep(1)
   }
 
@@ -199,9 +202,20 @@ function RegisterProduct() {
             <h2 style={{ color: '#2d6a4f', marginBottom: '0.5rem' }}>Registration Complete!</h2>
             <p style={{ color: '#555', marginBottom: '0.5rem' }}>Product ID: <strong>{form.productId}</strong></p>
             <p style={{ color: '#555', marginBottom: '0.5rem' }}>IPFS CID: <code style={{ fontSize: '0.8rem' }}>{ipfsResult?.cid}</code></p>
-            <p style={{ color: '#888', fontSize: '0.9rem', marginBottom: '2rem' }}>
+            <p style={{ color: '#888', fontSize: '0.9rem', marginBottom: '1rem' }}>
               Your product passport is now permanently recorded on the Sepolia blockchain.
             </p>
+            {txHash && (
+              <a
+                href={'https://sepolia.etherscan.io/tx/' + txHash}
+                target="_blank"
+                rel="noreferrer"
+                style={styles.etherscanLink}
+              >
+                <Link2 size={14} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />
+                View transaction on Etherscan
+              </a>
+            )}
             <button className="btn-green" style={styles.btnGreen} onClick={resetForm}>
               + Register Another Product
             </button>
@@ -433,6 +447,7 @@ const styles = {
   tipsTitle: { color: '#f57f17', marginBottom: '0.6rem' },
   tipsList: { margin: 0, paddingLeft: '1.2rem', color: '#555', fontSize: '0.88rem', lineHeight: 2.2 },
   successCard: { backgroundColor: 'white', borderRadius: '16px', padding: '3rem', textAlign: 'center', boxShadow: '0 2px 20px rgba(0,0,0,0.08)' },
+  etherscanLink: { display: 'inline-flex', alignItems: 'center', color: '#2d6a4f', fontSize: '0.9rem', fontWeight: '600', textDecoration: 'none', backgroundColor: '#e8f5e9', padding: '0.5rem 1.2rem', borderRadius: '8px', border: '1px solid #a5d6a7', marginBottom: '2rem' },
   walletWarning: {
     backgroundColor: '#fffbeb',
     border: '1px solid #fcd34d',
