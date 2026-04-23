@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ethers } from 'ethers'
 import { getContract } from '../utils/contract'
+import { ScanSearch, Search, ShieldCheck, CircleCheck, CircleX, Loader, FileText, Copy, User, Calendar, Package, Hash, Leaf } from 'lucide-react'
 
 function ScanProduct() {
   const [productId, setProductId] = useState('')
@@ -87,7 +88,7 @@ function ScanProduct() {
 
       {/* Header */}
       <div style={styles.header}>
-        <div style={styles.headerIcon}>🔍</div>
+        <div style={styles.headerIcon}><ScanSearch size={40} color="white" strokeWidth={1.5} /></div>
         <h1 style={styles.title}>Search Product Passport</h1>
         <p style={styles.subtitle}>
           Enter a Product ID to instantly retrieve its verified Digital Product
@@ -115,7 +116,7 @@ function ScanProduct() {
               onClick={handleSearch}
               disabled={loading}
             >
-              {loading ? '⏳' : '🔍 Search'}
+              {loading ? <Loader size={18} /> : <><Search size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Search</>}
             </button>
           </div>
 
@@ -141,8 +142,8 @@ function ScanProduct() {
             status.type === 'error' ? styles.error :
             status.type === 'info' ? styles.info : styles.success
           }>
-            {status.type === 'error' && '❌ '}
-            {status.type === 'info' && '⏳ '}
+            {status.type === 'error' && <CircleX size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />}
+            {status.type === 'info' && <Loader size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />}
             {status.msg}
           </div>
         )}
@@ -154,32 +155,32 @@ function ScanProduct() {
             {/* Result Header */}
             <div style={styles.resultHeader}>
               <div>
-                <div style={styles.resultBadge}>✅ Passport Found</div>
+                <div style={styles.resultBadge}><CircleCheck size={14} style={{ marginRight: '0.3rem', verticalAlign: 'middle' }} />Passport Found</div>
                 <h2 style={styles.resultProductId}>{result.productId}</h2>
               </div>
               <div style={styles.verifiedBadge}>
-                🔒 Blockchain Verified
+                <ShieldCheck size={14} style={{ marginRight: '0.3rem', verticalAlign: 'middle' }} />Blockchain Verified
               </div>
             </div>
 
             {/* Result Rows */}
             <div style={styles.resultBody}>
               <div className="result-row" style={styles.resultRow}>
-                <span style={styles.rowKey}>📋 Product ID</span>
+                <span style={styles.rowKey}><Package size={14} style={{ marginRight: '0.3rem', verticalAlign: 'middle' }} />Product ID</span>
                 <span style={styles.rowValue}>{result.productId}</span>
               </div>
               <div className="result-row" style={styles.resultRow}>
-                <span style={styles.rowKey}>👤 Issuer</span>
+                <span style={styles.rowKey}><User size={14} style={{ marginRight: '0.3rem', verticalAlign: 'middle' }} />Issuer</span>
                 <span style={styles.rowValue}>
                   {result.issuer.slice(0, 10) + '...' + result.issuer.slice(-8)}
                 </span>
               </div>
               <div className="result-row" style={styles.resultRow}>
-                <span style={styles.rowKey}>📅 Registered At</span>
+                <span style={styles.rowKey}><Calendar size={14} style={{ marginRight: '0.3rem', verticalAlign: 'middle' }} />Registered At</span>
                 <span style={styles.rowValue}>{result.timestamp}</span>
               </div>
               <div className="result-row" style={styles.resultRow}>
-                <span style={styles.rowKey}>📦 IPFS Document</span>
+                <span style={styles.rowKey}><FileText size={14} style={{ marginRight: '0.3rem', verticalAlign: 'middle' }} />IPFS Document</span>
                 <span style={styles.rowValue}>
                   {result.ipfsCID === 'ipfs://placeholder'
                     ? <span style={{ color: '#999' }}>No document attached</span>
@@ -195,7 +196,7 @@ function ScanProduct() {
                 </span>
               </div>
               <div className="result-row" style={{ ...styles.resultRow, borderBottom: 'none' }}>
-                <span style={styles.rowKey}>🔐 Metadata Hash</span>
+                <span style={styles.rowKey}><Hash size={14} style={{ marginRight: '0.3rem', verticalAlign: 'middle' }} />Metadata Hash</span>
                 <span style={styles.rowValueMono}>
                   {result.metadataHash.slice(0, 22) + '...'}
                 </span>
@@ -209,16 +210,13 @@ function ScanProduct() {
                 style={styles.detailBtn}
                 onClick={() => navigate('/product/' + result.productId)}
               >
-                📋 View Full Detail
+                <FileText size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />View Full Detail
               </button>
               <button
                 style={styles.copyBtn}
-                onClick={() => {
-                  navigator.clipboard.writeText(result.productId)
-                  alert('Product ID copied!')
-                }}
+                onClick={() => { navigator.clipboard.writeText(result.productId); alert('Product ID copied!') }}
               >
-                📋 Copy ID
+                <Copy size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Copy ID
               </button>
             </div>
           </div>
@@ -227,7 +225,7 @@ function ScanProduct() {
         {/* Empty State */}
         {!result && !status && (
           <div style={styles.emptyState}>
-            <div style={styles.emptyIcon}>🌿</div>
+            <div style={styles.emptyIcon}><Leaf size={52} color="#a5d6a7" strokeWidth={1.5} /></div>
             <p style={styles.emptyText}>
               Enter a Product ID above to verify its Digital Product Passport
             </p>

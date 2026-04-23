@@ -1,13 +1,15 @@
 import { Link, useLocation } from 'react-router-dom'
-import WalletConnect from './WalletConnect'
+import { Leaf, House, ClipboardPlus, Search, Package } from 'lucide-react'
+import WalletConnect, { getConnectedAccount } from './WalletConnect'
 
 function Navbar() {
   const location = useLocation()
+  const account = getConnectedAccount()
 
   const isActive = (path) => location.pathname === path
 
   return (
-    <nav style={styles.nav}>
+    <nav style={{ ...styles.nav, position: 'sticky', top: 0 }}>
       <style>{`
         .nav-link:hover {
           background-color: rgba(255,255,255,0.15) !important;
@@ -19,30 +21,26 @@ function Navbar() {
         }
       `}</style>
 
-      <Link to="/" style={styles.logo}>🌿 EcoPassEU</Link>
+      <Link to="/home" style={styles.logo}>
+        <Leaf size={18} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />
+        EcoPassEU
+      </Link>
 
-      <div style={styles.links}>
-        <Link
-          to="/"
-          className={'nav-link' + (isActive('/') ? ' nav-link-active' : '')}
-          style={styles.navBtn}
-        >
-          🏠 Home
+      <div style={styles.navCenter}>
+        <Link to="/home" className={'nav-link' + (isActive('/home') ? ' nav-link-active' : '')} style={styles.navBtn}>
+          <House size={14} style={styles.navIcon} /> Home
         </Link>
-        <Link
-          to="/register"
-          className={'nav-link' + (isActive('/register') ? ' nav-link-active' : '')}
-          style={styles.navBtn}
-        >
-          🏭 Register
+        <Link to="/register" className={'nav-link' + (isActive('/register') ? ' nav-link-active' : '')} style={styles.navBtn}>
+          <ClipboardPlus size={14} style={styles.navIcon} /> Register
         </Link>
-        <Link
-          to="/scan"
-          className={'nav-link' + (isActive('/scan') ? ' nav-link-active' : '')}
-          style={styles.navBtn}
-        >
-          🔍 Search
+        <Link to="/scan" className={'nav-link' + (isActive('/scan') ? ' nav-link-active' : '')} style={styles.navBtn}>
+          <Search size={14} style={styles.navIcon} /> Search
         </Link>
+        {account && (
+          <Link to="/my-products" className={'nav-link' + (isActive('/my-products') ? ' nav-link-active' : '')} style={styles.navBtn}>
+            <Package size={14} style={styles.navIcon} /> My Products
+          </Link>
+        )}
       </div>
 
       <WalletConnect />
@@ -62,6 +60,15 @@ const styles = {
     top: 0,
     zIndex: 1000,
     boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
+    isolation: 'isolate',
+  },
+  navCenter: {
+    position: 'absolute',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.2rem',
   },
   logo: {
     fontSize: '1.4rem',
@@ -72,18 +79,21 @@ const styles = {
   links: {
     display: 'flex',
     alignItems: 'center',
-    gap: '0.4rem',
+    gap: '0.2rem',
   },
   navBtn: {
     color: 'white',
     textDecoration: 'none',
-    fontSize: '0.92rem',
-    fontWeight: '600',
-    padding: '0.5rem 1rem',
-    borderRadius: '8px',
-    border: '1.5px solid rgba(255,255,255,0.25)',
-    display: 'inline-block',
+    fontSize: '0.88rem',
+    fontWeight: '500',
+    padding: '0.4rem 0.8rem',
+    borderRadius: '6px',
+    border: 'none',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '0.3rem',
   },
+  navIcon: { flexShrink: 0 },
 }
 
 export default Navbar

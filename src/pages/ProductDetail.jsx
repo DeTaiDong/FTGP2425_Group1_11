@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ethers } from 'ethers'
 import { getContract } from '../utils/contract'
 import SupplyChainMap from '../components/SupplyChainMap'
+import { Link2, Tag, Layers, Route, Map, MapPin, Calendar, Loader } from 'lucide-react'
 
 function ProductDetail() {
   const { id } = useParams()
@@ -56,7 +57,8 @@ function ProductDetail() {
 
   if (loading) return (
     <div style={styles.center}>
-      <p>⏳ Loading passport data from blockchain...</p>
+      <Loader size={28} color="#2d6a4f" style={{ marginBottom: '0.5rem' }} />
+      <p style={{ color: '#888' }}>Loading passport data from blockchain...</p>
     </div>
   )
 
@@ -70,11 +72,11 @@ function ProductDetail() {
   return (
     <div style={styles.container}>
       <button style={styles.backBtn} onClick={() => navigate('/scan')}>← Back</button>
-      <h2 style={styles.title}>📋 Product Passport Detail</h2>
+      <h2 style={styles.title}>Product Passport Detail</h2>
 
       {/* Blockchain Record */}
       <div style={styles.section}>
-        <h3 style={styles.sectionTitle}>🔗 Blockchain Record</h3>
+        <h3 style={styles.sectionTitle}><Link2 size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Blockchain Record</h3>
         <div style={styles.row}>
           <span style={styles.key}>Product ID</span>
           <span style={styles.value}>{passport.productId}</span>
@@ -97,7 +99,7 @@ function ProductDetail() {
         <>
           {/* Product Information */}
           <div style={styles.section}>
-            <h3 style={styles.sectionTitle}>🏷️ Product Information</h3>
+            <h3 style={styles.sectionTitle}><Tag size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Product Information</h3>
             <div style={styles.row}>
               <span style={styles.key}>Brand</span>
               <span style={styles.value}>{ipfsData.brand}</span>
@@ -123,7 +125,7 @@ function ProductDetail() {
           {/* Material Composition */}
           {ipfsData.materials && (
             <div style={styles.section}>
-              <h3 style={styles.sectionTitle}>🧵 Material Composition</h3>
+              <h3 style={styles.sectionTitle}><Layers size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Material Composition</h3>
               {ipfsData.materials.map((mat, i) => (
                 <div key={i} style={styles.materialCard}>
                   <div style={styles.row}>
@@ -146,14 +148,16 @@ function ProductDetail() {
           {/* Supply Chain Provenance */}
           {ipfsData.provenance && (
             <div style={styles.section}>
-              <h3 style={styles.sectionTitle}>🌍 Supply Chain Provenance</h3>
+              <h3 style={styles.sectionTitle}><Route size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Supply Chain Provenance</h3>
               {ipfsData.provenance.map((step, i) => (
                 <div key={i} style={styles.provenanceRow}>
                   <div style={styles.stepNumber}>{i + 1}</div>
                   <div>
                     <div style={{ fontWeight: 'bold' }}>{step.stage}</div>
-                    <div style={{ color: '#666', fontSize: '0.9rem' }}>
-                      📍 {step.location} · 📅 {step.date}
+                    <div style={{ color: '#666', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                      <MapPin size={13} style={{ verticalAlign: 'middle' }} />{step.location}
+                      <span style={{ color: '#ccc' }}>·</span>
+                      <Calendar size={13} style={{ verticalAlign: 'middle' }} />{step.date}
                     </div>
                   </div>
                 </div>
@@ -164,7 +168,7 @@ function ProductDetail() {
           {/* Supply Chain Map */}
           {ipfsData.provenance && ipfsData.provenance.length > 0 && (
             <div style={styles.section}>
-              <h3 style={styles.sectionTitle}>🗺️ Supply Chain Map</h3>
+              <h3 style={styles.sectionTitle}><Map size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Supply Chain Map</h3>
               <SupplyChainMap provenance={ipfsData.provenance} />
             </div>
           )}

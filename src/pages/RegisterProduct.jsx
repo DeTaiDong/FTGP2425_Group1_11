@@ -3,9 +3,10 @@ import { ethers } from 'ethers'
 import { getContract, getProviderAndSigner } from '../utils/contract'
 import LocationPicker from '../components/LocationPicker'
 import { getConnectedAccount } from '../components/WalletConnect'
+import { Factory, Layers, Route, CloudUpload, Link2, CircleCheck, WalletMinimal, Loader, CircleX, X, Plus } from 'lucide-react'
 
 
-const PINATA_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiJkNDg1MzhmMC0zMmEzLTQ4Y2MtODIwMi02ZDNlNWQ0NzczOTYiLCJlbWFpbCI6ImRldGFpX2RvbmdAMTYzLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaW5fcG9saWN5Ijp7InJlZ2lvbnMiOlt7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6IkZSQTEifSx7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6Ik5ZQzEifV0sInZlcnNpb24iOjF9LCJtZmFfZW5hYmxlZCI6ZmFsc2UsInN0YXR1cyI6IkFDVElWRSJ9LCJhdXRoZW50aWNhdGlvblR5cGUiOiJzY29wZWRLZXkiLCJzY29wZWRLZXlLZXkiOiIzMDk5ZmMwYmU4ZDg1ODRmMDUxMCIsInNjb3BlZEtleVNlY3JldCI6ImNkMzhlNGMzOTkwMjNlOTYyNjI2YTg2YjUzZmMxZjRhYjExMzk1NGIyZjRhYzFlZmU2ODM5ZmViMGNlMWIxYTkiLCJleHAiOjE4MDgyMzk2MDl9.Cuh58MqUvHoHgvPvOiFVAgvveXySQtq1RHxpuc8fQ_U'
+const PINATA_JWT = import.meta.env.VITE_PINATA_JWT
 
 const emptyMaterial = { name: '', percentage: '', origin: '', certified: '' }
 const emptyStage = { stage: '', location: '', coords: null, date: '' }
@@ -166,7 +167,7 @@ function RegisterProduct() {
 
       {/* Header */}
       <div style={styles.header}>
-        <div style={styles.headerIcon}>🏭</div>
+        <div style={styles.headerIcon}><Factory size={40} color="white" strokeWidth={1.5} /></div>
         <h1 style={styles.title}>Register Product Passport</h1>
         <p style={styles.subtitle}>
           Issue a tamper-proof Digital Product Passport on the Sepolia blockchain.
@@ -194,7 +195,7 @@ function RegisterProduct() {
         {/* Step 3: Success */}
         {step === 3 && (
           <div style={styles.successCard}>
-            <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🎉</div>
+            <div style={{ marginBottom: '1rem' }}><CircleCheck size={56} color="#2d6a4f" strokeWidth={1.5} /></div>
             <h2 style={{ color: '#2d6a4f', marginBottom: '0.5rem' }}>Registration Complete!</h2>
             <p style={{ color: '#555', marginBottom: '0.5rem' }}>Product ID: <strong>{form.productId}</strong></p>
             <p style={{ color: '#555', marginBottom: '0.5rem' }}>IPFS CID: <code style={{ fontSize: '0.8rem' }}>{ipfsResult?.cid}</code></p>
@@ -210,7 +211,7 @@ function RegisterProduct() {
         {/* Disconnected Wallet Warn！！ */}
         {!account && (
           <div style={styles.walletWarning}>
-            <div style={{ fontSize: '2.5rem', marginBottom: '0.8rem' }}>🦊</div>
+            <div style={{ marginBottom: '0.8rem' }}><WalletMinimal size={40} color="#b45309" strokeWidth={1.5} /></div>
             <h3 style={{ color: '#b45309', marginBottom: '0.5rem' }}>Wallet Not Connected</h3>
             <p style={{ color: '#78350f', fontSize: '0.95rem' }}>
               You need to connect your MetaMask wallet to register a product.
@@ -226,7 +227,7 @@ function RegisterProduct() {
           <>
             {/* Basic Info */}
             <div style={styles.card}>
-              <h3 style={styles.cardTitle}>📋 Basic Information</h3>
+              <h3 style={styles.cardTitle}>Basic Information</h3>
               <div style={styles.grid2}>
                 <div style={styles.field}>
                   <label style={styles.label}>Product ID <span style={styles.req}>*</span></label>
@@ -273,13 +274,13 @@ function RegisterProduct() {
 
             {/* Materials */}
             <div style={styles.card}>
-              <h3 style={styles.cardTitle}>🧵 Material Composition</h3>
+              <h3 style={styles.cardTitle}><Layers size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Material Composition</h3>
               {form.materials.map((mat, i) => (
                 <div key={i} style={styles.subCard}>
                   <div style={styles.subCardHeader}>
                     <span style={{ fontWeight: '600', color: '#2d6a4f' }}>Material {i + 1}</span>
                     {form.materials.length > 1 && (
-                      <button className="btn-red" style={styles.btnRemove} onClick={() => removeMaterial(i)}>✕ Remove</button>
+                      <button className="btn-red" style={styles.btnRemove} onClick={() => removeMaterial(i)}><X size={12} style={{ marginRight: '0.2rem', verticalAlign: 'middle' }} />Remove</button>
                     )}
                   </div>
                   <div style={styles.grid4}>
@@ -303,19 +304,19 @@ function RegisterProduct() {
                 </div>
               ))}
               <button className="btn-outline" style={styles.btnOutline} onClick={addMaterial}>
-                + Add Material
+                <Plus size={14} style={{ marginRight: '0.3rem', verticalAlign: 'middle' }} />Add Material
               </button>
             </div>
 
             {/* Supply Chain */}
             <div style={styles.card}>
-              <h3 style={styles.cardTitle}>🌍 Supply Chain Provenance</h3>
+              <h3 style={styles.cardTitle}><Route size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Supply Chain Provenance</h3>
               {form.provenance.map((stage, i) => (
                 <div key={i} style={styles.subCard}>
                   <div style={styles.subCardHeader}>
                     <span style={{ fontWeight: '600', color: '#2d6a4f' }}>Stage {i + 1}</span>
                     {form.provenance.length > 1 && (
-                      <button className="btn-red" style={styles.btnRemove} onClick={() => removeStage(i)}>✕ Remove</button>
+                      <button className="btn-red" style={styles.btnRemove} onClick={() => removeStage(i)}><X size={12} style={{ marginRight: '0.2rem', verticalAlign: 'middle' }} />Remove</button>
                     )}
                   </div>
                   <div style={styles.grid3}>
@@ -341,7 +342,7 @@ function RegisterProduct() {
                 </div>
               ))}
               <button className="btn-outline" style={styles.btnOutline} onClick={addStage}>
-                + Add Stage
+                <Plus size={14} style={{ marginRight: '0.3rem', verticalAlign: 'middle' }} />Add Stage
               </button>
             </div>
 
@@ -351,9 +352,9 @@ function RegisterProduct() {
                 status.type === 'success' ? styles.statusSuccess :
                 status.type === 'info' ? styles.statusInfo : styles.statusError
               }>
-                {status.type === 'success' && '✅ '}
-                {status.type === 'info' && '⏳ '}
-                {status.type === 'error' && '❌ '}
+                {status.type === 'success' && <CircleCheck size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />}
+                {status.type === 'info' && <Loader size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />}
+                {status.type === 'error' && <CircleX size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />}
                 {status.msg}
               </div>
             )}
@@ -362,7 +363,7 @@ function RegisterProduct() {
             <div style={styles.actionRow}>
               {!ipfsResult ? (
                 <button className="btn-green" style={loading ? styles.btnDisabled : styles.btnGreen} onClick={uploadToIPFS} disabled={loading}>
-                  {loading ? '⏳ Uploading...' : '☁️ Upload to IPFS'}
+                  {loading ? <><Loader size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Uploading...</> : <><CloudUpload size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Upload to IPFS</>}
                 </button>
               ) : (
                 <>
@@ -370,7 +371,7 @@ function RegisterProduct() {
                     ✅ IPFS uploaded! CID: <code style={{ fontSize: '0.8rem' }}>{ipfsResult.cid.slice(0, 20)}...</code>
                   </div>
                   <button className="btn-green" style={loading ? styles.btnDisabled : styles.btnGreen} onClick={registerOnChain} disabled={loading}>
-                    {loading ? '⏳ Processing...' : '🔗 Register on Blockchain'}
+                    {loading ? <><Loader size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Processing...</> : <><Link2 size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Register on Blockchain</>}
                   </button>
                 </>
               )}

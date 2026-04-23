@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 export function getConnectedAccount() {
   return localStorage.getItem('connectedAccount')
@@ -7,6 +8,7 @@ export function getConnectedAccount() {
 function WalletConnect() {
   const [account, setAccount] = useState(null)
   const [error, setError] = useState(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     const saved = localStorage.getItem('connectedAccount')
@@ -48,6 +50,7 @@ function WalletConnect() {
     setAccount(null)
     localStorage.removeItem('connectedAccount')
     setError(null)
+    navigate('/')
   }
 
   const shortAddress = (addr) => addr ? addr.slice(0, 6) + '...' + addr.slice(-4) : ''
