@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { ethers } from 'ethers'
 import { getContract } from '../utils/contract'
+import heroBg from '../assets/background.png'
 import {
   ShieldCheck, BadgeCheck, Landmark, CircleDollarSign,
   Smartphone, MapPin, Globe, Zap,
@@ -270,7 +271,10 @@ function Home() {
 const styles = {
   page: { fontFamily: 'Arial, sans-serif' },
   hero: {
-    background: 'linear-gradient(135deg, #1b4332 0%, #2d6a4f 50%, #40916c 100%)',
+    backgroundImage: `linear-gradient(rgba(27, 67, 50, 0.28), rgba(45, 106, 79, 0.18)), url(${heroBg})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
     padding: '5rem 2rem',
     textAlign: 'center',
     color: 'white',
