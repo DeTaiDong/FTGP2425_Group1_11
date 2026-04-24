@@ -165,6 +165,7 @@ const styles = {
     backgroundRepeat: 'no-repeat',
     padding: '3.5rem 2rem 7rem',
     color: 'white',
+    textAlign: 'center',
   },
   title: { fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.5rem' },
   subtitle: { fontSize: '0.95rem', opacity: 0.8 },

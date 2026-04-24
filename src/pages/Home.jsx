@@ -16,6 +16,17 @@ function Home() {
 
   useEffect(() => {
     fetchStats()
+    const observer = new IntersectionObserver(
+      entries => entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible')
+          observer.unobserve(e.target)
+        }
+      }),
+      { threshold: 0.1 }
+    )
+    document.querySelectorAll('.fade-section').forEach(el => observer.observe(el))
+    return () => observer.disconnect()
   }, [])
 
   const fetchStats = async () => {
@@ -131,6 +142,15 @@ function Home() {
           transform: translateY(-4px);
           box-shadow: 0 12px 30px rgba(0,0,0,0.1) !important;
         }
+        .fade-section {
+          opacity: 0;
+          transform: translateY(28px);
+          transition: opacity 0.65s ease, transform 0.65s ease;
+        }
+        .fade-section.visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
       `}</style>
 
       {/* Hero Section */}
@@ -159,7 +179,7 @@ function Home() {
       </div>
 
       {/* Stats Bar */}
-      <div style={styles.statsBar}>
+      <div className="fade-section" style={styles.statsBar}>
         <div style={styles.stat}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
             <span style={styles.statNumber}>
@@ -194,7 +214,7 @@ function Home() {
       </div>
 
       {/* How It Works */}
-      <div style={styles.section}>
+      <div className="fade-section" style={styles.section}>
         <h2 style={styles.sectionTitle}>How It Works</h2>
         <div style={styles.steps}>
           <div className="step-card" style={styles.step}>
@@ -229,7 +249,7 @@ function Home() {
       </div>
 
       {/* Why EcoPassEU - Horizontal Scroll */}
-      <div style={styles.featureSection}>
+      <div className="fade-section" style={styles.featureSection}>
         <div style={styles.featureSectionInner}>
           <h2 style={styles.sectionTitle}>Why EcoPassEU?</h2>
           <p style={styles.featureHint}>← Scroll to explore all features →</p>
@@ -248,7 +268,7 @@ function Home() {
       </div>
 
       {/* CTA */}
-      <div style={styles.cta}>
+      <div className="fade-section" style={styles.cta}>
         <h2 style={styles.ctaTitle}>Ready to Get Started?</h2>
         <p style={styles.ctaDesc}>
           Register your first product passport or search for an existing one.
@@ -269,7 +289,7 @@ function Home() {
 }
 
 const styles = {
-  page: { fontFamily: 'Arial, sans-serif' },
+  page: {},
   hero: {
     backgroundImage: `linear-gradient(rgba(27, 67, 50, 0.28), rgba(45, 106, 79, 0.18)), url(${heroBg})`,
     backgroundSize: 'cover',

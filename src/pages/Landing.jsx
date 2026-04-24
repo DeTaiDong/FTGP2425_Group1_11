@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import heroBg from '../assets/background2.png'
 
 function Landing() {
   const navigate = useNavigate()
@@ -25,7 +26,7 @@ function Landing() {
   const hasMetaMask = typeof window !== 'undefined' && !!window.ethereum
 
   return (
-    <div style={styles.page}>
+    <div className="page-fade-in" style={styles.page}>
       <div style={styles.card}>
         <div style={styles.logo}>EcoPassEU</div>
         <p style={styles.desc}>
@@ -84,40 +85,46 @@ function Landing() {
 const styles = {
   page: {
     minHeight: '100vh',
-    background: 'linear-gradient(135deg, #1b4332 0%, #2d6a4f 50%, #40916c 100%)',
+    backgroundImage: `linear-gradient(rgba(27, 67, 50, 0.65), rgba(45, 106, 79, 0.65)), url(${heroBg})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     padding: '2rem',
   },
   card: {
-    backgroundColor: 'white',
+    background: 'rgba(255, 255, 255, 0.15)',
+    backdropFilter: 'blur(16px)',
+    WebkitBackdropFilter: 'blur(16px)',
+    border: '1px solid rgba(255, 255, 255, 0.35)',
     borderRadius: '20px',
     padding: '3rem 2.5rem',
     maxWidth: '420px',
     width: '100%',
-    boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
+    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.25)',
     textAlign: 'center',
   },
   logo: {
     fontSize: '2rem',
     fontWeight: 'bold',
-    color: '#1b4332',
+    color: 'white',
     marginBottom: '0.8rem',
     letterSpacing: '-0.5px',
   },
   desc: {
-    color: '#666',
+    color: 'rgba(255, 255, 255, 0.85)',
     fontSize: '0.93rem',
     lineHeight: 1.6,
     margin: '0 0 1.5rem',
   },
   divider: {
-    borderTop: '1px solid #e8f5e9',
+    borderTop: '1px solid rgba(255, 255, 255, 0.25)',
     marginBottom: '1.5rem',
   },
   hint: {
-    color: '#555',
+    color: 'rgba(255, 255, 255, 0.9)',
     fontSize: '0.9rem',
     marginBottom: '1.2rem',
   },
@@ -137,14 +144,14 @@ const styles = {
     boxSizing: 'border-box',
   },
   connectedBadge: {
-    backgroundColor: '#e8f5e9',
-    color: '#2d6a4f',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    color: 'white',
     borderRadius: '8px',
     padding: '0.6rem 1rem',
     fontSize: '0.88rem',
     fontWeight: '600',
     marginBottom: '1.2rem',
-    border: '1px solid #a5d6a7',
+    border: '1px solid rgba(255, 255, 255, 0.4)',
   },
   enterBtn: {
     width: '100%',
@@ -165,17 +172,17 @@ const styles = {
     marginBottom: '1rem',
   },
   installNote: {
-    color: '#888',
+    color: 'rgba(255, 255, 255, 0.7)',
     fontSize: '0.82rem',
     marginBottom: '1.5rem',
   },
   readOnly: {
-    color: '#999',
+    color: 'rgba(255, 255, 255, 0.7)',
     fontSize: '0.85rem',
     margin: 0,
   },
   link: {
-    color: '#2d6a4f',
+    color: 'white',
     cursor: 'pointer',
     textDecoration: 'underline',
   },
