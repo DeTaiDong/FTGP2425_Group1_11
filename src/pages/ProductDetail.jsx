@@ -56,20 +56,21 @@ function ProductDetail() {
   }
 
   if (loading) return (
-    <div style={styles.center}>
+    <div style={{ ...styles.page, ...styles.center }}>
       <Loader size={28} color="#2d6a4f" className="spin" style={{ marginBottom: '0.5rem' }} />
       <p style={{ color: '#888' }}>Loading passport data from blockchain...</p>
     </div>
   )
 
   if (status) return (
-    <div style={styles.center}>
+    <div style={{ ...styles.page, ...styles.center }}>
       <p style={{ color: '#c62828' }}>{status.msg}</p>
       <button style={styles.backBtn} onClick={() => navigate('/scan')}>← Back to Search</button>
     </div>
   )
 
   return (
+    <div style={styles.page}>
     <div style={styles.container}>
       <style>{`
         .pd-row {
@@ -270,16 +271,19 @@ function ProductDetail() {
         </div>
       )}
     </div>
+    </div>
   )
 }
 
 const styles = {
+  page: { minHeight: '100vh', backgroundColor: '#f8faf9', paddingBottom: '3rem' },
   container: { maxWidth: '700px', margin: '0 auto', padding: '2rem 1rem' },
   center: { textAlign: 'center', padding: '4rem 1rem' },
-  title: { fontSize: '1.8rem', marginBottom: '1.5rem' },
+  title: { fontSize: '1.8rem', marginBottom: '1.5rem', color: '#1b4332' },
   backBtn: {
     backgroundColor: 'transparent',
-    border: '1px solid #ccc',
+    border: '1.5px solid #2d6a4f',
+    color: '#2d6a4f',
     borderRadius: '8px',
     padding: '0.4rem 1rem',
     cursor: 'pointer',

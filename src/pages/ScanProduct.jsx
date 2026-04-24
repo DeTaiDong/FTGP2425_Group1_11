@@ -10,7 +10,13 @@ function ScanProduct() {
   const [result, setResult] = useState(null)
   const [status, setStatus] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [toast, setToast] = useState(null)
   const navigate = useNavigate()
+
+  const showToast = (msg) => {
+    setToast(msg)
+    setTimeout(() => setToast(null), 2200)
+  }
 
   const handleSearch = async () => {
     setStatus(null)
@@ -85,6 +91,24 @@ function ScanProduct() {
           background-color: #f0f7f4 !important;
         }
         .result-row { transition: background 0.15s ease !important; }
+        .toast-popup {
+          position: fixed;
+          bottom: 2rem;
+          right: 2rem;
+          background: #1b4332;
+          color: white;
+          padding: 0.75rem 1.4rem;
+          border-radius: 10px;
+          font-size: 0.9rem;
+          font-weight: 600;
+          z-index: 9999;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+          animation: toastIn 0.3s ease;
+        }
+        @keyframes toastIn {
+          from { opacity: 0; transform: translateY(12px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
       `}</style>
 
       {/* Header */}
@@ -215,13 +239,15 @@ function ScanProduct() {
               </button>
               <button
                 style={styles.copyBtn}
-                onClick={() => { navigator.clipboard.writeText(result.productId); alert('Product ID copied!') }}
+                onClick={() => { navigator.clipboard.writeText(result.productId); showToast('✓ Product ID copied!') }}
               >
                 <Copy size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Copy ID
               </button>
             </div>
           </div>
         )}
+
+        {toast && <div className="toast-popup">{toast}</div>}
 
         {/* Empty State */}
         {!result && !status && (
@@ -247,7 +273,7 @@ const styles = {
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
-    padding: '3.5rem 2rem 7rem',
+    padding: '3.5rem 2rem',
     color: 'white',
     textAlign: 'center',
   },

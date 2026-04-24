@@ -74,6 +74,16 @@ function MyProducts() {
 
   return (
     <div style={styles.page}>
+      <style>{`
+        .product-card {
+          transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+          cursor: pointer;
+        }
+        .product-card:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 8px 24px rgba(45,106,79,0.15) !important;
+        }
+      `}</style>
       <div style={styles.header}>
         <h1 style={styles.title}>My Products</h1>
         <p style={styles.subtitle}>
@@ -100,7 +110,7 @@ function MyProducts() {
         )}
 
         {!loading && products.map((p, i) => (
-          <div key={i} style={styles.card}>
+          <div key={i} className="product-card" style={styles.card}>
             <div style={styles.cardLeft} onClick={() => navigate('/product/' + p.productId)}>
               <div style={styles.productId}>{p.productId}</div>
               <div style={styles.meta}>Registered: {p.timestamp}</div>
@@ -163,7 +173,7 @@ const styles = {
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
-    padding: '3.5rem 2rem 7rem',
+    padding: '3.5rem 2rem',
     color: 'white',
     textAlign: 'center',
   },
