@@ -5,7 +5,7 @@ import LocationPicker from '../components/LocationPicker'
 import { getConnectedAccount } from '../components/WalletConnect'
 import { Factory, Layers, Route, CloudUpload, Link2, CircleCheck, WalletMinimal, Loader, CircleX, X, Plus, Download } from 'lucide-react'
 import { QRCodeCanvas } from 'qrcode.react'
-
+import backgroundImg from '../assets/background.png'
 
 const PINATA_JWT = import.meta.env.VITE_PINATA_JWT
 
@@ -440,10 +440,10 @@ function RegisterProduct() {
 const styles = {
   page: { minHeight: '100vh', backgroundColor: '#f8faf9' },
   header: {
-    background: 'linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%)',
-    padding: '3rem 2rem 2rem',
-    textAlign: 'center',
-    color: 'white',
+    backgroundImage: `linear-gradient(rgba(27, 67, 50, 0.35), rgba(45, 106, 79, 0.22)), url(${backgroundImg})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
   },
   headerIcon: { fontSize: '3rem', marginBottom: '0.5rem' },
   title: { fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.5rem' },

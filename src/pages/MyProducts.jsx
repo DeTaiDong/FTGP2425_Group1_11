@@ -5,6 +5,7 @@ import { getContract, CONTRACT_ABI } from '../utils/contract'
 import { getConnectedAccount } from '../components/WalletConnect'
 import { QRCodeCanvas } from 'qrcode.react'
 import { QrCode, Download, X, Loader } from 'lucide-react'
+import backgroundImg from '../assets/background.png'
 
 function MyProducts() {
   const navigate = useNavigate()
@@ -158,10 +159,10 @@ function MyProducts() {
 const styles = {
   page: { minHeight: '100vh', backgroundColor: '#f8faf9' },
   header: {
-    background: 'linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%)',
-    padding: '3rem 2rem',
-    textAlign: 'center',
-    color: 'white',
+    backgroundImage: `linear-gradient(rgba(27, 67, 50, 0.35), rgba(45, 106, 79, 0.22)), url(${backgroundImg})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
   },
   title: { fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.5rem' },
   subtitle: { fontSize: '0.95rem', opacity: 0.8 },
