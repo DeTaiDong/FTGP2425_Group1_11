@@ -446,7 +446,6 @@ const styles = {
     backgroundRepeat: 'no-repeat',
     padding: '3.5rem 2rem 7rem',
     color: 'white',
-},
   },
   headerIcon: { fontSize: '3rem', marginBottom: '0.5rem' },
   title: { fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.5rem' },
