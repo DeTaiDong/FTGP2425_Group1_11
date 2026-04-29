@@ -11,15 +11,10 @@
 %
 \usepackage{graphicx}
 \usepackage{hyperref}
-% Used for displaying a sample figure. If possible, figure files should
-% be included in EPS format.
-%
-% If you use the hyperref package, please uncomment the following two lines
-% to display URLs in blue roman font according to Springer's eBook style:
-%\usepackage{color}
-%\renewcommand\UrlFont{\color{blue}\rmfamily}
-%\urlstyle{rm}
-%
+\renewcommand{\theHsection}{\thepart.\thesection} 
+
+
+
 \begin{document}
 	%
 	\title{EcoPassEU: A Privacy-Aware Digital Product Passport DApp for Sustainable Consumer Goods in Europe}
@@ -43,16 +38,85 @@
 	%
 	%
 	\section{Introduction}
-	% What exactly is your application? What can it do?
-	% Why is it important?
-	% Who is your target user group?
-	In this section, introduce the DApp and explain its importance without being overly technical. Focus on its uses and applications, addressing what EcoPassEU is, why combating greenwashing is important, and identifying the target user groups (e.g., European manufacturers, SMEs, consumers, and regulators).
+	Every year, billions of products enter the European market with  sustainability labels, yet consumers have little reliable way of checking whether claims such as ``low carbon'' or ``ethically sourced'' are accurate. A study commissioned by the European Commission found that more than half of the green environmental declarations lack verifiable evidence to support, eroding public confidence in corporate environmental commitments \cite{Silva2021The}.
+	
+	To address this credibility gap, the Ecodesign for Sustainable Products Regulation (ESPR) now mandates Digital Product Passports (DPPs) —standardised lifecycle records—for most EU products \cite{circularise_dpp_2025}.  
+	With the implementation of compliance in 2027, reliable DPP solutions have become a market urgent need\cite{circularise_dpp_2025}.
+	
+	Our product EcoPassEU is a blockchain-based DPP platform which  allows manufacturers to record product information as permanent, publicly verifiable entries on the Ethereum blockchain. 
+	Unlike traditional databases, the immutability of blockchain records means that once the data is released, it cannot be altered retrospectively, eliminating the possibility of post-hoc falsification \cite{Casino2019Systematic}. 
+	Any user can obtain a complete and encrypted product history by entering the product ID or scanning the QR code.
+	
+	EcoPassEU serves four key stakeholders. 
+	It provides SME manufacturers with a cost-effective ESPR compliance channel through a web for batch data entry and automated QR code generation. 
+	At the same time, consumers, regulators and retailers can also get open and wallet-free access. 
+	Just search for the product ID to immediately obtain the blockchain-verified product passport and supply chain map, enabling the independent verification of environmental claims without prior technical expertise.
+	
+	The value of EcoPassEU is threefold. 
+	Primarily, it provides manufacturers with a practical way to ESPR deadlines, reducing the risk of market exclusion. 
+	Meanwhile, the platform directly cracked down on greenwashing, 
+	securing product records via cryptographic hashing replaces brand self-reporting with independent, third-party verification.
+	Thirdly, it promotes the development of circular economy by equipping recyclers with the precise material data necessary to recover resources when products are scrapped.
+	
+	
+	
+	
+	
 	
 	\section{Background}
-	% Describe the topic of your application in more detail.
-	% Similar applications, competitors, or research.
-	% Business side: how such an application could be profitable.
-	Describe the landscape of sustainable consumer goods and the Ecodesign for Sustainable Products Regulation (ESPR). Detail the necessity of DPPs, present similar traceability applications or research, and discuss the business and financial viability of the DApp as a potential startup. Remember to include citations.
+	\subsection{Digital Product Passports and the Regulatory Context}
+	A Digital Product Passport (DPP) is a structured digital record encompassing lifecycle data—such as material composition, provenance, and end-of-life guidance—designed to inform stakeholders and support more sustainable design choices, efficient resource use, and the transition towards circular business models
+	\cite{Adisorn2021Towards,Basal2024Digital,VanCapelleveen2023The,Jansen2023Stop}.
+	
+	
+	The regulatory foundation for DPPs comes from the European Green Deal and Circular Economy Action Plan \cite{eu_green_deal_2019,ceap_2020}. Based on these 2 frameworks, the Ecodesign for Sustainable Products Regulation (ESPR), came into force on 18 July 2024,, mandates DPPs for almost all physical goods sold in the EU, regardless of the seller's location \cite{circularise_dpp_2025}.
+	
+	\subsection{The Problem: Trust in Sustainability Claims}
+	Despite regulatory momentum,  the implementations of most DPPs rely on centralised, proprietary databases \cite{Psarommatis2024Digital}. 
+	This architecture encourages the selective concealment of data, hindering aftermarket participants like independent repairers \cite{Ducuing2023Data}. 
+	Furthermore, managing huge volume of lifecycle data centrally raises significant concerns regarding storage efficiency, data integrity, and vulnerability to breaches\cite{Voulgaridis2024Digital}. 
+	Taken together, downstream actors — including importers, recyclers, and end consumers — lack reliable ways to independently verify product information.
+	
+	This problem is exacerbated by the prevalence of greenwashing, broadly understood as false, vague, or unsubstantiated environmental claims that make products appear more sustainable than they are \cite{Kundi2024The}. 
+	A 2020--2021 EU sweep of 344 online claims  found that nearly half were potentially deceptive—often substituting verifiable details with vague terms like ``conscious''—and 59\% lacked accessible evidence \cite{Silva2021The}. 
+	Another EU website screening found that 42\% of sustainability claims were misleading enough to constitute improper commercial behaviour \cite{Silva2021The}. 
+
+	
+	Blockchain provides a structural solution to this trust problem. 
+	Because records on a public blockchain are replicated across a distributed network, neither single party can unilaterally tamper with the records, providing a form of tamper evidence that cannot be replicated by a centralised system \cite{Casino2019Systematic,Nakamoto2008Bitcoin}.
+	Smart contract introduced in the Ethereum protocol allows data access and update rules to be encoded in publicly readable logic, so that there is no need for trusted intermediaries and enabling cross-organisational verification without shared infrastructure \cite{Wood2014Ethereum}.
+	
+	
+	\subsection{Related Work and Existing Platforms}
+	Blockchain-based product traceability uses its immutability and decentralised verification to improve supply chain transparency \cite{Casino2019Systematic}. 
+	Blockchain-based product traceability emerged as a research topic around 2015--2016, with early work concentrated in food and agriculture before spreading to pharmaceuticals, electronics, and textiles \cite{Tian2016Agri,Ellahi2023Blockchain-Based}. 
+	More recently, research has shifted from feasibility towards scale and efficiency: for instance, Walmart's use of IBM Food Trust — built on Hyperledger Fabric — to reduce food-item tracing time from six days to under three seconds \cite{Ellahi2023Blockchain-Based} .
+	
+	In the commercial field, Circularise is among the closest comparable 
+	platforms, offering DPPs with selective disclosure of sustainability data 
+	across supply chains, with applications spanning the automotive, battery, and textile sectors \cite{Circularise2026Platform}.
+	VeChain similarly deploys blockchain and smart contracts on its VeChainThor platform to achieve supply chain transparency, though it runs on on a permissioned network with a restricted set of authority-approved validators \cite{VeChain2026}
+	Both platforms have a common limitation: reliance on proprietary infrastructure or permissioned networks introduces vendor dependency and reduces interoperability \cite{Belchior2020A,Wang2023Exploring}.
+	
+	
+	\subsection{Business Viability}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	\section{Design Documentation}
 	% System's design, overall architecture, UI designs.
@@ -71,34 +135,17 @@
 	% Concise overview of findings, achievements, limitations, and future work.
 	Summarize the main theoretical and technical findings. Detail what the group achieved, acknowledge limitations (e.g., the physical-to-digital bridge vulnerabilities), and propose future work.
 	
+	
+	
+	\newpage
 	%
 	% ---- Bibliography ----
 	%
 	% BibTeX users should specify bibliography style 'splncs04'.
 	% References will then be sorted and formatted in the correct style.
 	%
-	% \bibliographystyle{splncs04}
-	% \bibliography{mybibliography}
-	%
-	\begin{thebibliography}{8}
-		\bibitem{ref_espr}
-		European Parliament and Council: Regulation (EU) 2024/1781 establishing a framework for the setting of ecodesign requirements for sustainable products. Official Journal of the European Union (2024).
-		
-		\bibitem{ref_greenforum}
-		European Commission: Implementing the Ecodesign for Sustainable Products Regulation. European Commission Green Forum (2026).
-		
-		\bibitem{ref_wallet}
-		European Commission: The EU Digital Identity Framework Regulation Enters into Force. EU Digital Identity Wallet (2024).
-		
-		\bibitem{ref_ebsi}
-		European Commission: European Blockchain Services Infrastructure (EBSI) Homepage. (2026).
-		
-		\bibitem{ref_did}
-		W3C: Decentralized Identifiers (DIDs) v1.0. W3C Recommendation (2022).
-		
-		\bibitem{ref_vc}
-		W3C: Verifiable Credentials Data Model v2.0. W3C Recommendation (2025).
-	\end{thebibliography}
+	\bibliographystyle{splncs04}
+	\bibliography{mybibliography}
 	
 	\newpage
 	\appendix
