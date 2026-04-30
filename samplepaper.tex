@@ -74,7 +74,7 @@
 	\subsection{The Problem: Trust in Sustainability Claims}
 	Despite regulatory momentum,  the implementations of most DPPs rely on centralised, proprietary databases \cite{Psarommatis2024Digital}. 
 	This architecture encourages the selective concealment of data, hindering aftermarket participants like independent repairers \cite{Ducuing2023Data}. 
-	Furthermore, managing huge volume of lifecycle data centrally raises significant concerns regarding storage efficiency, data integrity, and vulnerability to breaches\cite{Voulgaridis2024Digital}. 
+	Furthermore, managing huge volume of lifecycle data centrally raises significant concerns regarding storage efficiency, data integrity, and vulnerability to breaches \cite{Voulgaridis2024Digital}. 
 	Taken together, downstream actors — including importers, recyclers, and end consumers — lack reliable ways to independently verify product information.
 	
 	This problem is exacerbated by the prevalence of greenwashing, broadly understood as false, vague, or unsubstantiated environmental claims that make products appear more sustainable than they are \cite{Kundi2024The}. 
@@ -89,7 +89,7 @@
 	
 	\subsection{Related Work and Existing Platforms}
 	Blockchain-based product traceability uses its immutability and decentralised verification to improve supply chain transparency \cite{Casino2019Systematic}. 
-	Blockchain-based product traceability emerged as a research topic around 2015--2016, with early work concentrated in food and agriculture before spreading to pharmaceuticals, electronics, and textiles \cite{Tian2016Agri,Ellahi2023Blockchain-Based}. 
+	Blockchain-based product traceability emerged as a research topic around 2015--2016, with early work concentrated in food and agriculture before spreading to pharmaceuticals, electronics, and textiles \cite{Ellahi2023Blockchain-Based,Tian2016Agri}. 
 	More recently, research has shifted from feasibility towards scale and efficiency: for instance, Walmart's use of IBM Food Trust — built on Hyperledger Fabric — to reduce food-item tracing time from six days to under three seconds \cite{Ellahi2023Blockchain-Based} .
 	
 	In the commercial field, Circularise is among the closest comparable 
@@ -98,11 +98,24 @@
 	VeChain similarly deploys blockchain and smart contracts on its VeChainThor platform to achieve supply chain transparency, though it runs on on a permissioned network with a restricted set of authority-approved validators \cite{VeChain2026}
 	Both platforms have a common limitation: reliance on proprietary infrastructure or permissioned networks introduces vendor dependency and reduces interoperability \cite{Belchior2020A,Wang2023Exploring}.
 	
+	EcoPassEU takes a different approach. 
+	Rather than relying on a proprietary database, it is built on the public Ethereum blockchain and IPFS, with all rules encoded in open smart contracts. 
+	Product data is stored on IPFS, whilst only a small set of cryptographic identifiers is written on-chain, keeping costs low. 
+	The batch registration function further reduces the cost per product, making the platform viable for SMEs. 
+	And as an open-source project, it carries no vendor lock-in risk.
+	
 	
 	\subsection{Business Viability}
+	EcoPassEU's revenue model rests on two foundations.
+	The first is public funding: the EU's CIRPASS-2 project (2024--2027) explicitly subsidise DPP deployment across textiles, electronics, and construction, with dedicated support for SMEs adopting 
+	``DPP-as-a-Service'' models \cite{cirpass2_2024}. 
+	As an open source platform, EcoPassEU is  fully capable of benefitting from such grants.
 	
-	
-	
+	Another is subscription revenue. 
+	ESPR compliance is legally mandatory for any business selling physical goods in the EU, forming a captive market independent of voluntary commitments \cite{circularise_dpp_2025}
+	The green technology and sustainability market is projected to grow from USD~25.47 billion in 2025 to USD~73.90 billion by 2030 \cite{marketsandmarkets2025}.
+	EcoPassEU charges a graded subscription fee based on passport volume, with optional premium tiers for API integration and compliance reporting. 
+	The platform is built on public Ethereum, supporting payment with ETH or other ERC-20 tokens, providing international users a lower-friction settlement option and removing the need for traditional banking intermediaries.
 	
 	
 	
