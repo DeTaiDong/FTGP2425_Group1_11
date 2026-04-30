@@ -114,31 +114,32 @@ sequenceDiagram
     participant M as 🏭 Manufacturer
     participant F as ⚛️ Frontend
     participant I as 🌐 IPFS
-    participant C as 📜 PassportRegistry
-    participant U as 🛒 Consumer / Regulator
+    participant C as 📜 Contract
+    participant U as 🛒 Consumer
 
-    rect rgb(232, 245, 233)
-        Note over M,C: Registration Flow
-        M->>F: Fill product details (materials, provenance, recycling…)
-        F->>I: Upload JSON metadata to Pinata
-        I-->>F: Return IPFS CID
-        F->>F: Compute keccak256(JSON) → metadataHash
-        M->>F: Confirm MetaMask transaction
-        F->>C: registerPassport(productId, CID, metadataHash)
-        C-->>F: Emit PassportIssued · Transaction confirmed ✅
-        F-->>M: Display QR code + Etherscan link
-    end
+    Note over M,C: ── Registration Flow ──────────────────────────
 
-    rect rgb(227, 242, 253)
-        Note over U,I: Verification Flow (wallet-free)
-        U->>F: Enter Product ID
-        F->>C: passportExists(id) · getPassport(id)
-        C-->>F: Return CID · hash · issuer · timestamp
-        F->>I: Fetch full document from IPFS gateway
-        I-->>F: Return product JSON
-        F->>F: Recompute keccak256(JSON) · compare with on-chain hash
-        F-->>U: Display verified passport + integrity badge ✅ / ⚠️
-    end
+    M->>F: Fill product details
+    F->>I: Upload JSON metadata to Pinata
+    I-->>F: Return IPFS CID
+    F->>F: Compute keccak256(JSON) → metadataHash
+    Note over M,F: MetaMask prompts for transaction signature
+    M->>F: Confirm transaction
+    F->>C: registerPassport(productId, CID, metadataHash)
+    C-->>F: Emit PassportIssued · Transaction confirmed ✅
+    F-->>M: Display QR code + Etherscan link
+
+    Note over U,C: ── Verification Flow (wallet-free) ────────────
+
+    U->>F: Enter Product ID
+    F->>C: passportExists(id)
+    C-->>F: true
+    F->>C: getPassport(id)
+    C-->>F: Return CID · hash · issuer · timestamp
+    F->>I: Fetch full document from IPFS
+    I-->>F: Return product JSON
+    F->>F: Recompute keccak256(JSON) · compare with on-chain hash
+    F-->>U: Display verified passport + integrity badge ✅ / ⚠️
 ```
 
 
