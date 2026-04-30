@@ -3,13 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ethers } from 'ethers'
 import { getContract } from '../utils/contract'
 import SupplyChainMap from '../components/SupplyChainMap'
-import { Link2, Tag, Layers, Route, Map, MapPin, Calendar, Loader } from 'lucide-react'
+import { Link2, Tag, Layers, Route, Map, MapPin, Calendar, Loader, ShieldCheck, TriangleAlert } from 'lucide-react'
 
 function ProductDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [passport, setPassport] = useState(null)
   const [ipfsData, setIpfsData] = useState(null)
+  const [integrityCheck, setIntegrityCheck] = useState(null)
   const [status, setStatus] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -45,7 +46,22 @@ function ProductDetail() {
         const res = await fetch('https://gateway.pinata.cloud/ipfs/' + cid)
         if (res.ok) {
           const data = await res.json()
+          const computedHash = calculateMetadataHash(data)
+          const verified = computedHash.toLowerCase() === metadataHash.toLowerCase()
           setIpfsData(data)
+          setIntegrityCheck({
+            verified,
+            computedHash,
+            message: verified
+              ? 'IPFS metadata matches the on-chain hash.'
+              : 'IPFS metadata does not match the on-chain hash.',
+          })
+        } else {
+          setIntegrityCheck({
+            verified: false,
+            computedHash: null,
+            message: 'Unable to fetch IPFS metadata for verification.',
+          })
         }
       }
     } catch (err) {
@@ -53,6 +69,19 @@ function ProductDetail() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const calculateMetadataHash = (data) => {
+    const passportData = {
+      productId: data.productId,
+      category: data.category,
+      brand: data.brand,
+      materials: data.materials || [],
+      provenance: data.provenance || [],
+      repairGuide: data.repairGuide || '',
+      recycling: data.recycling || '',
+    }
+    return ethers.keccak256(ethers.toUtf8Bytes(JSON.stringify(passportData)))
   }
 
   if (loading) return (
@@ -175,6 +204,33 @@ function ProductDetail() {
         </div>
       </div>
 
+      {integrityCheck && (
+        <div className="pd-section" style={{
+          ...styles.integritySection,
+          ...(integrityCheck.verified ? styles.integrityVerified : styles.integrityWarning),
+        }}>
+          <div style={styles.integrityHeader}>
+            {integrityCheck.verified ? (
+              <ShieldCheck size={20} color="#2d6a4f" />
+            ) : (
+              <TriangleAlert size={20} color="#b45309" />
+            )}
+            <div>
+              <h3 className="pd-section-title" style={styles.integrityTitle}>
+                Data Integrity {integrityCheck.verified ? 'Verified' : 'Warning'}
+              </h3>
+              <p style={styles.integrityMessage}>{integrityCheck.message}</p>
+            </div>
+          </div>
+          {integrityCheck.computedHash && (
+            <div className="pd-row-stack" style={{ borderBottom: 'none', marginTop: '0.8rem' }}>
+              <span className="pd-key" style={styles.key}>Computed IPFS Hash</span>
+              <span className="pd-value-mono">{integrityCheck.computedHash}</span>
+            </div>
+          )}
+        </div>
+      )}
+
       {ipfsData && (
         <>
           {/* Product Information */}
@@ -296,6 +352,35 @@ const styles = {
     borderRadius: '12px',
     padding: '1.5rem',
     marginBottom: '1.5rem',
+  },
+  integritySection: {
+    borderRadius: '12px',
+    padding: '1.2rem 1.5rem',
+    marginBottom: '1.5rem',
+  },
+  integrityVerified: {
+    backgroundColor: '#edf7f0',
+    border: '1px solid #74c69d',
+  },
+  integrityWarning: {
+    backgroundColor: '#fff7ed',
+    border: '1px solid #f59e0b',
+  },
+  integrityHeader: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: '0.75rem',
+  },
+  integrityTitle: {
+    color: '#1b4332',
+    margin: 0,
+    fontSize: '1rem',
+  },
+  integrityMessage: {
+    color: '#555',
+    margin: '0.25rem 0 0',
+    fontSize: '0.9rem',
+    lineHeight: 1.5,
   },
   sectionTitle: { color: '#2d6a4f', marginBottom: '1rem', fontSize: '1.1rem' },
   key: { fontWeight: 'bold', color: '#444', fontSize: '0.95rem', flexShrink: 0 },
