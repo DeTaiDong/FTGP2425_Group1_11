@@ -70,21 +70,41 @@ This approach keeps gas costs low while protecting commercially sensitive supply
 
 ```mermaid
 graph LR
-    User([👤 User])
-    MM([🦊 MetaMask])
-    FE([⚛️ React Frontend\nVercel])
-    SC([📜 PassportRegistry\nSepolia Testnet])
-    IPFS([🌐 IPFS\nPinata])
-    BC[(⛓️ Blockchain\nSepolia)]
+    subgraph UL["👥 User Layer"]
+        MFR([🏭 Manufacturer])
+        CNS([🛒 Consumer / Regulator])
+    end
 
-    User -->|Connect Wallet| MM
-    MM -->|Sign Transaction| FE
-    FE -->|Register Product| SC
-    FE -->|Upload Documents| IPFS
-    SC -->|Store Hash + CID| BC
-    BC -->|Read Passport| FE
-    IPFS -->|Retrieve Full Data| FE
-    User -->|Search Product| FE
+    MM([🦊 MetaMask\nSepolia Testnet])
+
+    subgraph AL["⚛️ Application Layer · Vercel"]
+        FE([React + Vite\nEthers.js v6])
+    end
+
+    subgraph SL["🌐 Decentralised Storage"]
+        IPFS([IPFS\nPinata])
+    end
+
+    subgraph BL["⛓️ Blockchain · Sepolia"]
+        SC([📜 PassportRegistry\nSmart Contract])
+        BC[(Sepolia\nLedger)]
+    end
+
+    %% Registration Flow
+    MFR -->|"Connect Wallet"| MM
+    MM -->|"Sign Transaction"| FE
+    FE -->|"① Upload JSON metadata"| IPFS
+    IPFS -.->|"② Return CID"| FE
+    FE -->|"③ registerPassport\nid · CID · keccak256 hash"| SC
+    SC -->|"Emit PassportIssued\nStore on-chain"| BC
+
+    %% Verification Flow
+    CNS -->|"Search Product ID\nno wallet needed"| FE
+    FE -->|"getPassport(id)"| SC
+    SC -.->|"CID · hash · issuer · timestamp"| FE
+    FE -->|"Fetch full document"| IPFS
+    IPFS -.->|"Product JSON"| FE
+    FE -.->|"Verify keccak256 = on-chain hash ✅"| FE
 ```
 
 ## Data Flow
@@ -94,22 +114,31 @@ sequenceDiagram
     participant M as 🏭 Manufacturer
     participant F as ⚛️ Frontend
     participant I as 🌐 IPFS
-    participant C as 📜 Contract
-    participant U as 🛒 Consumer
+    participant C as 📜 PassportRegistry
+    participant U as 🛒 Consumer / Regulator
 
-    M->>F: Fill product details
-    F->>I: Upload JSON to IPFS
-    I-->>F: Return CID
-    F->>F: Compute metadataHash
-    F->>C: registerPassport(id, CID, hash)
-    C-->>F: Transaction confirmed ✅
+    rect rgb(232, 245, 233)
+        Note over M,C: Registration Flow
+        M->>F: Fill product details (materials, provenance, recycling…)
+        F->>I: Upload JSON metadata to Pinata
+        I-->>F: Return IPFS CID
+        F->>F: Compute keccak256(JSON) → metadataHash
+        M->>F: Confirm MetaMask transaction
+        F->>C: registerPassport(productId, CID, metadataHash)
+        C-->>F: Emit PassportIssued · Transaction confirmed ✅
+        F-->>M: Display QR code + Etherscan link
+    end
 
-    U->>F: Search Product ID
-    F->>C: getPassport(id)
-    C-->>F: Return CID + hash + issuer
-    F->>I: Fetch document from IPFS
-    I-->>F: Return full product data
-    F-->>U: Display verified passport 🎉
+    rect rgb(227, 242, 253)
+        Note over U,I: Verification Flow (wallet-free)
+        U->>F: Enter Product ID
+        F->>C: passportExists(id) · getPassport(id)
+        C-->>F: Return CID · hash · issuer · timestamp
+        F->>I: Fetch full document from IPFS gateway
+        I-->>F: Return product JSON
+        F->>F: Recompute keccak256(JSON) · compare with on-chain hash
+        F-->>U: Display verified passport + integrity badge ✅ / ⚠️
+    end
 ```
 
 
