@@ -2,7 +2,7 @@
 
 > A privacy-aware, blockchain-powered Digital Product Passport (DPP) platform for sustainable consumer goods in Europe, built for the EU's Ecodesign for Sustainable Products Regulation (ESPR).
 
-🌐 **Live Demo:** [https://your-vercel-url.vercel.app](https://your-vercel-url.vercel.app)  
+🌐 **Live Demo:** [https://ftgp-2526-group1-11.vercel.app/home](https://ftgp-2526-group1-11.vercel.app/home)  
 📜 **Smart Contract:** [0x0617635eA34a7835807EbC6D0A7aECC9de8E1Cf0](https://sepolia.etherscan.io/address/0x0617635eA34a7835807EbC6D0A7aECC9de8E1Cf0)  
 🔗 **Network:** Ethereum Sepolia Testnet
 
