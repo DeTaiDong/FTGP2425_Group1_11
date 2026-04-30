@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ethers } from 'ethers'
 import { getContract } from '../utils/contract'
+import { getIssuerProfile, getShortAddress } from '../utils/issuerProfiles'
 import SupplyChainMap from '../components/SupplyChainMap'
-import { Link2, Tag, Layers, Route, Map, MapPin, Calendar, Loader, ShieldCheck, TriangleAlert } from 'lucide-react'
+import { Link2, Tag, Layers, Route, Map, MapPin, Calendar, Loader, ShieldCheck, TriangleAlert, Building2 } from 'lucide-react'
 
 function ProductDetail() {
   const { id } = useParams()
@@ -97,6 +98,8 @@ function ProductDetail() {
       <button style={styles.backBtn} onClick={() => navigate('/scan')}>← Back to Search</button>
     </div>
   )
+
+  const issuerProfile = getIssuerProfile(passport.issuer)
 
   return (
     <div style={styles.page}>
@@ -201,6 +204,34 @@ function ProductDetail() {
         <div className="pd-row-stack" style={{ borderBottom: 'none' }}>
           <span className="pd-key" style={styles.key}>Metadata Hash</span>
           <span className="pd-value-mono">{passport.metadataHash}</span>
+        </div>
+      </div>
+
+      <div className="pd-section" style={styles.section}>
+        <h3 className="pd-section-title" style={styles.sectionTitle}>
+          <Building2 size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Issuer Profile
+        </h3>
+        <div style={styles.issuerCard}>
+          <div style={styles.issuerAvatar}>
+            <Building2 size={24} color="white" />
+          </div>
+          <div style={styles.issuerContent}>
+            <div style={styles.issuerTopRow}>
+              <div>
+                <div style={styles.issuerName}>{issuerProfile?.name || 'Unknown Issuer'}</div>
+                <div style={styles.issuerMeta}>
+                  {issuerProfile ? `${issuerProfile.role} - ${issuerProfile.country}` : 'Wallet address only'}
+                </div>
+              </div>
+              <span style={issuerProfile ? styles.issuerVerifiedBadge : styles.issuerUnknownBadge}>
+                {issuerProfile?.verification || 'Unverified'}
+              </span>
+            </div>
+            <div style={styles.issuerWallet}>{getShortAddress(passport.issuer)}</div>
+            <button style={styles.issuerBtn} onClick={() => navigate('/issuer/' + passport.issuer)}>
+              View issuer profile
+            </button>
+          </div>
         </div>
       </div>
 
@@ -383,6 +414,72 @@ const styles = {
     lineHeight: 1.5,
   },
   sectionTitle: { color: '#2d6a4f', marginBottom: '1rem', fontSize: '1.1rem' },
+  issuerCard: {
+    display: 'flex',
+    gap: '0.9rem',
+    alignItems: 'flex-start',
+    backgroundColor: 'white',
+    borderRadius: '8px',
+    padding: '1rem',
+  },
+  issuerAvatar: {
+    width: '44px',
+    height: '44px',
+    minWidth: '44px',
+    borderRadius: '8px',
+    backgroundColor: '#2d6a4f',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  issuerContent: { flex: 1, minWidth: 0 },
+  issuerTopRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    gap: '0.8rem',
+    alignItems: 'flex-start',
+    flexWrap: 'wrap',
+  },
+  issuerName: { color: '#1b4332', fontWeight: '700', fontSize: '1rem' },
+  issuerMeta: { color: '#666', fontSize: '0.85rem', marginTop: '0.2rem' },
+  issuerWallet: {
+    color: '#666',
+    fontFamily: 'monospace',
+    fontSize: '0.8rem',
+    marginTop: '0.7rem',
+    wordBreak: 'break-all',
+  },
+  issuerVerifiedBadge: {
+    color: '#2d6a4f',
+    backgroundColor: '#e8f5e9',
+    border: '1px solid #a5d6a7',
+    borderRadius: '999px',
+    padding: '0.25rem 0.6rem',
+    fontSize: '0.78rem',
+    fontWeight: '700',
+    flexShrink: 0,
+  },
+  issuerUnknownBadge: {
+    color: '#6b7280',
+    backgroundColor: '#f3f4f6',
+    border: '1px solid #d1d5db',
+    borderRadius: '999px',
+    padding: '0.25rem 0.6rem',
+    fontSize: '0.78rem',
+    fontWeight: '700',
+    flexShrink: 0,
+  },
+  issuerBtn: {
+    marginTop: '0.8rem',
+    border: 'none',
+    backgroundColor: '#2d6a4f',
+    color: 'white',
+    borderRadius: '8px',
+    padding: '0.45rem 0.75rem',
+    cursor: 'pointer',
+    fontWeight: '700',
+    fontSize: '0.85rem',
+  },
   key: { fontWeight: 'bold', color: '#444', fontSize: '0.95rem', flexShrink: 0 },
   subKey: { color: '#666', fontSize: '0.9rem', flexShrink: 0 },
   value: { color: '#222', fontSize: '0.95rem', textAlign: 'right' },
