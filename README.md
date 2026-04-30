@@ -39,29 +39,30 @@ This approach keeps gas costs low while protecting commercially sensitive supply
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend Framework | React + Vite |
-| Routing | React Router DOM |
+| Frontend Framework | React 19 + Vite |
+| Routing | React Router DOM v7 |
 | Blockchain Interaction | Ethers.js v6 |
 | Wallet | MetaMask |
-| Smart Contract | Solidity ^0.8.20 |
+| Smart Contract | Solidity ^0.8.20 / Hardhat |
 | Decentralised Storage | IPFS via Pinata |
 | Supply Chain Map | Leaflet.js + OpenStreetMap |
+| QR Code | qrcode.react |
+| Icons | lucide-react |
 | Deployment | Vercel (frontend) + Sepolia Testnet (contract) |
 
 ---
 
 ## Project Structure
 
-## Project Structure
-
 | Directory / File | Description |
 |-----------------|-------------|
 | `contracts/` | Solidity smart contract source code |
-| `scripts/` | IPFS upload and deployment scripts |
-| `src/components/` | Reusable UI components (Navbar, WalletConnect, Map, LocationPicker) |
-| `src/pages/` | Page components (Home, Register, Search, ProductDetail) |
-| `src/utils/` | Contract ABI, address helpers, city coordinates database |
-| `hardhat.config.js` | Hardhat local development configuration |
+| `scripts/` | IPFS upload, batch data, and deployment scripts |
+| `src/components/` | Reusable UI components (Navbar, WalletConnect, SupplyChainMap, LocationPicker) |
+| `src/pages/` | Page components (Landing, Home, RegisterProduct, ScanProduct, ProductDetail, MyProducts, IssuerProfile) |
+| `src/utils/` | Contract ABI, address helpers, issuer profiles, city coordinates |
+| `test/` | Hardhat smart contract tests |
+| `hardhat.config.js` | Hardhat development and deployment configuration |
 | `upload-result.json` | Latest IPFS upload results |
 
 ---
@@ -151,6 +152,18 @@ sequenceDiagram
 **Contract Address (Sepolia):**
 0x0617635eA34a7835807EbC6D0A7aECC9de8E1Cf0
 
+**On-chain Data Structure:**
+
+Each registered passport stores the following fields immutably on the ledger:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `ipfsCID` | `string` | IPFS content identifier pointing to the full product JSON |
+| `metadataHash` | `bytes32` | keccak256 hash of the product JSON for tamper detection |
+| `issuer` | `address` | Ethereum address of the registering manufacturer |
+| `timestamp` | `uint256` | Block timestamp of registration |
+| `exists` | `bool` | Prevents duplicate registration of the same product ID |
+
 **Key Functions:**
 
 | Function | Description |
@@ -165,7 +178,7 @@ sequenceDiagram
 ## Getting Started
 
 ### Prerequisites
-- Node.js >= 18 ([Download](https://nodejs.org))
+- Node.js >= 22 ([Download](https://nodejs.org))
 - MetaMask browser extension
 - MetaMask switched to **Sepolia Testnet**
 - Free test ETH from [Google Sepolia Faucet](https://cloud.google.com/application/web3/faucet/ethereum/sepolia)
@@ -196,28 +209,35 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 1. Connect your MetaMask wallet (Sepolia Testnet)
 2. Navigate to **Register Product**
 3. Fill in product details: basic info, material composition, supply chain stages
-4. Click **Upload to IPFS** — your data is stored on IPFS
+4. Click **Upload to IPFS** — your data is stored on IPFS and a CID is returned
 5. Click **Register on Blockchain** — confirm the MetaMask transaction
 6. Your product passport is now permanently on-chain ✅
+7. Download the generated **QR code** to attach to your physical product
+8. View all your registered products under **My Products**
 
 ### For Consumers & Regulators — Verify a Product
-1. Navigate to **Search Product**
+1. Navigate to **Search Product** (no wallet required)
 2. Enter the Product ID (e.g. `ECO-TX-2025-001`)
-3. View the verified passport — issuer, timestamp, IPFS document link
-4. Click **View Full Detail** to see full material composition, supply chain map, and certifications
+3. View the on-chain record — issuer address, timestamp, IPFS document link
+4. Click **View Full Detail** to see:
+   - Material composition and certifications
+   - Supply chain provenance with interactive map
+   - Data integrity badge (✅ hash match / ⚠️ mismatch)
+   - Issuer profile and verification status
 
 ---
 
 ## IPFS Upload Script
 
-To upload product data to IPFS before registering:
+To upload product data to IPFS before registering, create a `.env` file in the project root:
 
 ```bash
-# Set your Pinata API credentials
-$env:PINATA_API_KEY="your_api_key"
-$env:PINATA_SECRET_API_KEY="your_secret_key"
+VITE_PINATA_JWT=your_pinata_jwt_token
+```
 
-# Run the upload script
+Then run the upload script:
+
+```bash
 node scripts/uploadToIPFS.js
 ```
 
