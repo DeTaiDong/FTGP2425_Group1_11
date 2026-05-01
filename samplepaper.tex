@@ -11,6 +11,30 @@
 %
 \usepackage{graphicx}
 \usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstdefinelanguage{Solidity}{
+	morekeywords={pragma, solidity, contract, struct, mapping, 
+		address, uint256, bytes32, string, bool, 
+		function, public, private, view, returns, 
+		emit, event, require, memory, storage},
+	sensitive=true,
+	morecomment=[l]{//},
+	morecomment=[s]{/*}{*/},
+	morestring=[b]{"}
+}
+
+\lstset{
+	basicstyle=\ttfamily\small,
+	keywordstyle=\color{blue}\bfseries,
+	commentstyle=\color{gray}\itshape,
+	stringstyle=\color{orange},
+	breaklines=true,
+	showstringspaces=false,
+	frame=single
+}
+
 \renewcommand{\theHsection}{\thepart.\thesection} 
 
 
@@ -203,18 +227,22 @@
 	\vspace{-0.2cm}
 	
 	\subsection{User Interface Design}
-	To reflect the theme of environmental protection, the page adopts a dark green colour scheme (\texttt{\#2d6a4f}, \texttt{\#1b4332}). 
-	The layout uses standard \texttt{rem} spacing for a concise and consistent visual effect. 
-	As shown in Figure~\ref{fig:ui_search}, the design of the homepage is concise and clear. Users can directly find the product ID through the central search bar without binding the wallet.
 	
 	\vspace{-0.2cm}
 	\begin{figure}[htbp]
 		\centering
 		\includegraphics[width=0.9\linewidth]{figures/5.png}
-		\caption{Wireframe of the landing page and wallet-free search interface.}
+		\caption{Wireframe of the search interface, showing the initial state and the on-chain result card.}
 		\label{fig:ui_search}
 	\end{figure}
 	\vspace{-0.2cm}
+	
+	
+	
+	To reflect the environmental theme, the page adopts a dark green colour scheme (\texttt{\#2d6a4f}, \texttt{\#1b4332}). The layout uses standard \texttt{rem} spacing for a clean and consistent visual effect. As shown in Figure~\ref{fig:ui_search}, the search interface is straightforward. Users can query a product ID via the central search bar or use the predefined quick search buttons, entirely without connecting a wallet. The interface transitions from an initial empty state to a verified result card upon a successful search. This card immediately displays the core on-chain data—such as the issuer address, registration timestamp, and metadata hash—providing instant verification before the user proceeds to view the full product passport.
+	
+
+	
 	
 	Figure~\ref{fig:ui_register} displays the registration layout. 
 	A simple tracker (Fill Details $\to$ Upload IPFS $\to$ Register Chain $\to$ Done) shows the user's registration progress. 
@@ -255,11 +283,94 @@
 	
 	\section{Project Execution}
 	
-	The implementation of EcoPassEU adopts a hybrid architecture that combines on-chain and off-chain to achieve a balance between data transparency and execution efficiency. The core data structure is distributed in two environments. In the on-chain part, the smart contract \texttt{PassportRegistry.sol} uses a strictly typified struct named \texttt{Passport} to store the smallest and immutable data: \texttt{ipfsCID} (\texttt{string}), \texttt{metadataHash} (\texttt{bytes32}), issuer's address and timestamp. The system directly associates the unique product ID with its corresponding data through state mapping, so as to ensure that it can be retrieved quickly. Although the original system design considered using ERC-1155 tokens to represent product passports, we finally chose this lightweight, structure-based registry scheme to significantly reduce the deployment complexity and initial gas cost. In the off-chain part, the complete life cycle data---including product category, brand, material composition and supply chain traceability information---is organised as JSON objects at the front end. The data is uploaded to IPFS through Pinata. Before registering on the chain, the React front-end uses the Ethers.js library to calculate the cryptographic hash value of the JSON.
+	\subsection{Core Code Analysis and Data Structures}
+	EcoPassEU uses a hybrid architecture, separating on-chain and off-chain data to balance transparency with efficiency. The core data structure is divided across these two environments. 
 	
-	In order to ensure the stable execution of smart contracts, we performed a complete set of unit tests in the Hardhat environment combined with the Chai assertion library, following established practices in smart contract analysis and validation \cite{Ferreira2020SmartBugs}. The test confirms that the \texttt{registerPassport} function can correctly store the issuer's address---which is automatically derived from the transaction sender to prevent forgery---and generate a valid block timestamp. The test also clearly verified the boundary situation, and successfully ensured that when submitting duplicate product IDs, the transaction will roll back and report errors. In addition, the \texttt{batchRegisterPassports} function has also been tested to process multiple arrays at the same time, correctly trigger events for valid entries, and silently skip registered products.
+	Off-chain, the complete lifecycle data---including category, brand, material composition, and supply chain provenance---is structured as JSON objects and pinned to IPFS via Pinata. On-chain, the \texttt{PassportRegistry.sol} smart contract uses a strictly typed \texttt{Passport} struct to store only the essential, immutable references:
 	
-	From the perspective of user interaction, the front-end component simplifies the manufacturer's usage process into a logical and clear operation chain. Manufacturers input materials and traceable data, and use integrated map components to record spatial coordinates. After clicking ``Upload to IPFS'', the data will be pinned to IPFS and return a unique content identifier (CID). Finally, clicking ``Register on Blockchain'' will trigger the user's MetaMask wallet to sign the transaction and submit the CID and metadata hash to the Sepolia testnet. After successful registration, the system will dynamically generate a QR code mapped to the product URL. Users can directly download the QR code from the interface for physical product labels.
+	\begin{lstlisting}[language=Solidity, 
+		caption={Core Data Structure in PassportRegistry.sol}]
+		struct Passport {
+			string  ipfsCID;       // off-chain document pointer
+			bytes32 metadataHash;  // keccak256 of JSON for tamper-evidence
+			address issuer;
+			uint256 timestamp;
+			bool    exists;
+		}
+		
+		// productId => Passport
+		mapping(string => Passport) private passports;
+	\end{lstlisting}
+	
+	This private mapping directly associates a unique product ID with its corresponding 
+	passport data for O(1) retrieval. Initially, we considered using ERC-1155 tokens 
+	to represent these passports; however, we opted for this lightweight registry 
+	approach. Storing only the IPFS CID, a cryptographic hash, the issuer address, 
+	and a block timestamp on-chain significantly reduces deployment complexity and 
+	gas costs per registration, whilst keeping the full product lifecycle data 
+	off-chain on IPFS.
+	
+	\subsection{Testing Strategy}
+	To ensure the reliability of the smart contracts, we implemented a comprehensive unit testing suite using the Hardhat environment alongside the Chai assertion library. This follows established practices for smart contract validation \cite{Ferreira2020SmartBugs}. 
+	
+	Our testing strategy focused on core functionality and edge cases. We confirmed that the \texttt{registerPassport} function accurately stores the transaction sender's address as the issuer, preventing forgery, and generates a valid block timestamp. Furthermore, boundary testing verified that the contract successfully reverts transactions and reports errors when a duplicate product ID is submitted. We also tested the \texttt{batchRegisterPassports} function to ensure it can process arrays efficiently, emit correct events for valid entries, and silently skip already registered products without failing the entire batch.
+	
+	
+	\subsection{Final UI Showcase}
+	
+	
+    Figures~\ref{fig:ui_register} and~\ref{fig:ui_verify} show the 
+    deployed EcoPassEU interface.
+	The registration portal guides manufacturers through a structured 
+	form with a step indicator, whilst the public verification page 
+	displays the passport details, integrity status, and IPFS document 
+	link without requiring a wallet.
+	\vspace{-0.2cm}
+	\begin{figure}[htbp]
+		\centering
+		\includegraphics[width=0.85\linewidth]{figures/8.png}
+		\caption{Deployed EcoPassEU interface: manufacturer registration portal.}
+		\label{fig:ui_register}
+	\end{figure}
+	
+	\begin{figure}[htbp]
+		\centering
+		\includegraphics[width=0.85\linewidth]{figures/9.png}
+		\caption{Deployed EcoPassEU interface: public product verification page.}
+		\label{fig:ui_verify}
+	\end{figure}
+	\vspace{-0.2cm}
+	
+	\subsection{User Manual}
+	The application is designed to be intuitive for two distinct user groups. 
+	
+	\textbf{For Manufacturers (Registration):}
+	\begin{enumerate}
+		\item Connect your MetaMask wallet to the Sepolia testnet using the top navigation bar.
+		\item Navigate to the 'Register' page and complete the product detail forms, including material and supply chain data.
+		\item Click 'Upload to IPFS'. The system will generate a unique CID.
+		\item Click 'Register on Blockchain' and approve the transaction in the MetaMask pop-up.
+		\item Once confirmed, download the generated QR code to attach to your physical products.
+	\end{enumerate}
+	
+	\textbf{For Consumers and Regulators (Verification):}
+	\begin{enumerate}
+		\item No wallet connection is required. Open the EcoPassEU homepage.
+		\item Enter the Product ID into the central search bar, or scan the product's QR code.
+		\item Review the product's lifecycle data. A green 'Blockchain Verified' badge indicates that the IPFS data matches the immutable blockchain record.
+	\end{enumerate}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
