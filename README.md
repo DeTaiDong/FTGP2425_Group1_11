@@ -143,7 +143,64 @@ sequenceDiagram
     F-->>U: Display verified passport + integrity badge ✅ / ⚠️
 ```
 
+---
 
+## Use Case Diagram
+
+```mermaid
+graph LR
+    %% ── Actors (outside system boundary) ──
+    MFR(["🏭\nManufacturer"])
+    ADM(["⚙️\nAdmin"])
+    CNS(["🛒\nConsumer /\nRegulator"])
+
+    %% ── System Boundary ──
+    subgraph SYS["EcoPassEU — System Boundary"]
+        direction TB
+
+        subgraph MUC["Manufacturer Use Cases"]
+            UC01(["UC-01\nConnect MetaMask Wallet"])
+            UC02(["UC-02\nComplete Registration Form"])
+            UC03(["UC-03\nUpload Product JSON to IPFS"])
+            UC04(["UC-04\nRegister Passport on Blockchain"])
+            UC05(["UC-05\nDownload QR Code"])
+            UC06(["UC-06\nView Personal Product List"])
+        end
+
+        subgraph CUC["Consumer / Regulator Use Cases"]
+            UC07(["UC-07\nSearch by Product ID"])
+            UC08(["UC-08\nView Full Passport Details"])
+            UC09(["UC-09\nVerify Data Integrity"])
+            UC10(["UC-10\nView Supply Chain Map"])
+            UC11(["UC-11\nView Issuer Profile"])
+        end
+
+        subgraph AUC["Admin Use Cases"]
+            UC12(["UC-12\nBatch-register Products"])
+        end
+    end
+
+    %% ── Actor Associations ──
+    MFR --- UC01
+    MFR --- UC02
+    MFR --- UC05
+    MFR --- UC06
+    ADM --- UC12
+    CNS --- UC07
+    CNS --- UC08
+
+    %% ── Include relationships (mandatory sub-flows) ──
+    UC02 -.->|"«include»"| UC03
+    UC02 -.->|"«include»"| UC04
+    UC04 -.->|"«include»"| UC01
+    UC12 -.->|"«include»"| UC01
+    UC08 -.->|"«include»"| UC09
+    UC08 -.->|"«include»"| UC10
+
+    %% ── Extend relationships (optional sub-flows) ──
+    UC11 -.->|"«extend»"| UC08
+    UC05 -.->|"«extend»"| UC06
+```
 
 ---
 
