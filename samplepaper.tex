@@ -370,11 +370,7 @@
 	
 	
 	
-	
-	
-	
-	
-	\subsection{Critical Evaluation}
+	\section{Critical Evaluation}
 	
 	A critical assessment of the execution cost of the DApp shows that its gas efficiency has been highly optimised. The design of storing larger string data such as repair guides or recycling instructions off-chain ensures that the state changes required for the registry are extremely lightweight. According to the testnet deployment results and standard EVM opcodes estimates, executing a single registration transaction consumes about 125,430 gas. In addition, the \texttt{batchRegisterPassports} function shows significant operational scalability. By traversing a set of ID and hash values in one transaction, the contract avoids the basic transaction fee of 21,000 gas. Test data shows that when 10 products are registered in bulk, the average gas cost of a single product can be reduced to about 92,100 gas, achieving an efficiency improvement of more than 25\%, making the platform economically feasible for small and medium-sized enterprises.
 	
@@ -383,9 +379,16 @@
 	Although the decentralised architecture provides strong security, it also brings some runtime restrictions. The DApp performs quickly in on-chain verification and can usually be read in the state of completion in milliseconds. However, the access to the complete product history depends on public IPFS gateways, which sometimes have higher latency than centralised cloud servers. In addition, although the current platform runs efficiently on the Sepolia testnet, if it is migrated to the Ethereum mainnet, users will face volatile gas costs. Future versions of EcoPassEU should be considered for deployment on Layer-2 networks such as Polygon. This can not only maintain EVM compatibility, but also achieve near-instant final confirmation; at the same time, if it is necessary to support secondary market transfer in the future, it can be further reconstructed into a plan based on ERC-1155 tokens \cite{Radomski2018ERC1155}.
 	
 	
+	
+	
 	\section{Conclusion}
-	% Concise overview of findings, achievements, limitations, and future work.
-	Summarize the main theoretical and technical findings. Detail what the group achieved, acknowledge limitations (e.g., the physical-to-digital bridge vulnerabilities), and propose future work.
+	This project successfully built EcoPassEU, a decentralised application (DApp) that provides Digital Product Passports (DPPs) to meet the EU's Ecodesign for Sustainable Products Regulation (ESPR) \cite{EU2024ESPR}. By using Ethereum smart contracts \cite{Antonopoulos2018Mastering}, the system registers and verifies products automatically without relying on central authorities \cite{Szabo1997Formalizing}. To prevent false environmental claims, a \texttt{keccak256} hash securely links the immutable on-chain record to the full document on IPFS \cite{NIST2015SHA3}. Furthermore, running on Ethereum's Proof-of-Stake network aligns with the project's green goals by keeping energy use extremely low \cite{EthereumMerge2022,Buterin2019Casper,Saberi2019Blockchain}. This hybrid storage model also greatly reduces gas fees by keeping heavy data off the blockchain \cite{Kouhizadeh2021Blockchain}.
+	
+	Technically, the platform is live on the Sepolia testnet. We used Hardhat to test the smart contracts thoroughly, ensuring core functions and edge cases perform exactly as expected \cite{Hardhat2024}. To help small and medium enterprises (SMEs), we added a batch registration feature that significantly cuts transaction costs. The front-end allows consumers to view product histories without a crypto wallet, fetching data smoothly via public nodes \cite{EthersJS2024}. 
+	
+	However, the system has current limitations. As a testnet deployment, real-world gas costs and network limits remain unproven. Using a single IPFS provider (Pinata) also introduces a central point of failure. Furthermore, the platform lacks identity verification (KYC), meaning any user can register a product ID. Finally, the strict immutability of the smart contract means honest mistakes cannot be fixed, and products cannot be officially recalled or revoked.
+	
+	Future work will focus on mainnet deployment and gas profiling. We plan to add decentralised identifiers (DIDs) or verifiable credentials to confirm manufacturer identities, alongside a system to update or revoke passports safely. Moving to a multi-node storage solution like Filecoin will remove the reliance on one IPFS gateway. Finally, zero-knowledge proofs could be explored to hide sensitive supply chain details while still proving compliance to the public. Overall, EcoPassEU proves that blockchain offers a practical, transparent way to track sustainable goods, providing a strong base for future real-world use.
 	
 	
 	
