@@ -148,40 +148,47 @@ sequenceDiagram
 ## Use Case Diagram
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'background': '#ffffff', 'lineColor': '#64748b', 'fontSize': '13px'}}}%%
 graph LR
-    %% ── Actors (outside system boundary) ──
-    MFR(["🏭\nManufacturer"])
-    ADM(["⚙️\nAdmin"])
-    CNS(["🛒\nConsumer /\nRegulator"])
+
+    classDef actor  fill:#1e293b,stroke:#1e293b,color:#f1f5f9,font-weight:bold
+    classDef ucBlue fill:#eff6ff,stroke:#3b82f6,stroke-width:1.5px,color:#1e3a5f
+    classDef ucGreen fill:#f0fdf4,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+    classDef ucAmber fill:#fefce8,stroke:#ca8a04,stroke-width:2px,color:#713f12,font-weight:bold
+
+    %% ── Actors ──
+    MFR["🏭 Manufacturer"]:::actor
+    ADM["⚙️ Admin"]:::actor
+    CNS["🛒 Consumer / Regulator"]:::actor
 
     %% ── System Boundary ──
     subgraph SYS["EcoPassEU — System Boundary"]
         direction TB
 
-        subgraph MUC["Manufacturer Use Cases"]
-            UC01(["UC-01\nConnect MetaMask Wallet"])
-            UC02(["UC-02\nComplete Registration Form"])
-            UC03(["UC-03\nUpload Product JSON to IPFS"])
-            UC04(["UC-04\nRegister Passport on Blockchain"])
-            UC05(["UC-05\nDownload QR Code"])
-            UC06(["UC-06\nView Personal Product List"])
+        subgraph SHARED["Shared Prerequisite"]
+            UC01(["UC-01 · Connect MetaMask Wallet"]):::ucAmber
         end
 
-        subgraph CUC["Consumer / Regulator Use Cases"]
-            UC07(["UC-07\nSearch by Product ID"])
-            UC08(["UC-08\nView Full Passport Details"])
-            UC09(["UC-09\nVerify Data Integrity"])
-            UC10(["UC-10\nView Supply Chain Map"])
-            UC11(["UC-11\nView Issuer Profile"])
+        subgraph REG["Manufacturer Use Cases"]
+            UC02(["UC-02 · Complete Registration Form"]):::ucBlue
+            UC03(["UC-03 · Upload to IPFS"]):::ucBlue
+            UC04(["UC-04 · Register On-chain"]):::ucBlue
+            UC05(["UC-05 · Download QR Code"]):::ucBlue
+            UC06(["UC-06 · My Products"]):::ucBlue
+            UC12(["UC-12 · Batch-register Products"]):::ucBlue
         end
 
-        subgraph AUC["Admin Use Cases"]
-            UC12(["UC-12\nBatch-register Products"])
+        subgraph VER["Consumer / Regulator Use Cases"]
+            UC07(["UC-07 · Search by Product ID"]):::ucGreen
+            UC08(["UC-08 · View Full Passport"]):::ucGreen
+            UC09(["UC-09 · Verify Data Integrity"]):::ucGreen
+            UC10(["UC-10 · Supply Chain Map"]):::ucGreen
+            UC11(["UC-11 · Issuer Profile"]):::ucGreen
         end
     end
 
     %% ── Actor Associations ──
-    MFR --- UC01
+    %% MFR→UC-01 omitted: implied via UC-02→UC-04→UC-01 include chain
     MFR --- UC02
     MFR --- UC05
     MFR --- UC06
@@ -189,7 +196,7 @@ graph LR
     CNS --- UC07
     CNS --- UC08
 
-    %% ── Include relationships (mandatory sub-flows) ──
+    %% ── Include (mandatory sub-flows) ──
     UC02 -.->|"«include»"| UC03
     UC02 -.->|"«include»"| UC04
     UC04 -.->|"«include»"| UC01
@@ -197,9 +204,14 @@ graph LR
     UC08 -.->|"«include»"| UC09
     UC08 -.->|"«include»"| UC10
 
-    %% ── Extend relationships (optional sub-flows) ──
+    %% ── Extend (optional sub-flows) ──
     UC11 -.->|"«extend»"| UC08
     UC05 -.->|"«extend»"| UC06
+
+    style SYS    fill:#f8fafc,stroke:#475569,stroke-width:2px
+    style SHARED fill:#ffffff,stroke:#fde68a,stroke-width:1px
+    style REG    fill:#ffffff,stroke:#93c5fd,stroke-width:1px
+    style VER    fill:#ffffff,stroke:#86efac,stroke-width:1px
 ```
 
 ---
