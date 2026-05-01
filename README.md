@@ -108,7 +108,7 @@ graph LR
     FE -.->|"Verify keccak256 = on-chain hash ✅"| FE
 ```
 
-## Data Flow
+## Sequence Diagram
 
 ```mermaid
 sequenceDiagram
