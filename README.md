@@ -378,6 +378,131 @@ flowchart TD
 
 ---
 
+## UI Wireframes
+
+Three wireframes cover the core user journeys. Each diagram flows **left → right**, mapping top-to-bottom page sections onto a horizontal axis. Colours distinguish UI layers: dark green for navigation, purple for on-chain data, light green for IPFS data, and amber for action elements.
+
+### Wireframe A — Scan Product (Consumer Entry)
+
+```mermaid
+graph LR
+    classDef nav  fill:#1b4332,color:#fff,stroke:#1b4332
+    classDef card fill:#f0f7f4,stroke:#2d6a4f,stroke-width:1.5px,color:#1b4332
+
+    A1["NAVBAR
+    🌿 EcoPassEU  ·  Home  ·  Scan Product  ·  My Products  ·  Connect Wallet"]:::nav
+
+    A2["HERO SECTION
+    Verify Product Sustainability Credentials
+    Search any product — no wallet required"]:::card
+
+    A3["SEARCH BAR
+    [ Product ID  e.g. ECO-TX-2025-001                    ]  [ 🔍 Search ]"]:::card
+
+    A4["RESULT CARD
+    ECO Organic Cotton T-Shirt                    EcoWear GmbH
+    Product ID: ECO-TX-2025-001  ·  Registered: 2025-01-15
+                                        [ View Full Passport ▶ ]"]:::card
+
+    A1 --> A2 --> A3 --> A4
+```
+
+### Wireframe B — Register Product (Manufacturer)
+
+```mermaid
+graph LR
+    classDef nav    fill:#1b4332,color:#fff,stroke:#1b4332
+    classDef hdr    fill:#2d6a4f,color:#fff,stroke:#2d6a4f
+    classDef card   fill:#f0f7f4,stroke:#2d6a4f,stroke-width:1.5px,color:#1b4332
+    classDef action fill:#fff8e1,stroke:#ca8a04,stroke-width:1.5px,color:#78350f
+
+    B1["NAVBAR
+    🌿 EcoPassEU  ·  Home  ·  Register  ·  My Products  ·  0xAbCd...1234"]:::nav
+
+    B2["PAGE HEADER  green gradient
+    Register Product Passport
+    ① Fill Details ──▶ ② Upload IPFS ──▶ ③ Register Chain ──▶ ④ Done"]:::hdr
+
+    B3["CARD: Basic Information
+    Product ID *    [ _________________ ]
+    Product Name *  [ _________________ ]
+    Brand *         [ _________________ ]
+    Category        [ Select ▾ ]   Recyclable  [ Select ▾ ]
+    Repair URL      [ _________________ ]
+    Recycling       [ _________________ ]"]:::card
+
+    B4["CARD: Material Composition
+    [ Name ──── ][ % ][ Origin ][ Certification ]  [ × Remove ]
+    [ Name ──── ][ % ][ Origin ][ Certification ]  [ × Remove ]
+    [ + Add Material ]"]:::card
+
+    B5["CARD: Supply Chain Provenance
+    [ Stage Name ─────── ][ Location ▾ ][ Date ]  [ × Remove ]
+    [ Stage Name ─────── ][ Location ▾ ][ Date ]  [ × Remove ]
+    [ + Add Stage ]"]:::card
+
+    B6["ACTIONS
+    Step 1  [ ▲ Upload to IPFS ]
+    Step 2  ✅ CID: Qm3x...  ·  hash: 0xef12...
+    Step 3  [ 🔗 Register on Blockchain ]  MetaMask popup
+    Step 4  QR Code download  +  Etherscan TX link"]:::action
+
+    B1 --> B2 --> B3 --> B4 --> B5 --> B6
+```
+
+### Wireframe C — Product Detail (Consumer / Regulator)
+
+```mermaid
+graph LR
+    classDef nav   fill:#1b4332,color:#fff,stroke:#1b4332
+    classDef chain fill:#faf5ff,stroke:#7c3aed,stroke-width:1.5px,color:#4c1d95
+    classDef ipfs  fill:#f0f7f4,stroke:#2d6a4f,stroke-width:1.5px,color:#1b4332
+    classDef ok    fill:#edf7f0,stroke:#16a34a,stroke-width:2px,color:#14532d
+
+    C1["NAVBAR
+    🌿 EcoPassEU  ·  Home  ·  Scan Product  ·  no wallet required"]:::nav
+
+    C2["BACK + TITLE
+    [ ← Back to Search ]    Product Passport Detail"]:::chain
+
+    C3["CARD: Blockchain Record  ⛓ on-chain
+    Product ID   ECO-TX-2025-001
+    Issuer       0xAbCd...1234
+    Timestamp    2025-01-15  10:32
+    Hash         0xef12...9a3b"]:::chain
+
+    C4["CARD: Issuer Profile  ⛓ on-chain
+    🏢 EcoWear GmbH     [ ✓ Verified ]
+    Manufacturer · Germany · 0xAbCd...1234
+    [ View issuer profile ▶ ]"]:::chain
+
+    C5["CARD: Data Integrity
+    🛡 VERIFIED ✅  IPFS hash == on-chain hash
+    — or —
+    ⚠ WARNING    hash mismatch detected"]:::ok
+
+    C6["CARD: Product Information  🌐 IPFS
+    Brand: EcoWear GmbH    Category: Textile
+    Recycling: Drop-off at any H&M store"]:::ipfs
+
+    C7["CARD: Material Composition  🌐 IPFS
+    Organic Cotton     85%   India  ·  GOTS
+    Recycled Polyester 15%   EU     ·  GRS"]:::ipfs
+
+    C8["CARD: Supply Chain Provenance  🌐 IPFS
+    ① Raw Material    Gujarat, India     2024-03
+    ② Spinning        Tamil Nadu         2024-04
+    ③ Manufacturing   Dhaka, Bangladesh  2024-06"]:::ipfs
+
+    C9["CARD: Supply Chain Map  🗺  IPFS
+    Interactive Leaflet map
+    route polyline  +  location markers"]:::ipfs
+
+    C1 --> C2 --> C3 --> C4 --> C5 --> C6 --> C7 --> C8 --> C9
+```
+
+---
+
 ## Smart Contract
 
 **Contract Address (Sepolia):**
