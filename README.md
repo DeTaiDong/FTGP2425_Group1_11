@@ -147,48 +147,49 @@ sequenceDiagram
 
 ## Use Case Diagram
 
+> **Note:** GitHub renders Mermaid but not PlantUML. The diagram below uses Mermaid with UML `«actor»` stereotypes. For the formal report, use the PlantUML source in the appendix to generate a standard stick-figure diagram.
+
 ```mermaid
 %%{init: {'theme': 'base', 'themeVariables': {'background': '#ffffff', 'lineColor': '#64748b', 'fontSize': '13px'}}}%%
 graph LR
 
-    classDef actor  fill:#1e293b,stroke:#1e293b,color:#f1f5f9,font-weight:bold
+    classDef actor  fill:#f1f5f9,stroke:#334155,stroke-width:2px,color:#0f172a,font-weight:bold
     classDef ucBlue fill:#eff6ff,stroke:#3b82f6,stroke-width:1.5px,color:#1e3a5f
     classDef ucGreen fill:#f0fdf4,stroke:#16a34a,stroke-width:1.5px,color:#14532d
     classDef ucAmber fill:#fefce8,stroke:#ca8a04,stroke-width:2px,color:#713f12,font-weight:bold
 
-    %% ── Actors ──
-    MFR["🏭 Manufacturer"]:::actor
-    ADM["⚙️ Admin"]:::actor
-    CNS["🛒 Consumer / Regulator"]:::actor
+    %% ── Actors (UML «actor» stereotype) ──
+    MFR["«actor»\n🏭 Manufacturer"]:::actor
+    ADM["«actor»\n⚙️ Admin"]:::actor
+    CNS["«actor»\n🛒 Consumer / Regulator"]:::actor
 
     %% ── System Boundary ──
     subgraph SYS["EcoPassEU — System Boundary"]
         direction TB
 
         subgraph SHARED["Shared Prerequisite"]
-            UC01(["UC-01 · Connect MetaMask Wallet"]):::ucAmber
+            UC01(["UC-01\nConnect MetaMask Wallet"]):::ucAmber
         end
 
         subgraph REG["Manufacturer Use Cases"]
-            UC02(["UC-02 · Complete Registration Form"]):::ucBlue
-            UC03(["UC-03 · Upload to IPFS"]):::ucBlue
-            UC04(["UC-04 · Register On-chain"]):::ucBlue
-            UC05(["UC-05 · Download QR Code"]):::ucBlue
-            UC06(["UC-06 · My Products"]):::ucBlue
-            UC12(["UC-12 · Batch-register Products"]):::ucBlue
+            UC02(["UC-02\nComplete Registration Form"]):::ucBlue
+            UC03(["UC-03\nUpload to IPFS"]):::ucBlue
+            UC04(["UC-04\nRegister On-chain"]):::ucBlue
+            UC05(["UC-05\nDownload QR Code"]):::ucBlue
+            UC06(["UC-06\nMy Products"]):::ucBlue
+            UC12(["UC-12\nBatch-register Products"]):::ucBlue
         end
 
         subgraph VER["Consumer / Regulator Use Cases"]
-            UC07(["UC-07 · Search by Product ID"]):::ucGreen
-            UC08(["UC-08 · View Full Passport"]):::ucGreen
-            UC09(["UC-09 · Verify Data Integrity"]):::ucGreen
-            UC10(["UC-10 · Supply Chain Map"]):::ucGreen
-            UC11(["UC-11 · Issuer Profile"]):::ucGreen
+            UC07(["UC-07\nSearch by Product ID"]):::ucGreen
+            UC08(["UC-08\nView Full Passport"]):::ucGreen
+            UC09(["UC-09\nVerify Data Integrity"]):::ucGreen
+            UC10(["UC-10\nSupply Chain Map"]):::ucGreen
+            UC11(["UC-11\nIssuer Profile"]):::ucGreen
         end
     end
 
     %% ── Actor Associations ──
-    %% MFR→UC-01 omitted: implied via UC-02→UC-04→UC-01 include chain
     MFR --- UC02
     MFR --- UC05
     MFR --- UC06
@@ -213,6 +214,62 @@ graph LR
     style REG    fill:#ffffff,stroke:#93c5fd,stroke-width:1px
     style VER    fill:#ffffff,stroke:#86efac,stroke-width:1px
 ```
+
+<details>
+<summary>PlantUML source (for LaTeX / formal report)</summary>
+
+```plantuml
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Manufacturer" as M
+actor "Admin" as A
+actor "Consumer / Regulator" as CR
+
+rectangle "EcoPassEU — System Boundary" {
+
+    package "Shared Prerequisite" {
+        usecase "UC-01\nConnect MetaMask Wallet" as UC01
+    }
+
+    package "Manufacturer Use Cases" {
+        usecase "UC-02\nComplete Registration Form" as UC02
+        usecase "UC-03\nUpload to IPFS" as UC03
+        usecase "UC-04\nRegister On-chain" as UC04
+        usecase "UC-05\nDownload QR Code" as UC05
+        usecase "UC-06\nMy Products" as UC06
+        usecase "UC-12\nBatch-register Products" as UC12
+    }
+
+    package "Consumer / Regulator Use Cases" {
+        usecase "UC-07\nSearch by Product ID" as UC07
+        usecase "UC-08\nView Full Passport" as UC08
+        usecase "UC-09\nVerify Data Integrity" as UC09
+        usecase "UC-10\nSupply Chain Map" as UC10
+        usecase "UC-11\nIssuer Profile" as UC11
+    }
+}
+
+M  -- UC02
+M  -- UC05
+M  -- UC06
+A  -- UC12
+CR -- UC07
+CR -- UC08
+
+UC02 .> UC03 : <<include>>
+UC02 .> UC04 : <<include>>
+UC04 .> UC01 : <<include>>
+UC12 .> UC01 : <<include>>
+UC08 .> UC09 : <<include>>
+UC08 .> UC10 : <<include>>
+UC11 .> UC08 : <<extend>>
+UC05 .> UC06 : <<extend>>
+@enduml
+```
+
+</details>
 
 ---
 
