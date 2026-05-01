@@ -386,25 +386,43 @@ Three wireframes cover the core user journeys. Each diagram flows **left → rig
 
 ```mermaid
 graph LR
-    classDef nav  fill:#1b4332,color:#fff,stroke:#1b4332
-    classDef card fill:#f0f7f4,stroke:#2d6a4f,stroke-width:1.5px,color:#1b4332
+    classDef nav   fill:#1b4332,color:#fff,stroke:#1b4332
+    classDef card  fill:#f0f7f4,stroke:#2d6a4f,stroke-width:1.5px,color:#1b4332
+    classDef empty fill:#ffffff,stroke:#a5d6a7,stroke-width:1.5px,color:#888
+    classDef result fill:#ffffff,stroke:#2d6a4f,stroke-width:2px,color:#1b4332
 
     A1["NAVBAR
     🌿 EcoPassEU  ·  Home  ·  Scan Product  ·  My Products  ·  Connect Wallet"]:::nav
 
-    A2["HERO SECTION
-    Verify Product Sustainability Credentials
-    Search any product — no wallet required"]:::card
+    A2["HEADER  green gradient background
+    🔍 Search Product Passport
+    Enter a Product ID to instantly retrieve its verified
+    Digital Product Passport from the Sepolia blockchain."]:::nav
 
-    A3["SEARCH BAR
-    [ Product ID  e.g. ECO-TX-2025-001                    ]  [ 🔍 Search ]"]:::card
+    A3["SEARCH CARD
+    Product ID
+    [ e.g. ECO-TX-2025-001                    ]  [ Search ]
+    Quick search:  ECO-TX-2025-001   ECO-EL-2025-001   ECO-FN-2025-001"]:::card
 
-    A4["RESULT CARD
-    ECO Organic Cotton T-Shirt                    EcoWear GmbH
-    Product ID: ECO-TX-2025-001  ·  Registered: 2025-01-15
-                                        [ View Full Passport ▶ ]"]:::card
+    A4["RESULT CARD  on-chain data only
+    ✅ Passport Found   ECO-TX-2025-001   [ Blockchain Verified ]
+    ────────────────────────────────────────────────────────
+    Product ID      ECO-TX-2025-001
+    Issuer          0xAbCd...1234
+    Registered At   2025-01-15  10:32
+    IPFS Document   Qm3xR...  link
+    Metadata Hash   0xef12...9a3b
+    ────────────────────────────────────────────────────────
+    [ View Full Detail ]          [ Copy ID ]"]:::result
 
-    A1 --> A2 --> A3 --> A4
+    A5["EMPTY STATE  initial view
+    🌿
+    Enter a Product ID above to verify its Digital Product Passport
+    All registered products are publicly verifiable on the blockchain"]:::empty
+
+    A1 --> A2 --> A3
+    A3 -->|search success| A4
+    A3 -->|before search| A5
 ```
 
 ### Wireframe B — Register Product (Manufacturer)
