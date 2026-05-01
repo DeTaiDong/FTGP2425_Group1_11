@@ -121,20 +121,88 @@
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	\section{Design Documentation}
-	% System's design, overall architecture, UI designs.
-	% Use Case diagrams, Sequence/Flow diagrams, State diagrams.
-	Outline the system architecture of EcoPassEU. Include your justifications for using EVM-compatible networks like Polygon, ERC-1155 tokens, IPFS, and DIDs/VCs. Insert your Use Case diagrams, Sequence/Flow diagrams, and front-end wireframes here.
+	\subsection{Design Philosophy and Architectural Choices}
+	EcoPassEU is a DPP designed to deliver ESPR-compliant Digital Product Passports with independently verifiable sustainability data. The design is governed by three design principles, each addressing a specific product requirement. 
+	
+	First, a hybrid storage model is adopted: full product data is pinned to 
+	IPFS via Pinata \cite{Benet2014IPFS}, whilst only the content identifier 
+	(CID), a \texttt{keccak256} integrity hash, the issuer address, and a 
+	timestamp are recorded on-chain \cite{Wood2014Ethereum}, keeping gas costs 
+	low. Second, commercially sensitive data remains off-chain by design; the 
+	on-chain hash serves as an integrity anchor, confirming that the off-chain 
+	document is unaltered without exposing its contents to the ledger. Third, 
+	all read queries use a public RPC endpoint, allowing consumers and 
+	regulators to inspect any passport without holding a wallet or incurring 
+	gas fees.
+
+	\subsection{System Architecture}
+	Figure ~\ref{fig:architecture} shows the four-layer architecture of the overall system
+    \vspace{-0.2cm}
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=\linewidth]{figures/1.png}
+		\caption{EcoPassEU system architecture.}
+		\label{fig:architecture}
+	\end{figure}
+    \vspace{-0.2cm}
+	
+	At the user layer, two distinct actors participants interact with the system: manufacturers, who connect through MetaMask to sign and submit transactions, and consumers or regulators, who can query product records without a wallet. 
+	Both routes pass through the application layer — a React/Vitefrontend deployed on Vercel, using Ethers.js~v6 for contract calls — which is responsible for uploading documents to IPFS, calling the Sepolia test network and local integrity check. 
+	The \texttt{PassportRegistry} smart contract records the CID, metadata hash, issuer address, and timestamp on the Sepolia ledger, emitting a \texttt{PassportIssued} event upon registration. 
+	An \texttt{exists} flag can prevent duplicate entries. Supply chain provenance is visualised via Leaflet.js with OpenStreetMap.
+	
+	\subsection{Use Cases}
+	Table~\ref{tab:usecases} reflects EcoPassEU serves four actor types with differing technical needs. 
+	Manufacturers interact with the system through a wallet-connected flow (UC-01 to UC-06), they register product data, upload it to IPFS, and anchor the record on-chain via MetaMask.
+	This design assigns the responsibility for issuing to the party that can best guarantee the accuracy of the product.
+	In contrast, consumers and regulators  require no wallet (UC-07 to UC-11), they can search, verify and check any passport just by reading the query, which reflects the principle that transparency should not set up any financial or technical barriers. 
+	An admin role (UC-12) supports batch registration, reducing the per-unit cost for high-volume producers.
+	
+	\vspace{-0.2cm}
+	\begin{table}[h]
+		\caption{EcoPassEU use cases by actor}
+		\label{tab:usecases}
+		\centering
+		\begin{tabular}{lll}
+			\hline
+			\textbf{ID} & \textbf{Actor} & \textbf{Description} \\
+			\hline
+			UC-01 & Manufacturer       & Connect MetaMask wallet (Sepolia testnet) \\
+			UC-02 & Manufacturer       & Complete product registration form \\
+			UC-03 & Manufacturer       & Upload product JSON to IPFS \\
+			UC-04 & Manufacturer       & Register passport on blockchain \\
+			UC-05 & Manufacturer       & Download QR code \\
+			UC-06 & Manufacturer       & View personal product list \\
+			UC-07 & Consumer/Regulator & Search by product ID (no wallet) \\
+			UC-08 & Consumer/Regulator & View full passport details \\
+			UC-09 & Consumer/Regulator & Verify data integrity via hash comparison \\
+			UC-10 & Consumer/Regulator & View interactive supply chain map \\
+			UC-11 & Consumer/Regulator & View issuer profile \\
+			UC-12 & Admin              & Batch-register products \\
+			\hline
+		\end{tabular}
+	\end{table}
+	\vspace{-0.2cm}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	\section{Project Execution}
 	% Core code analysis, description of system functions, testing strategy, UI showcase, User Manual.
