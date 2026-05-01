@@ -273,6 +273,111 @@ UC05 .> UC06 : <<extend>>
 
 ---
 
+## State & Data Flow Diagrams
+
+### Passport Lifecycle State Diagram
+
+Every Digital Product Passport passes through the following states, from physical product creation to final on-chain verification. Error transitions allow the manufacturer to retry without losing their draft data.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Unregistered : Physical product created
+
+    Unregistered --> FillingForm : Manufacturer opens\nRegister page
+
+    FillingForm --> FillingForm : Edit fields · add materials\nadd supply chain stages
+
+    FillingForm --> UploadingIPFS : Click "Upload to IPFS"\n[productId · brand · name required]
+
+    UploadingIPFS --> IPFSStored : Pinata returns CID ✅
+    UploadingIPFS --> FillingForm : Upload failed — retry
+
+    IPFSStored --> AwaitingSignature : Click "Register on Blockchain"
+
+    AwaitingSignature --> TxPending : User signs in MetaMask ✅
+    AwaitingSignature --> IPFSStored : User rejects transaction
+
+    TxPending --> Registered : Block mined\nPassportIssued event emitted
+    TxPending --> IPFSStored : Duplicate ID or gas error
+
+    note right of Registered
+        Immutable on Sepolia.
+        CID · hash · issuer · timestamp stored.
+    end note
+
+    Registered --> Verified : keccak256(IPFS JSON)\n== on-chain metadataHash ✅
+    Registered --> Compromised : keccak256(IPFS JSON)\n≠ on-chain metadataHash ⚠️
+```
+
+### Data Flow Diagram
+
+This diagram traces how data moves through the system during both the **Registration** and **Verification** flows, showing the transformation from raw user input to immutable on-chain records and back.
+
+```mermaid
+flowchart TD
+    subgraph INPUT["📝 Manufacturer Input"]
+        A[Product Form\nid · name · brand · materials · provenance]
+    end
+
+    subgraph FE["⚙️ Frontend Processing"]
+        B[Serialise to JSON\npassportData object]
+        C[keccak256 hash\nmetadataHash : bytes32]
+    end
+
+    subgraph IPFS["🌐 Decentralised Storage — IPFS"]
+        D[Pinata API]
+        E[(Content-Addressed\nIPFS Store)]
+    end
+
+    subgraph BC["⛓️ Blockchain · Sepolia"]
+        F["PassportRegistry\n.registerPassport(id, CID, hash)"]
+        G[(Ledger\nproductId → Passport struct\nCID · hash · issuer · timestamp)]
+    end
+
+    subgraph OUT["📤 Registration Output"]
+        H[QR Code\n/product/productId]
+        I[Etherscan TX link]
+    end
+
+    A --> B
+    B --> C
+    B -->|Upload JSON| D
+    D -->|Pin & store| E
+    E -.->|Return CID| D
+    D -.->|CID| F
+    C -->|metadataHash| F
+    A -->|productId| F
+    F -->|Emit PassportIssued| G
+    G -.-> H
+    G -.-> I
+
+    subgraph VER["🔍 Verification Flow — wallet-free"]
+        J[Consumer enters\nProduct ID]
+        K["passportExists(id)\ngetPassport(id)"]
+        L[Fetch JSON from\nIPFS gateway]
+        M[Recompute\nkeccak256 hash]
+        N{Hashes\nMatch?}
+        O[✅ VERIFIED\nIntegrity badge shown]
+        P[⚠️ TAMPERED\nWarning displayed]
+    end
+
+    J --> K
+    K -.->|"CID · storedHash\nissuer · timestamp"| L
+    L -->|Product JSON| M
+    M --> N
+    N -->|Yes| O
+    N -->|No| P
+
+    style INPUT fill:#f0f9ff,stroke:#3b82f6,stroke-width:1.5px
+    style FE    fill:#fefce8,stroke:#ca8a04,stroke-width:1.5px
+    style IPFS  fill:#f0fdf4,stroke:#16a34a,stroke-width:1.5px
+    style BC    fill:#faf5ff,stroke:#7c3aed,stroke-width:1.5px
+    style OUT   fill:#fff7ed,stroke:#f97316,stroke-width:1.5px
+    style VER   fill:#f0f9ff,stroke:#0891b2,stroke-width:1.5px
+```
+
+---
+
 ## Smart Contract
 
 **Contract Address (Sepolia):**
