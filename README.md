@@ -626,7 +626,7 @@ Results are saved to `upload-result.json`.
 |------|------|
 | Detai Dong | Frontend Development, UI/UX, Deployment |
 | Akshansh Rajora | Smart Contract, IPFS Integration |
-| Luxiao Cao | Backend Scripts, Testing, Thesis Writing |
+| Luxiao Cao | Backend Scripts, Testing, Thesis Writing, Documentation |
 | Fuyu Cao | Research, Documentation |
 | Tianwei Yu | Data Design, Product Passport Schema |
 
