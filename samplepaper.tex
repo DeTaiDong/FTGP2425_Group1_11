@@ -56,9 +56,9 @@
 
 \begin{document}
 	%
-	\title{EcoPassEU: A Privacy-Aware Digital Product Passport DApp for Sustainable Consumer Goods in Europe}
+	\title{EcoPassEU: A Hybrid Blockchain Architecture for ESPR-Compliant Digital Product Passports}
 	
-	\titlerunning{EcoPassEU: A Privacy-Aware Digital Product Passport DApp}
+	\titlerunning{EcoPassEU: A Hybrid Blockchain DApp for Digital Product Passports}
 	
 	\author{Fuyu Cao\inst{1} \and
 		Luxiao Cao\inst{1} \and
@@ -129,9 +129,14 @@
 	improper commercial behaviour \cite{Silva2021The}.
 
 	
-	Blockchain provides a structural solution to this trust problem. 
-	Because records on a public blockchain are replicated across a distributed network, neither single party can unilaterally tamper with the records, providing a form of tamper evidence that cannot be replicated by a centralised system \cite{Casino2019Systematic,Nakamoto2008Bitcoin}.
-	Smart contract introduced in the Ethereum protocol allows data access and update rules to be encoded in publicly readable logic, so that there is no need for trusted intermediaries and enabling cross-organisational verification without shared infrastructure \cite{Wood2014Ethereum}.
+	Blockchain technology offers a structural solution to this issue. Because 
+	records are replicated across a distributed network, no single party can 
+	tamper with the data without detection \cite{Casino2019Systematic,Nakamoto2008Bitcoin}. 
+	It is important to note that while blockchain cannot guarantee that the data 
+	is initially physically true (the ``oracle problem'') \cite{Egberts2017}, it 
+	can ensure strict tamper-evidence, meaning that upon the commitment of a 
+	manufacturer to a sustainability claim, they are held publicly accountable 
+	for that claim \cite{Wood2014Ethereum}.
 	
 	
 	\subsection{Related Work and Existing Platforms}
@@ -173,7 +178,9 @@
 	\subsection{Design Philosophy and Architectural Choices}
 	EcoPassEU is a digital product passport (DPP) designed to provide an ESPR-compliant digital product passport and contains independently verifiable sustainability data. The design follows three design principles, each of which is aimed at specific product needs. 
 	
-	First, the hybrid storage model is adopted: the complete product data is fixed on IPFS through Pinata \cite{Benet2014IPFS}, and only the content identifier (CID), \texttt{keccak256} integrity hash, issuer address and timestamp \cite{Wood2014Ethereum} are recorded on the chain, thus reducing gas costs. Secondly, commercially sensitive data is designed to be kept off-chain; the on-chain hash is used as an integrity anchor to confirm that the off-chain document has not been tampered with, and at the same time, its content will not be exposed to the ledger. Third, all read queries use public RPC endpoints, allowing consumers and regulators to view any passport without holding wallets or paying gas fees.
+	First, the hybrid storage model is adopted: the complete product data is fixed on IPFS through Pinata \cite{Benet2014IPFS}, and only the content identifier (CID), \texttt{keccak256} integrity hash, issuer address and timestamp \cite{Wood2014Ethereum} are recorded on the chain, thus reducing gas costs. 
+	Second, the system is privacy-aware and future-proof. While full data is currently stored off-chain on public network IPFS, this architecture sets the necessary foundation for data privacy. In future versions, manufacturers will also be able to easily encrypt commercially sensitive product data before uploading it. The on-chain hash will continue to function as an integrity anchor, proving the data has not been altered without exposing the full contents to the public ledger.
+	Third, all read queries use public RPC endpoints, allowing consumers and regulators to view any passport without holding wallets or paying gas fees.
 
 	\subsection{System Architecture}
 	The user layer comprises 3 separate actor types: manufacturers, who connect to the platform via MetaMask and sign/submit transactions, and consumers/ regulators, who can query product records without holding a wallet. This is a non-exhaustive overview, as both actors must pass through the application layer — a React/Vite frontend deployed on the cloud platform Vercel that makes use of Ethers.js v6 for contract calls — to perform document uploads to IPFS, contract calls to the Sepolia network, and local integrity checks. These actor types, with differing requirements, are served by EcoPassEU (See Figure ~\ref{fig:architecture}).
@@ -418,25 +425,28 @@
 	\subsection{Final UI Showcase}
 	
 	
-    Figures~\ref{fig:ui_register} and~\ref{fig:ui_verify} show the deployed interface of EcoPassEU. The registration portal guides manufacturers through a structured form (with step indicator), whilst the public verification page shows the passport details, integrity status and IPFS document link (without wallet requirement).
+    Figures~\ref{fig:ui_register} and~\ref{fig:ui_verify} show the deployed interface of EcoPassEU.The registration portal guides manufacturers through a structured form (with step indicator), whilst the public verification page shows the passport details, integrity status and IPFS document link (without wallet requirement).
 	
 	\vspace{-0.2cm}
-	\begin{figure}[htbp]
+	\begin{figure}[H]
 		\centering
-		\includegraphics[width=0.8\linewidth]{figures/8.png}
-		\caption{Deployed EcoPassEU interface: manufacturer registration portal.}
-		\label{fig:ui_register}
-	\end{figure}
-	
-	\begin{figure}[htbp]
-		\centering
-		\includegraphics[width=0.8\linewidth]{figures/9.png}
-		\caption{Deployed EcoPassEU interface: public product verification page.}
-		\label{fig:ui_verify}
+		\begin{minipage}{\linewidth}
+			\centering
+			\includegraphics[width=0.85\linewidth]{figures/8.png}
+			\caption{Deployed EcoPassEU interface: manufacturer registration portal.}
+			\label{fig:ui_register}
+		\end{minipage}
+		\vspace{0.3cm}
+		\begin{minipage}{\linewidth}
+			\centering
+			\includegraphics[width=0.85\linewidth]{figures/9.png}
+			\caption{Deployed EcoPassEU interface: public product verification page.}
+			\label{fig:ui_verify}
+		\end{minipage}
 	\end{figure}
 	\vspace{-0.2cm}
 	
-	\newpage
+
 	\subsection{User Manual}
 	The application is designed to be intuitive for two distinct user groups. 
 	
@@ -484,41 +494,57 @@
 	
 	
 	
-	Although the decentralised architecture provides strong security, it also brings some runtime restrictions. The DApp performs quickly in on-chain verification and can usually be read in the state of completion in milliseconds. However, the access to the complete product history depends on public IPFS gateways, which sometimes have higher latency than centralised cloud servers. In addition, although the current platform runs efficiently on the Sepolia testnet, if it is migrated to the Ethereum mainnet, users will face volatile gas costs.  
-	EcoPassEU can be modified for deployment on Layer-2 networks such as 
-	Polygon to benefit from its EVM compatibility and near-instant finality 
-	with significantly lower transaction fees. In the unlikely event that 
-	secondary-market transfer becomes mandatory, the registry can be 
-	reconstructed around ERC-1155 tokens \cite{Radomski2018ERC1155}.
+	Although the proposed EcoPassEU system presents strong advantages, it does 
+	have some limitations that arise from the decentralised architecture. While 
+	the on-chain verification process is extremely fast, obtaining the complete 
+	JSON from public IPFS gateways can have some longer latency compared to 
+	centralised servers.
+	First and most importantly, even though the batch registration function is 
+	very affordable on a testnet, executing such loop-based operations directly 
+	on the Ethereum mainnet will get immensely pricey during congested networks, 
+	so the production version of EcoPassEU is intended primarily for deployment 
+	on Layer-2 networks (Polygon, for example, or Arbitrum). This approach will 
+	still allow EVM compatibility and security while also making near-zero 
+	transaction fees for long-term financial viability of SMEs 
+	\cite{Radomski2018ERC1155}.
 	
 	
 	\section{Conclusion}
-	EcoPassEU demonstrates that a public blockchain can serve as a 
-	practical, tamper-evident foundation for ESPR-compliant Digital 
-	Product Passports. By combining Ethereum smart contracts 
-	\cite{Antonopoulos2018Mastering} with IPFS-based off-chain 
-	storage, the platform achieves independently verifiable 
-	sustainability records without imposing wallet requirements on 
-	end users. The \texttt{keccak256} hash pairing mechanism 
-	\cite{NIST2015SHA3} and Ethereum's Proof-of-Stake consensus 
-	\cite{EthereumMerge2022} together address both data integrity 
-	and the carbon-footprint concerns that would otherwise undermine 
-	a sustainability-focused platform. Batch registration reduces 
-	per-unit gas costs by 26\%, making the system economically 
-	accessible to SMEs.
 	
-	The platform's current limitations are clear: testnet-only 
-	deployment leaves real-world gas costs unvalidated, reliance on 
-	a single Pinata gateway introduces a central point of failure, 
-	and the absence of KYC means product identity cannot be 
-	guaranteed. Immutability, while essential for tamper evidence, 
-	also prevents correction of honest registration errors.
+	In this work, we show that a proof-of-concept implementation (EcoPassEU) 
+	builds a workably tamper-proof infrastructure for Digital Product Passports 
+	according to the ESPR. By integrating Ethereum smart contracts 
+	\cite{Antonopoulos2018Mastering} with the off-chain system, IPFS, we create 
+	independently verifiable sustainability records that do not compel end users 
+	to handle crypto wallets. Further, a combination of a \texttt{keccak256} 
+	hash pairing system \cite{NIST2015SHA3} with Ethereum's Proof-of-Stake 
+	consensus \cite{EthereumMerge2022} solves the fundamental integrity problem 
+	without the high carbon footprint that typically accompanies blockchains. 
+	Finally, the feature of batch registration results in a 26\% reduction in 
+	gas costs, bringing much greater access for small and medium-sized 
+	enterprises (SMEs).
 	
-	Addressing these gaps --- through mainnet deployment, 
-	decentralised identifiers \cite{W3C2025DID,W3C2025VC}, multi-node IPFS storage via 
-	Filecoin, and zero-knowledge proofs for selective compliance 
-	disclosure --- represents a concrete and achievable roadmap for 
-	taking EcoPassEU from proof-of-concept to production.
+	Nonetheless, the prototype has several limitations in practical use that 
+	must be overcome before launch to the public. First, using the testnet 
+	exclusively to test on the Sepolia testnet means that gas costs are untested 
+	in practice. Specifically, this is true for the loop-based 
+	\texttt{batchRegisterPassports} function, which in mainnet congestion could 
+	become prohibitively expensive. Another crucial problem lies in the off-chain 
+	storage, where, at the moment, it is purely dependent on Pinata. In the case 
+	of this single gateway being unavailable, the documents it links to will 
+	become inaccessible, leaving the passport cryptographically correct, but 
+	useless in use. As well, the whole system is completely open; there are no 
+	identity checks, allowing any wallet address to issue a passport, so 
+	providing no confidence that it came from the genuine manufacturer. Finally 
+	and most crucially, the strict immutability of the blockchain does not allow 
+	users to fix mistakes they make in good faith or to withdraw invalidated 
+	entries. This is a large issue for regulators, as, at present, there is also 
+	no upgradeable proxy pattern in the current smart contract design.
+	
+	EcoPassEU will need a clear roadmap to transition from a proof-of-concept into a production-ready environment. As outlined earlier, the platform needs to be migrated into a Layer-2 solution to ensure costs are affordable when scaled. Additionally, the current proof-of-concept is not set up to have a formal identity verification mechanism. In future versions, W3C Decentralised Identifiers (DIDs) and 
+	Verifiable Credentials \cite{W3C2025DID,W3C2025VC} should be included in the system. Not only will this link a manufacturer's wallet to a legally verified entity, but it solves the ``oracle problem'' without sacrificing corporate privacy.
+	
+	Finally, addressing the strict immutability of the blockchain, an upgradeable and controlled proxy pattern should be considered. This would give regulators and manufacturers the ability to amend honest errors or update compliance requirements, without compromising historical passport records.
 	
 	
 	
