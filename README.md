@@ -7,7 +7,6 @@
 🔗 **Network:** Ethereum Sepolia Testnet
 
 ---
-
 ## Overview
 
 EcoPassEU allows manufacturers to issue tamper-proof digital product passports on the blockchain. Consumers, regulators, and auditors can instantly verify any product's sustainability credentials — including material composition, supply chain provenance, recycling guidance, and certifications — without requiring any blockchain knowledge.

@@ -16,9 +16,9 @@ describe("PassportRegistry Smart Contract", function () {
     contract = await Factory.deploy();
   });
 
-  // ──────────────────────────────────────────────
+  // ────────────────────────────────────────────
   // 1. Deployment
-  // ──────────────────────────────────────────────
+  // ────────────────────────────────────────────
   describe("Deployment", function () {
     it("should deploy with a valid contract address", async function () {
       expect(contract.target).to.be.a("string");
@@ -26,9 +26,9 @@ describe("PassportRegistry Smart Contract", function () {
     });
   });
 
-  // ──────────────────────────────────────────────
+  // ────────────────────────────────────────────
   // 2. registerPassport
-  // ──────────────────────────────────────────────
+  // ────────────────────────────────────────────
   describe("registerPassport", function () {
     it("should register a new passport successfully", async function () {
       await expect(
