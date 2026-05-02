@@ -13,6 +13,10 @@
 \usepackage{hyperref}
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage{float}
+
+
+
 
 \lstdefinelanguage{Solidity}{
 	morekeywords={pragma, solidity, contract, struct, mapping, 
@@ -73,10 +77,10 @@
 	%
 	%
 	\section{Introduction}
-	Every year, billions of products enter the European market with  sustainability labels, yet consumers have little reliable way of checking whether claims such as ``low carbon'' or ``ethically sourced'' are accurate. A study commissioned by the European Commission found that more than half of the green environmental declarations lack verifiable evidence to support, eroding public confidence in corporate environmental commitments \cite{Silva2021The}.
+	Billions of products enter the European market with sustainability labels every year, and consumers have little reliable means of verification for the information included, such as ``low carbon'' or ``ethically sourced'' \cite{Silva2021The}.
+	A study commissioned by European Commission found more than half green environmental declarations without verifiable evidence to confirm them, eroding public confidence in environmental commitments \cite{Silva2021The}.
 	
-	To address this credibility gap, the Ecodesign for Sustainable Products Regulation (ESPR) now mandates Digital Product Passports (DPPs) —standardised lifecycle records—for most EU products \cite{circularise_dpp_2025}.  
-	With the implementation of compliance in 2027, reliable DPP solutions have become a market urgent need\cite{circularise_dpp_2025}.
+	To address the credibility gap, the Ecodesign for Sustainable Products Regulation (ESPR) now mandates Digital Product Passports (DPPs) -standardised records of a products' lifecycle- for most EU products \cite{circularise_dpp_2025}.With the implementation of compliance in 2027, reliable DPP solutions have become a market urgent need.
 	
 	Our product EcoPassEU is a blockchain-based DPP platform which  allows manufacturers to record product information as permanent, publicly verifiable entries on the Ethereum blockchain. 
 	Unlike traditional databases, the immutability of blockchain records means that once the data is released, it cannot be altered retrospectively, eliminating the possibility of post-hoc falsification \cite{Casino2019Systematic}. 
@@ -87,11 +91,15 @@
 	At the same time, consumers, regulators and retailers can also get open and wallet-free access. 
 	Just search for the product ID to immediately obtain the blockchain-verified product passport and supply chain map, enabling the independent verification of environmental claims without prior technical expertise.
 	
-	The value of EcoPassEU is threefold. 
-	Primarily, it provides manufacturers with a practical way to ESPR deadlines, reducing the risk of market exclusion. 
-	Meanwhile, the platform directly cracked down on greenwashing, 
-	securing product records via cryptographic hashing replaces brand self-reporting with independent, third-party verification.
-	Thirdly, it promotes the development of circular economy by equipping recyclers with the precise material data necessary to recover resources when products are scrapped.
+	The value of EcoPassEU is threefold.
+	It gives manufacturers a practical pathway to meet ESPR deadlines, 
+	reducing the risk of market exclusion.
+	The platform also combats greenwashing: securing product records 
+	via cryptographic hashing replaces brand self-reporting with 
+	independent, third-party verification.
+	Finally, it supports the circular economy by equipping recyclers 
+	with precise material data necessary to recover resources at 
+	end-of-life.
 	
 	
 	
@@ -104,17 +112,21 @@
 	\cite{Adisorn2021Towards,Basal2024Digital,VanCapelleveen2023The,Jansen2023Stop}.
 	
 	
-	The regulatory foundation for DPPs comes from the European Green Deal and Circular Economy Action Plan \cite{eu_green_deal_2019,ceap_2020}. Based on these 2 frameworks, the Ecodesign for Sustainable Products Regulation (ESPR), came into force on 18 July 2024,, mandates DPPs for almost all physical goods sold in the EU, regardless of the seller's location \cite{circularise_dpp_2025}.
+	The regulatory foundation for DPPs comes from the European Green Deal and Circular Economy Action Plan \cite{eu_green_deal_2019,ceap_2020}. Building on these two frameworks, the Ecodesign for Sustainable Products Regulation (ESPR) has come into force from 18 July 2024 for products in the scope of the regulation, mandating DPPs for almost all physical goods sold in the EU, regardless of where the goods are sold \cite{circularise_dpp_2025}.
 	
 	\subsection{The Problem: Trust in Sustainability Claims}
-	Despite regulatory momentum,  the implementations of most DPPs rely on centralised, proprietary databases \cite{Psarommatis2024Digital}. 
-	This architecture encourages the selective concealment of data, hindering aftermarket participants like independent repairers \cite{Ducuing2023Data}. 
-	Furthermore, managing huge volume of lifecycle data centrally raises significant concerns regarding storage efficiency, data integrity, and vulnerability to breaches \cite{Voulgaridis2024Digital}. 
-	Taken together, downstream actors — including importers, recyclers, and end consumers — lack reliable ways to independently verify product information.
+	Despite regulatory momentum, most DPP implementations rely on centralised, proprietary databases \cite{Psarommatis2024Digital}. This architecture encourages selective concealment of data, hindering aftermarket participants such as independent repairers \cite{Ducuing2023Data}. Managing large volumes of lifecycle data centrally also raises important concerns regarding its storage efficiency, data integrity, and vulnerability to breaches \cite{Voulgaridis2024Digital}.
+	As such, downstream actors, including importers, recyclers and end consumers, are left with no reliable means to independently verify product information.
 	
-	This problem is exacerbated by the prevalence of greenwashing, broadly understood as false, vague, or unsubstantiated environmental claims that make products appear more sustainable than they are \cite{Kundi2024The}. 
-	A 2020--2021 EU sweep of 344 online claims  found that nearly half were potentially deceptive—often substituting verifiable details with vague terms like ``conscious''—and 59\% lacked accessible evidence \cite{Silva2021The}. 
-	Another EU website screening found that 42\% of sustainability claims were misleading enough to constitute improper commercial behaviour \cite{Silva2021The}. 
+	Greenwashing compounds this problem. Broadly understood as false, 
+	vague, or unsubstantiated environmental claims 
+	\cite{Kundi2024The}, it is widespread: a 2020--2021 EU sweep of 
+	344 online claims found that nearly half were potentially 
+	deceptive---often substituting verifiable details with vague terms 
+	like ``conscious''---and 59\% lacked accessible evidence 
+	\cite{Silva2021The}. A separate EU website screening found that 
+	42\% of sustainability claims were misleading enough to constitute 
+	improper commercial behaviour \cite{Silva2021The}.
 
 	
 	Blockchain provides a structural solution to this trust problem. 
@@ -130,27 +142,28 @@
 	In the commercial field, Circularise is among the closest comparable 
 	platforms, offering DPPs with selective disclosure of sustainability data 
 	across supply chains, with applications spanning the automotive, battery, and textile sectors \cite{Circularise2026Platform}.
-	VeChain similarly deploys blockchain and smart contracts on its VeChainThor platform to achieve supply chain transparency, though it runs on on a permissioned network with a restricted set of authority-approved validators \cite{VeChain2026}
-	Both platforms have a common limitation: reliance on proprietary infrastructure or permissioned networks introduces vendor dependency and reduces interoperability \cite{Belchior2020A,Wang2023Exploring}.
+	VeChain similarly deploys blockchain and smart contracts on its 
+	VeChainThor platform to achieve supply chain transparency, though 
+	it operates on a permissioned network with a restricted set of 
+	authority-approved validators \cite{VeChain2026}.
+	Both platforms share a common limitation: reliance on proprietary 
+	infrastructure or permissioned networks introduces vendor 
+	dependency and reduces interoperability 
+	\cite{Belchior2020A,Wang2023Exploring}.
 	
 	EcoPassEU takes a different approach. 
 	Rather than relying on a proprietary database, it is built on the public Ethereum blockchain and IPFS, with all rules encoded in open smart contracts. 
 	Product data is stored on IPFS, whilst only a small set of cryptographic identifiers is written on-chain, keeping costs low. 
-	The batch registration function further reduces the cost per product, making the platform viable for SMEs. 
-	And as an open-source project, it carries no vendor lock-in risk.
+	The batch registration further reduces the cost of individual products and makes the platform more attractive to SMEs. Moreover, as an open source project, it does not have the risk of vendor lock-in.
 	
 	
 	\subsection{Business Viability}
 	EcoPassEU's revenue model rests on two foundations.
-	The first is public funding: the EU's CIRPASS-2 project (2024--2027) explicitly subsidise DPP deployment across textiles, electronics, and construction, with dedicated support for SMEs adopting 
-	``DPP-as-a-Service'' models \cite{cirpass2_2024}. 
-	As an open source platform, EcoPassEU is  fully capable of benefitting from such grants.
+	One is public funding: the EU's CIRPASS-2 Project (2024—2027) explicitly subsidise DPP deployment across textiles, electronics, and construction, with dedicated support for SMEs adopting ``DPP-as-a-Service'' models \cite{cirpass2_2024}.
+	As an open source platform, EcoPassEU is fully capable of benefitting from such grants.
 	
-	Another is subscription revenue. 
-	ESPR compliance is legally mandatory for any business selling physical goods in the EU, forming a captive market independent of voluntary commitments \cite{circularise_dpp_2025}
-	The green technology and sustainability market is projected to grow from USD~25.47 billion in 2025 to USD~73.90 billion by 2030 \cite{marketsandmarkets2025}.
-	EcoPassEU charges a graded subscription fee based on passport volume, with optional premium tiers for API integration and compliance reporting. 
-	The platform is built on public Ethereum, supporting payment with ETH or other ERC-20 tokens, providing international users a lower-friction settlement option and removing the need for traditional banking intermediaries.
+	The other is subscription revenue. ESPR compliance is legally mandatory for any business selling physical goods in the EU, forming a captive market independent of voluntary commitments \cite{circularise_dpp_2025}.
+	The green technology and sustainability market is projected to grow from USD $25.47 billion in 2025 to USD $73.90 billion in 2030 \cite{marketsandmarkets2025}. EcoPassEU charges a graded subscription fee based on passport volume, with optional premium tiers for API integration and compliance reporting. The platform is built on public Ethereum, supporting payment with ETH or other ERC-20 tokens, providing international users a lower-friction settlement option and removing the need for traditional banking intermediaries.
 	
 	
 	
@@ -158,37 +171,29 @@
 	
 	\section{Design Documentation}
 	\subsection{Design Philosophy and Architectural Choices}
-	EcoPassEU is a DPP designed to deliver ESPR-compliant Digital Product Passports with independently verifiable sustainability data. The design is governed by three design principles, each addressing a specific product requirement. 
+	EcoPassEU is a digital product passport (DPP) designed to provide an ESPR-compliant digital product passport and contains independently verifiable sustainability data. The design follows three design principles, each of which is aimed at specific product needs. 
 	
-	First, a hybrid storage model is adopted: full product data is pinned to 
-	IPFS via Pinata \cite{Benet2014IPFS}, whilst only the content identifier 
-	(CID), a \texttt{keccak256} integrity hash, the issuer address, and a 
-	timestamp are recorded on-chain \cite{Wood2014Ethereum}, keeping gas costs 
-	low. Second, commercially sensitive data remains off-chain by design; the 
-	on-chain hash serves as an integrity anchor, confirming that the off-chain 
-	document is unaltered without exposing its contents to the ledger. Third, 
-	all read queries use a public RPC endpoint, allowing consumers and 
-	regulators to inspect any passport without holding a wallet or incurring 
-	gas fees.
+	First, the hybrid storage model is adopted: the complete product data is fixed on IPFS through Pinata \cite{Benet2014IPFS}, and only the content identifier (CID), \texttt{keccak256} integrity hash, issuer address and timestamp \cite{Wood2014Ethereum} are recorded on the chain, thus reducing gas costs. Secondly, commercially sensitive data is designed to be kept off-chain; the on-chain hash is used as an integrity anchor to confirm that the off-chain document has not been tampered with, and at the same time, its content will not be exposed to the ledger. Third, all read queries use public RPC endpoints, allowing consumers and regulators to view any passport without holding wallets or paying gas fees.
 
 	\subsection{System Architecture}
-	Figure ~\ref{fig:architecture} shows the four-layer architecture of the overall system
+	The user layer comprises 3 separate actor types: manufacturers, who connect to the platform via MetaMask and sign/submit transactions, and consumers/ regulators, who can query product records without holding a wallet. This is a non-exhaustive overview, as both actors must pass through the application layer — a React/Vite frontend deployed on the cloud platform Vercel that makes use of Ethers.js v6 for contract calls — to perform document uploads to IPFS, contract calls to the Sepolia network, and local integrity checks. These actor types, with differing requirements, are served by EcoPassEU (See Figure ~\ref{fig:architecture}).
+    
     \vspace{-0.2cm}
 	\begin{figure}[h]
 		\centering
 		\includegraphics[width=\linewidth]{figures/1.png}
-		\caption{EcoPassEU system architecture.}
+		\caption{Overall system architecture.}
 		\label{fig:architecture}
 	\end{figure}
     \vspace{-0.2cm}
 	
-	At the user layer, two distinct actors participants interact with the system: manufacturers, who connect through MetaMask to sign and submit transactions, and consumers or regulators, who can query product records without a wallet. 
-	Both routes pass through the application layer — a React/Vitefrontend deployed on Vercel, using Ethers.js~v6 for contract calls — which is responsible for uploading documents to IPFS, calling the Sepolia test network and local integrity check. 
-	The \texttt{PassportRegistry} smart contract records the CID, metadata hash, issuer address, and timestamp on the Sepolia ledger, emitting a \texttt{PassportIssued} event upon registration. 
-	An \texttt{exists} flag can prevent duplicate entries. Supply chain provenance is visualised via Leaflet.js with OpenStreetMap.
+	
 	
 	\subsection{Use Cases and Workflow}
 	EcoPassEU serves three actor types with differing technical needs, as illustrated in Figure~\ref{fig:usecase}. 
+	
+	Wallet connection via MetaMask on the Sepolia testnet (UC-01) is a common premise for all manufacturers and administrators, as each on-chain write must be signed by a wallet key pair and cryptographically linked to an accountable issuer \cite{Jorgensen2022Universal,Keršič2023Orchestrating}. To register a product, the manufacturer fills in a structured registration form (UC-02), including product details, material composition, and supply chain sources. Upon submission, the frontend serialises the form data to JSON and uploads it to IPFS via Pinata (UC-03) to receive a CID. 
+	
 	\vspace{-0.2cm}
 	\begin{figure}[h]
 		\centering
@@ -198,11 +203,9 @@
 	\end{figure}
 	\vspace{-0.2cm}
 	
-	Wallet connection via MetaMask on the Sepolia testnet (UC-01) is a common premise for all manufacturers and administrators, as each on-chain write must be signed by a wallet key pair and cryptographically linked to an accountable issuer \cite{Jorgensen2022Universal,Keršič2023Orchestrating}. To register a product, the manufacturer fills in a structured registration form (UC-02), including product details, material composition, and supply chain sources. Upon submission, the frontend serialises the form data to JSON and uploads it to IPFS via Pinata (UC-03) to receive a CID. 
-	
 	Next, the system calculates the \texttt{keccak256} hash of the JSON locally and passes it to the \texttt{registerPassport()} function on the smart contract alongside the CID and product ID (UC-04). After the user confirms the transaction in MetaMask, a \texttt{PassportIssued} event is emitted, and a QR code with an Etherscan link is provided for users to download (UC-05), which also accesses the product list view (UC-06). The admin role requires the same wallet connection but adds batch registration capabilities (UC-12) to reduce the unit gas cost for high-volume producers.
 	
-	On the read side, consumers and regulators require no wallet to verify a product. The user submits a product ID (UC-07), and the frontend queries the contract via a public RPC endpoint to jump to the full passport view (UC-08). If the passport exists, the system obtains the complete JSON data from IPFS and recalculates its hash on the client: a green integrity badge is displayed if it matches, and a warning if it does not match (UC-09). The product passport page will also display an interactive supply chain map (UC-10) and an optional issuer profile (UC-11). This separation between the write-gated and read-open flows supports the design goal of providing transparent information without setting financial or technical barriers to end users.
+	At the read end, consumers and regulators can verify the product without a wallet. The user submits the product ID (UC-07), and the frontend queries the contract through the public RPC endpoint and jumps to the complete product passport page (UC-08). If the product passport exists, the system will obtain the complete JSON data from IPFS and recalculate its hash value on the client: if it matches, the green integrity badge will be displayed; if it does not match, a warning (UC-09) will be displayed. The product passport page will also display an interactive supply chain map (UC-10) and an optional issuer profile (UC-11). This separation between the write-gated and read-open flows supports the design goal of providing transparent information without setting financial or technical barriers to end users.
 	
 	
 	\subsection{Sequence and State Diagrams}
@@ -216,76 +219,69 @@
 	\begin{figure}[htbp]
 		\centering
 		\includegraphics[width=0.75\linewidth]{figures/2.png}
-		\caption{UML sequence diagram detailing the registration and wallet-free verification flows.}
+		\caption{UML sequence diagram.}
 		\label{fig:sequence}
 	\end{figure}
 	\vspace{-0.2cm}
 	
-	Figure~\ref{fig:state} presents an UML state machine diagram to track the digital passport's lifecycle. 
-	Physical products initially entered the system as \texttt{Unregistered}.
-	Only after the data is successfully uploaded to Pinata will the status change to \texttt{IPFSStored}.
-	Following the user's signature, the status changes to \texttt{TxPending}, and then after mining the block on Sepolia, it reaches the immutable \texttt{Registered}.
-	During the final verification stage, the client hash comparison will mark the record as either \texttt{Verified} (if the hash matches) or \texttt{Compromised} (if the data has been altered).
+	Figure~\ref{fig:state} illustrates a state machine diagram that describes the lifecycle that a digital passport undergoes. At the beginning of the process, physical products were always entered as \texttt{Unregistered}.
+	The status of the digital document only changes to \texttt{IPFSStored} after the data is successfully uploaded to Pinata. Once the user signs the document, the status of the document changes to \texttt{TxPending}. After the block is mined on the Sepolia network, the digital document becomes immutable and is then marked as \texttt{Registered}.
+	During the final verification step, the client hash comparison will mark the record as either \texttt{Verified} when the hash is similar or \texttt{Compromised} when the data has been altered.
 	
 	\vspace{-0.2cm}
 	\begin{figure}[htbp]
 		\centering
-		\includegraphics[width=0.4\linewidth]{figures/4.png}
-		\caption{UML state machine diagram showing the lifecycle of a 
-			digital product passport.}
+		\includegraphics[width=0.5\linewidth]{figures/4.png}
+		\caption{UML state machine diagram.}
 		\label{fig:state}
 	\end{figure}
 	\vspace{-0.2cm}
 	
-	\subsection{User Interface Design}
 	
-	\vspace{-0.2cm}
+	\subsection{User Interface Design}
+	To reflect the environmental theme, the search page adopts a dark green colour scheme (\#2d6a4f, \#1b4332).
+	Figure~\ref{fig:ui_search} shows that the search page is laid out with simple and consistent spacing.
+	It presents a user-focused interface with a clear flow.
+	Users can perform a search for a product by providing a product ID in the search box in the centre of the page or click on one of the pre-defined quick search buttons. No wallet connection is required.
+	The interface begins with an empty state and upon a search is then replaced by a verified product result card. The card contains the crucial information on-chain data, such as the product issuer address, timestamp of registration on-chain, and the hash of product metadata.
+	This allows users to instantly verify the authenticity of the product before accessing the full product passport.
+
+
 	\begin{figure}[htbp]
 		\centering
-		\includegraphics[width=0.9\linewidth]{figures/5.png}
-		\caption{Wireframe of the search interface, showing the initial state and the on-chain result card.}
+		\includegraphics[width=0.75\linewidth]{figures/5.png}
+		\caption{Wireframe of the search interface.}
 		\label{fig:ui_search}
 	\end{figure}
-	\vspace{-0.2cm}
-	
-	
-	
-	To reflect the environmental theme, the page adopts a dark green colour scheme (\texttt{\#2d6a4f}, \texttt{\#1b4332}). The layout uses standard \texttt{rem} spacing for a clean and consistent visual effect. As shown in Figure~\ref{fig:ui_search}, the search interface is straightforward. Users can query a product ID via the central search bar or use the predefined quick search buttons, entirely without connecting a wallet. The interface transitions from an initial empty state to a verified result card upon a successful search. This card immediately displays the core on-chain data—such as the issuer address, registration timestamp, and metadata hash—providing instant verification before the user proceeds to view the full product passport.
-	
 
 	
+	Figure~\ref{fig:ui_registers} displays the registration layout.
+	To provide a clear representation of the user's current state in the registration process, a simple tracker is included on the page with different steps: Fill Details $\to$ Upload IPFS $\to$ Register Chain $\to$ Done. 
+	There is no hidden section; all fields within the product detail, materials, and supply chain forms are presented on one scrollable page, which avoids confusion where the user does not know which section has not yet been completed or submitted. 
+	If the page is reached without having MetaMask connected, an amber coloured banner will appear under the details section. By doing this, we can stop users from uploading their data if they have not logged in yet.
 	
-	Figure~\ref{fig:ui_register} displays the registration layout. 
-	A simple tracker (Fill Details $\to$ Upload IPFS $\to$ Register Chain $\to$ Done) shows the user's registration progress. 
-	All form fields—product details, materials, and supply chain—are displayed on a scrollable page instead of hiding sections.
-	If MetaMask is not connected, an amber warning banner will be displayed to stop users from uploading data until they log in.
-	
-	\vspace{-0.2cm}
+
 	\begin{figure}[htbp]
 		\centering
 		\includegraphics[width=\linewidth]{figures/6.png}
 		\caption{Wireframe layout of the manufacturer registration form.}
-		\label{fig:ui_register}
+		\label{fig:ui_registers}
 	\end{figure}
-	\vspace{-0.2cm}
+
 	
-	As seen in Figure~\ref{fig:ui_verify}, the result page clearly divides the information. 
-	The \emph{Blockchain Record} card displays on-chain data (issuer, time, and hash), while other cards display IPFS details. 
-	Integrity badge—a green check for a match, or an amber triangle for an error—makes it easy to judge whether the data is valid. 
-	If a user does not install MetaMask, the page will automatically use public RPC to load information.
 	
-	\vspace{-0.2cm}
+	
+	The result page is described in Figure~\ref{fig:ui_verif}, clearly differentiating information. The \emph{Blockchain Record} card displays on-chain data (issuer, time, and hash), while other cards display IPFS details. It is easy to see whether the information is valid by only considering the integrity badge. It will be presented as a green checkmark if the check can be passed, or as an amber triangle if an error occurs. If a user does not install MetaMask, the page will automatically use public RPC to load information.
+
 	\begin{figure}[htbp]
 		\centering
 		\includegraphics[width=\linewidth]{figures/7.png}
 		\caption{Wireframe detailing the structure of the product verification page.}
-		\label{fig:ui_verify}
+		\label{fig:ui_verif}
 	\end{figure}
-	\vspace{-0.2cm}
+
 	
-	Our site is built with CSS Grid and Flexbox to run perfectly on any device. 
-	At 600\,px, forms will switch to a single-column layout to adapt to the mobile device screen. 
-	A 768\,px breakpoint adjusts the menu and interactive map sizes for tablet users.
+	We've implemented a CSS Grid and a Flexbox to ensure our site works perfectly on any device. At 600,px, forms will switch to a single-column layout to adapt to the mobile device screen. We had to use a 768,px breakpoint for the menu and interactive map size, to make it easier for users on a tablet.
 	
 	
 	
@@ -343,9 +339,15 @@
 		}
 	\end{lstlisting}
 	
-	Passing string parameters as \texttt{calldata} instead of \texttt{memory} avoids redundant data copying and significantly reduces the cost of gas. 
-	Meanwhile, the \texttt{external} visibility modifier allows direct argument access from the call data, providing greater gas efficiency compared with a \texttt{public} declaration. 
-	Whats more, binding the \texttt{issuer} directly to \texttt{msg.sender}---a secure EVM primitive---guarantees unforgeable cryptographic attribution for every passport , bypassing the need for supplementary access controls.
+	Passing string parameters as \texttt{calldata} instead of 
+	\texttt{memory} avoids redundant data copying and reduces gas 
+	consumption. The \texttt{external} visibility modifier further 
+	improves efficiency by allowing direct argument access from 
+	calldata, compared with a \texttt{public} declaration. 
+	What is more, binding \texttt{issuer} to \texttt{msg.sender}---a 
+	secure EVM primitive---provides unforgeable cryptographic 
+	attribution for every passport without requiring supplementary 
+	access controls.
 	
 	As a supplement to the registration logic, the \texttt{PassportIssued}
 	event will be issued after each successful execution:
@@ -390,13 +392,7 @@
 		});
 	\end{lstlisting}
 	
-	The most critical tests concern \texttt{registerPassport}, as shown in
-	Listing~\ref{lst:test-register}. The first case confirms that
-	\texttt{msg.sender} is persisted as the issuer, which is the foundation of
-	the platform's unforgeable attribution model. The second verifies that
-	attempting to re-register an existing product ID triggers the
-	\texttt{require} guard and reverts with the expected reason string,
-	guaranteeing passport immutability.
+	The most critical tests concern \texttt{registerPassport}, seen in Listing~\ref{lst:test-register}. The first case confirms that \texttt{msg.sender} is persisted as the issuer, which is the foundation of the platform's unforgeable attribution model. The second verifies that attempting to re-register an existing product ID triggers the \texttt{require} guard and reverts with the expected reason string, guaranteeing passport immutability.
 	
 	\begin{lstlisting}[
 		language=JavaScript,
@@ -422,28 +418,25 @@
 	\subsection{Final UI Showcase}
 	
 	
-    Figures~\ref{fig:ui_register} and~\ref{fig:ui_verify} show the 
-    deployed EcoPassEU interface.
-	The registration portal guides manufacturers through a structured 
-	form with a step indicator, whilst the public verification page 
-	displays the passport details, integrity status, and IPFS document 
-	link without requiring a wallet.
+    Figures~\ref{fig:ui_register} and~\ref{fig:ui_verify} show the deployed interface of EcoPassEU. The registration portal guides manufacturers through a structured form (with step indicator), whilst the public verification page shows the passport details, integrity status and IPFS document link (without wallet requirement).
+	
 	\vspace{-0.2cm}
 	\begin{figure}[htbp]
 		\centering
-		\includegraphics[width=0.85\linewidth]{figures/8.png}
+		\includegraphics[width=0.8\linewidth]{figures/8.png}
 		\caption{Deployed EcoPassEU interface: manufacturer registration portal.}
 		\label{fig:ui_register}
 	\end{figure}
 	
 	\begin{figure}[htbp]
 		\centering
-		\includegraphics[width=0.85\linewidth]{figures/9.png}
+		\includegraphics[width=0.8\linewidth]{figures/9.png}
 		\caption{Deployed EcoPassEU interface: public product verification page.}
 		\label{fig:ui_verify}
 	\end{figure}
 	\vspace{-0.2cm}
 	
+	\newpage
 	\subsection{User Manual}
 	The application is designed to be intuitive for two distinct user groups. 
 	
@@ -458,9 +451,9 @@
 	
 	\textbf{For Consumers and Regulators (Verification):}
 	\begin{enumerate}
-		\item No wallet connection is required. Open the EcoPassEU homepage.
+		\item No wallet connection needed. Open the EcoPassEU homepage.
 		\item Enter the Product ID into the central search bar, or scan the product's QR code.
-		\item Review the product's lifecycle data. A green 'Blockchain Verified' badge indicates that the IPFS data matches the immutable blockchain record.
+		\item Review the product's lifecycle data. There will be a green `Blockchain Verified' badge, indicating that the IPFS data matches the immutable blockchain record.
 	\end{enumerate}
 	
 	
@@ -475,28 +468,57 @@
 	
 	\section{Critical Evaluation}
 	
-	A critical assessment of the DApp's execution costs demonstrates highly optimised gas efficiency. The gas cost can be rigorously decomposed using standard EVM opcode pricing \cite{Wood2014Ethereum}. Each registration incurs a base transaction cost of 21,000 gas, plus approximately 20,000 gas per \texttt{SSTORE} opcode for each new storage slot written. By keeping heavy string data (e.g., repair guides) off-chain on IPFS, the on-chain state changes are kept extremely lightweight. Crucially, the \texttt{Passport} struct writes five fields, but using \texttt{bytes32} for \texttt{metadataHash} rather than a hex string halves the storage cost for that specific field, as it fits neatly into a single 32-byte EVM storage word. According to our testnet deployment, executing a single registration transaction consumes approximately 125,430 gas. However, the \texttt{batchRegisterPassports} function shows significant operational scalability. By traversing an array of products in one transaction, the contract amortises the fixed 21,000-gas base cost across multiple registrations. Test data confirms that registering 10 products in bulk reduces the average per-product cost to roughly 92,100 gas---explaining the 26\% per-unit reduction and rendering the platform economically viable for SMEs.
+	A per-transaction cost analysis of this DApp's operation reveals highly 
+	optimised gas efficiency. The transaction cost can be rigorously decomposed based on standard EVM opcode pricing \cite{Wood2014Ethereum}. Each registration transaction has a base cost of 21,000 gas, with an additional cost of approximately 20,000 gas per \texttt{SSTORE} opcode for each new storage slot written. By storing heavy string data (e.g., repair guides) off-chain on IPFS, the on-chain state changes can be kept extremely lightweight. Moreover, it's important to note that the \texttt{Passport} struct can write 5 fields, however, using \texttt{bytes32} type for \texttt{metadataHash} instead of a hex string halves the storage cost for this one field, since it fits perfectly into one 32-byte EVM storage word. The testnet deployment reveals that conducting a single registration 
+	transaction would use approximately 125,430 gas. However, it is critical to mention that there can be very high operational scalability provided by the \texttt{batchRegisterPassports} function. Since the contract iterates an array of products in one transaction, it effectively amortises the fixed 21,000-gas base cost across multiple registration transactions. Based on the test data, it has been shown that registering 10 products in bulk reduces the average per-product cost to roughly 92,100 gas. This in turn explains the 26\% per-unit cost reduction, and gives the platform potential to be economically viable for SMEs.
 	
 	In terms of security, the implementation has successfully reduced the risk of tampering and unauthorised modification, which is a central concern in Ethereum smart contract security \cite{Luu2016Making,Tsankov2018Securify}. In smart contracts, the explicit \texttt{require} check provides a strict tamperability detection guarantee by making the registered passport immutable. In addition, the stored metadata hash establishes a cryptographic commitment between the on-chain registry and the off-chain IPFS load. If the malicious actor tries to intercept and tamper with the IPFS document, the cryptographic hash of the tampered document will no longer match the immutable record saved on the chain, thus immediately invalidating the passport. Unlike existing solutions that rely on permissioned nodes or proprietary databases, EcoPassEU achieves enterprise-level privacy protection on a fully open network through the IPFS hash pairing mechanism.
-	
+
 	The contract structurally avoids several common loopholes in Ethereum. 
 	The re-entry attack \cite{Luu2016Making} is not applicable because the contract neither accepts nor transfers Ether, eliminating the external call path used by reentrancy attack. 
-	Integer overflow and overflow has been mitigated by Solidity 0.8.x compiler's built-in checked arithmetic, which will revert when overflow occurs without the SafeMath library \cite{SolidityDocs2024}.
+	Integer overflow has been mitigated by Solidity 0.8.x's 
+	built-in checked arithmetic, which reverts automatically on 
+	overflow without requiring the SafeMath library 
+	\cite{SolidityDocs2024}.
 	The \texttt{private} visibility of \texttt{passports} mapping prevents direct external enumeration; all reading are controlled by the typed \texttt{getPassport()} and \texttt{passportExists()} view functions, which are declared as \texttt{view}, therefore cost zero gas when called off-chain.
 	
 	
 	
-	Although the decentralised architecture provides strong security, it also brings some runtime restrictions. The DApp performs quickly in on-chain verification and can usually be read in the state of completion in milliseconds. However, the access to the complete product history depends on public IPFS gateways, which sometimes have higher latency than centralised cloud servers. In addition, although the current platform runs efficiently on the Sepolia testnet, if it is migrated to the Ethereum mainnet, users will face volatile gas costs. Future versions of EcoPassEU should be considered for deployment on Layer-2 networks such as Polygon. This can not only maintain EVM compatibility, but also achieve near-instant final confirmation; at the same time, if it is necessary to support secondary market transfer in the future, it can be further reconstructed into a plan based on ERC-1155 tokens \cite{Radomski2018ERC1155}.
+	Although the decentralised architecture provides strong security, it also brings some runtime restrictions. The DApp performs quickly in on-chain verification and can usually be read in the state of completion in milliseconds. However, the access to the complete product history depends on public IPFS gateways, which sometimes have higher latency than centralised cloud servers. In addition, although the current platform runs efficiently on the Sepolia testnet, if it is migrated to the Ethereum mainnet, users will face volatile gas costs.  
+	EcoPassEU can be modified for deployment on Layer-2 networks such as 
+	Polygon to benefit from its EVM compatibility and near-instant finality 
+	with significantly lower transaction fees. In the unlikely event that 
+	secondary-market transfer becomes mandatory, the registry can be 
+	reconstructed around ERC-1155 tokens \cite{Radomski2018ERC1155}.
 	
 	
 	\section{Conclusion}
-	This project successfully built EcoPassEU, a decentralised application (DApp) that provides Digital Product Passports (DPPs) to meet the EU's Ecodesign for Sustainable Products Regulation (ESPR) \cite{EU2024ESPR}. By using Ethereum smart contracts \cite{Antonopoulos2018Mastering}, the system registers and verifies products automatically without relying on central authorities \cite{Szabo1997Formalizing}. To prevent false environmental claims, a \texttt{keccak256} hash securely links the immutable on-chain record to the full document on IPFS \cite{NIST2015SHA3}. Running on Ethereum's Proof-of-Stake network, which reduced energy consumption by approximately 99.95\% compared to its predecessor Proof-of-Work consensus \cite{EthereumMerge2022}, directly reinforces EcoPassEU's sustainability mandate: a DPP platform that itself carries a high carbon footprint would undermine the environmental credentials it is designed to certify. This hybrid storage model also greatly reduces gas fees by keeping heavy data off the blockchain \cite{Kouhizadeh2021Blockchain}.
+	EcoPassEU demonstrates that a public blockchain can serve as a 
+	practical, tamper-evident foundation for ESPR-compliant Digital 
+	Product Passports. By combining Ethereum smart contracts 
+	\cite{Antonopoulos2018Mastering} with IPFS-based off-chain 
+	storage, the platform achieves independently verifiable 
+	sustainability records without imposing wallet requirements on 
+	end users. The \texttt{keccak256} hash pairing mechanism 
+	\cite{NIST2015SHA3} and Ethereum's Proof-of-Stake consensus 
+	\cite{EthereumMerge2022} together address both data integrity 
+	and the carbon-footprint concerns that would otherwise undermine 
+	a sustainability-focused platform. Batch registration reduces 
+	per-unit gas costs by 26\%, making the system economically 
+	accessible to SMEs.
 	
-	Technically, the platform is live on the Sepolia testnet. We used Hardhat to test the smart contracts thoroughly, ensuring core functions and edge cases perform exactly as expected \cite{Hardhat2024}. To help small and medium enterprises (SMEs), we added a batch registration feature that significantly cuts transaction costs. The front-end allows consumers to view product histories without a crypto wallet, fetching data smoothly via public nodes \cite{EthersJS2024}. 
+	The platform's current limitations are clear: testnet-only 
+	deployment leaves real-world gas costs unvalidated, reliance on 
+	a single Pinata gateway introduces a central point of failure, 
+	and the absence of KYC means product identity cannot be 
+	guaranteed. Immutability, while essential for tamper evidence, 
+	also prevents correction of honest registration errors.
 	
-	However, the system has current limitations. As a testnet deployment, real-world gas costs and network limits remain unproven. Using a single IPFS provider (Pinata) also introduces a central point of failure. Furthermore, the platform lacks identity verification (KYC), meaning any user can register a product ID. Finally, the strict immutability of the smart contract means honest mistakes cannot be fixed, and products cannot be officially recalled or revoked.
-	
-	Future work will focus on mainnet deployment and gas profiling. We plan to add decentralised identifiers (DIDs) or verifiable credentials to confirm manufacturer identities, alongside a system to update or revoke passports safely. Moving to a multi-node storage solution like Filecoin will remove the reliance on one IPFS gateway. Finally, zero-knowledge proofs could be explored to hide sensitive supply chain details while still proving compliance to the public. Overall, EcoPassEU proves that blockchain offers a practical, transparent way to track sustainable goods, providing a strong base for future real-world use.
+	Addressing these gaps --- through mainnet deployment, 
+	decentralised identifiers \cite{W3C2025DID,W3C2025VC}, multi-node IPFS storage via 
+	Filecoin, and zero-knowledge proofs for selective compliance 
+	disclosure --- represents a concrete and achievable roadmap for 
+	taking EcoPassEU from proof-of-concept to production.
 	
 	
 	
