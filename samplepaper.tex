@@ -35,6 +35,17 @@
 	frame=single
 }
 
+
+\lstdefinelanguage{JavaScript}{
+	keywords={import, from, describe, it, async, function, await, const, let},
+	sensitive=true,
+	comment=[l]{//},
+	morecomment=[s]{/*}{*/},
+	morestring=[b]",
+	morestring=[b]'
+}
+
+
 \renewcommand{\theHsection}{\thepart.\thesection} 
 
 
@@ -310,10 +321,102 @@
 	gas costs per registration, whilst keeping the full product lifecycle data 
 	off-chain on IPFS.
 	
-	\subsection{Testing Strategy}
-	To ensure the reliability of the smart contracts, we implemented a comprehensive unit testing suite using the Hardhat environment alongside the Chai assertion library. This follows established practices for smart contract validation \cite{Ferreira2020SmartBugs}. 
 	
-	Our testing strategy focused on core functionality and edge cases. We confirmed that the \texttt{registerPassport} function accurately stores the transaction sender's address as the issuer, preventing forgery, and generates a valid block timestamp. Furthermore, boundary testing verified that the contract successfully reverts transactions and reports errors when a duplicate product ID is submitted. We also tested the \texttt{batchRegisterPassports} function to ensure it can process arrays efficiently, emit correct events for valid entries, and silently skip already registered products without failing the entire batch.
+	Listing 1.2 outlines the core registration functions and reflects a number of optimisations for Solidity:
+	
+	\begin{lstlisting}[language=Solidity, caption=registerPassport function]
+		function registerPassport(
+		string calldata productId,
+		string calldata ipfsCID,
+		bytes32 metadataHash
+		) external {
+			require(!passports[productId].exists, "Passport already exists");
+			passports[productId] = Passport({
+				ipfsCID:      ipfsCID,
+				metadataHash: metadataHash,
+				issuer:       msg.sender,
+				timestamp:    block.timestamp,
+				exists:       true
+			});
+			emit PassportIssued(productId, ipfsCID, metadataHash,
+			msg.sender, block.timestamp);
+		}
+	\end{lstlisting}
+	
+	Passing string parameters as \texttt{calldata} instead of \texttt{memory} avoids redundant data copying and significantly reduces the cost of gas. 
+	Meanwhile, the \texttt{external} visibility modifier allows direct argument access from the call data, providing greater gas efficiency compared with a \texttt{public} declaration. 
+	Whats more, binding the \texttt{issuer} directly to \texttt{msg.sender}---a secure EVM primitive---guarantees unforgeable cryptographic attribution for every passport , bypassing the need for supplementary access controls.
+	
+	As a supplement to the registration logic, the \texttt{PassportIssued}
+	event will be issued after each successful execution:
+	
+	\begin{lstlisting}[language=Solidity, caption=PassportIssued Event Definition]
+		event PassportIssued(
+		string  indexed productId,
+		string          ipfsCID,
+		bytes32         metadataHash,
+		address indexed issuer,
+		uint256         timestamp
+		);
+	\end{lstlisting}
+	
+	By designating \texttt{productId} and \texttt{issuer} as \texttt{indexed}, EVM stores these parameters in the Bloom filter of the transaction receipt.
+	This mechanism allows off-chain clients to efficiently filter logs by specific product or manufacturer without scanning the computing overhead of each block, which represents  best-practice model of establishing queryable audit tracking in Ethereum DApps \cite{Wood2014Ethereum}.
+	
+	
+	
+	
+	
+	\subsection{Testing Strategy}
+	
+	To validate the reliability of \texttt{PassportRegistry}, a unit-testing
+	suite was implemented using the Hardhat environment alongside the Chai
+	assertion library~\cite{nomic2024hardhat}, following established practices
+	for smart contract validation~\cite{ferreira2020smartbugs}.
+	Listing~\ref{lst:test-setup} shows the shared test fixture; a fresh contract
+	instance is deployed via \texttt{beforeEach}, ensuring full isolation between
+	cases.
+	
+	\begin{lstlisting}[
+		language=JavaScript,
+		caption={Hardhat test fixture -- shared setup},
+		label={lst:test-setup}
+		]
+		beforeEach(async function () {
+			[owner, addr1] = await hre.ethers.getSigners();
+			const Factory =
+			await hre.ethers.getContractFactory("PassportRegistry");
+			contract = await Factory.deploy();
+		});
+	\end{lstlisting}
+	
+	The most critical tests concern \texttt{registerPassport}, as shown in
+	Listing~\ref{lst:test-register}. The first case confirms that
+	\texttt{msg.sender} is persisted as the issuer, which is the foundation of
+	the platform's unforgeable attribution model. The second verifies that
+	attempting to re-register an existing product ID triggers the
+	\texttt{require} guard and reverts with the expected reason string,
+	guaranteeing passport immutability.
+	
+	\begin{lstlisting}[
+		language=JavaScript,
+		caption={Unit tests -- registerPassport: issuer storage and duplicate
+			guard},
+		label={lst:test-register}
+		]
+		it("should store the correct issuer address", async function () {
+			await contract.registerPassport(PRODUCT_ID, IPFS_CID, META_HASH);
+			const [, , issuer] = await contract.getPassport(PRODUCT_ID);
+			expect(issuer).to.equal(owner.address);
+		});
+		
+		it("should revert on duplicate product ID", async function () {
+			await contract.registerPassport(PRODUCT_ID, IPFS_CID, META_HASH);
+			await expect(
+			contract.registerPassport(PRODUCT_ID, IPFS_CID, META_HASH)
+			).to.be.revertedWith("Passport already exists");
+		});
+	\end{lstlisting}
 	
 	
 	\subsection{Final UI Showcase}
@@ -372,17 +475,22 @@
 	
 	\section{Critical Evaluation}
 	
-	A critical assessment of the execution cost of the DApp shows that its gas efficiency has been highly optimised. The design of storing larger string data such as repair guides or recycling instructions off-chain ensures that the state changes required for the registry are extremely lightweight. According to the testnet deployment results and standard EVM opcodes estimates, executing a single registration transaction consumes about 125,430 gas. In addition, the \texttt{batchRegisterPassports} function shows significant operational scalability. By traversing a set of ID and hash values in one transaction, the contract avoids the basic transaction fee of 21,000 gas. Test data shows that when 10 products are registered in bulk, the average gas cost of a single product can be reduced to about 92,100 gas, achieving an efficiency improvement of more than 25\%, making the platform economically feasible for small and medium-sized enterprises.
+	A critical assessment of the DApp's execution costs demonstrates highly optimised gas efficiency. The gas cost can be rigorously decomposed using standard EVM opcode pricing \cite{Wood2014Ethereum}. Each registration incurs a base transaction cost of 21,000 gas, plus approximately 20,000 gas per \texttt{SSTORE} opcode for each new storage slot written. By keeping heavy string data (e.g., repair guides) off-chain on IPFS, the on-chain state changes are kept extremely lightweight. Crucially, the \texttt{Passport} struct writes five fields, but using \texttt{bytes32} for \texttt{metadataHash} rather than a hex string halves the storage cost for that specific field, as it fits neatly into a single 32-byte EVM storage word. According to our testnet deployment, executing a single registration transaction consumes approximately 125,430 gas. However, the \texttt{batchRegisterPassports} function shows significant operational scalability. By traversing an array of products in one transaction, the contract amortises the fixed 21,000-gas base cost across multiple registrations. Test data confirms that registering 10 products in bulk reduces the average per-product cost to roughly 92,100 gas---explaining the 26\% per-unit reduction and rendering the platform economically viable for SMEs.
 	
 	In terms of security, the implementation has successfully reduced the risk of tampering and unauthorised modification, which is a central concern in Ethereum smart contract security \cite{Luu2016Making,Tsankov2018Securify}. In smart contracts, the explicit \texttt{require} check provides a strict tamperability detection guarantee by making the registered passport immutable. In addition, the stored metadata hash establishes a cryptographic commitment between the on-chain registry and the off-chain IPFS load. If the malicious actor tries to intercept and tamper with the IPFS document, the cryptographic hash of the tampered document will no longer match the immutable record saved on the chain, thus immediately invalidating the passport. Unlike existing solutions that rely on permissioned nodes or proprietary databases, EcoPassEU achieves enterprise-level privacy protection on a fully open network through the IPFS hash pairing mechanism.
+	
+	The contract structurally avoids several common loopholes in Ethereum. 
+	The re-entry attack \cite{Luu2016Making} is not applicable because the contract neither accepts nor transfers Ether, eliminating the external call path used by reentrancy attack. 
+	Integer overflow and overflow has been mitigated by Solidity 0.8.x compiler's built-in checked arithmetic, which will revert when overflow occurs without the SafeMath library \cite{SolidityDocs2024}.
+	The \texttt{private} visibility of \texttt{passports} mapping prevents direct external enumeration; all reading are controlled by the typed \texttt{getPassport()} and \texttt{passportExists()} view functions, which are declared as \texttt{view}, therefore cost zero gas when called off-chain.
+	
+	
 	
 	Although the decentralised architecture provides strong security, it also brings some runtime restrictions. The DApp performs quickly in on-chain verification and can usually be read in the state of completion in milliseconds. However, the access to the complete product history depends on public IPFS gateways, which sometimes have higher latency than centralised cloud servers. In addition, although the current platform runs efficiently on the Sepolia testnet, if it is migrated to the Ethereum mainnet, users will face volatile gas costs. Future versions of EcoPassEU should be considered for deployment on Layer-2 networks such as Polygon. This can not only maintain EVM compatibility, but also achieve near-instant final confirmation; at the same time, if it is necessary to support secondary market transfer in the future, it can be further reconstructed into a plan based on ERC-1155 tokens \cite{Radomski2018ERC1155}.
 	
 	
-	
-	
 	\section{Conclusion}
-	This project successfully built EcoPassEU, a decentralised application (DApp) that provides Digital Product Passports (DPPs) to meet the EU's Ecodesign for Sustainable Products Regulation (ESPR) \cite{EU2024ESPR}. By using Ethereum smart contracts \cite{Antonopoulos2018Mastering}, the system registers and verifies products automatically without relying on central authorities \cite{Szabo1997Formalizing}. To prevent false environmental claims, a \texttt{keccak256} hash securely links the immutable on-chain record to the full document on IPFS \cite{NIST2015SHA3}. Furthermore, running on Ethereum's Proof-of-Stake network aligns with the project's green goals by keeping energy use extremely low \cite{EthereumMerge2022,Buterin2019Casper,Saberi2019Blockchain}. This hybrid storage model also greatly reduces gas fees by keeping heavy data off the blockchain \cite{Kouhizadeh2021Blockchain}.
+	This project successfully built EcoPassEU, a decentralised application (DApp) that provides Digital Product Passports (DPPs) to meet the EU's Ecodesign for Sustainable Products Regulation (ESPR) \cite{EU2024ESPR}. By using Ethereum smart contracts \cite{Antonopoulos2018Mastering}, the system registers and verifies products automatically without relying on central authorities \cite{Szabo1997Formalizing}. To prevent false environmental claims, a \texttt{keccak256} hash securely links the immutable on-chain record to the full document on IPFS \cite{NIST2015SHA3}. Running on Ethereum's Proof-of-Stake network, which reduced energy consumption by approximately 99.95\% compared to its predecessor Proof-of-Work consensus \cite{EthereumMerge2022}, directly reinforces EcoPassEU's sustainability mandate: a DPP platform that itself carries a high carbon footprint would undermine the environmental credentials it is designed to certify. This hybrid storage model also greatly reduces gas fees by keeping heavy data off the blockchain \cite{Kouhizadeh2021Blockchain}.
 	
 	Technically, the platform is live on the Sepolia testnet. We used Hardhat to test the smart contracts thoroughly, ensuring core functions and edge cases perform exactly as expected \cite{Hardhat2024}. To help small and medium enterprises (SMEs), we added a batch registration feature that significantly cuts transaction costs. The front-end allows consumers to view product histories without a crypto wallet, fetching data smoothly via public nodes \cite{EthersJS2024}. 
 	
