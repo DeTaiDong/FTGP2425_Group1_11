@@ -443,10 +443,24 @@
 			\caption{Deployed EcoPassEU interface: public product verification page.}
 			\label{fig:ui_verify}
 		\end{minipage}
+		\vspace{0.3cm}
+		\begin{minipage}{\linewidth}
+			\centering
+			\includegraphics[width=0.6\linewidth]{figures/10.png}
+			\caption{Interactive supply chain map rendered on the public product verification page (UC-10).}
+			\label{fig:ui_supplychain}
+		\end{minipage}
 	\end{figure}
 	\vspace{-0.2cm}
 	
+	Figure~\ref{fig:ui_supplychain} illustrates the interactive supply chain 
+	map that displays every registered stage of the supply chain from a 
+	geographic perspective. By doing this, we enable consumers and regulators to follow the product's provenance, from the sourcing of raw materials to its final assembly.
+	
 
+	
+	
+	
 	\subsection{User Manual}
 	The application is designed to be intuitive for two distinct user groups. 
 	
@@ -559,6 +573,16 @@
 	\bibliography{mybibliography}
 	
 	\newpage
+	%
+	% ---- Bibliography ----
+	%
+	% BibTeX users should specify bibliography style 'splncs04'.
+	% References will then be sorted and formatted in the correct style.
+	%
+	\bibliographystyle{splncs04}
+	\bibliography{mybibliography}
+	
+	\newpage
 	\appendix
 	\section{Appendix}
 	% The appendix has no page limit and must include specific items in order.
@@ -572,7 +596,8 @@
 	
 	\subsection{Project Links}
 	\begin{itemize}
-		\item \textbf{Deployed Website:} [Insert URL]
+		\item \textbf{Deployed Website:} 
+		\url{https://ftgp-2526-group1-11.vercel.app/home}
 		\item \textbf{GitHub Repository:} \url{https://github.com/DeTaiDong/FTGP2425_Group1_11} 
 	\end{itemize}
 	
@@ -605,15 +630,15 @@
 	[Insert 500-word reflection here]
 	
 	\subsubsection{Fuyu Cao}
-    During the FTGP group project, I mainly contributed to the frontend presentation, visual refinement, and part of the data preparation for our DApp, EcoPassEU. Our project focused on building a privacy-aware Digital Product Passport platform for sustainable consumer goods in Europe. Compared with some of my teammates who worked more on the smart contract logic or report writing, my role was more related to improving how the project was presented and how users would interact with it. I helped optimise the page design, adjust the layout of several pages, improve the homepage background and visual consistency, and design the project logo. In addition, I also processed part of the dataset so that it could be used more clearly in the frontend demonstration.
-
-    At the beginning of the project, I did not have a very strong background in frontend development, so some tasks seemed unfamiliar to me. For example, when I first looked at the project files, I was not very confident about how to modify the UI, replace images, or update components correctly. However, through this project I gradually became more comfortable with reading the code structure, locating the relevant files, and making direct changes to the interface. I learned how the React frontend was organised, how local changes could be previewed on the browser, and how visual elements such as logos, banners, and page sections could be integrated into the project. Although these may seem like small tasks compared with blockchain deployment, I realised that they are still very important because they directly affect the clarity, usability, and professionalism of the final product.
-
-    Another useful part of my work was helping with the dataset. The raw data was not in a form that could be directly used in the project, so I helped clean part of it and organise sample data that was easier for the frontend to display. This made me understand that in a real project, the gap between raw data and usable system data is often larger than expected. Even if the final interface looks simple, a lot of supporting work is needed behind it.
-
-    From a teamwork perspective, this project also taught me a lot. I learned that not every contribution has to be the “main technical core” in order to be valuable. In a group project, different members naturally take responsibility for different parts, and what matters is whether each person helps move the project forward. In my case, improving the UI, preparing data, and helping with presentation materials were practical contributions that supported the overall result. I also became more aware of the importance of communication, especially when multiple people are editing code, updating files, and trying to keep the project consistent.
-
-    Overall, this project was a meaningful experience for me. It not only improved my understanding of blockchain-based application development, but also gave me more confidence in contributing to a technical team project in my own way. I learned that building a complete product requires not only backend logic and smart contracts, but also design, data preparation, usability, and coordination. This experience helped me better understand how a group project comes together as a whole.
+	During the FTGP group project, I mainly contributed to the frontend presentation, visual refinement, and part of the data preparation for our DApp, EcoPassEU. Our project focused on building a privacy-aware Digital Product Passport platform for sustainable consumer goods in Europe. Compared with some of my teammates who worked more on the smart contract logic or report writing, my role was more related to improving how the project was presented and how users would interact with it. I helped optimise the page design, adjust the layout of several pages, improve the homepage background and visual consistency, and design the project logo. In addition, I also processed part of the dataset so that it could be used more clearly in the frontend demonstration.
+	
+	At the beginning of the project, I did not have a very strong background in frontend development, so some tasks seemed unfamiliar to me. For example, when I first looked at the project files, I was not very confident about how to modify the UI, replace images, or update components correctly. However, through this project I gradually became more comfortable with reading the code structure, locating the relevant files, and making direct changes to the interface. I learned how the React frontend was organised, how local changes could be previewed on the browser, and how visual elements such as logos, banners, and page sections could be integrated into the project. Although these may seem like small tasks compared with blockchain deployment, I realised that they are still very important because they directly affect the clarity, usability, and professionalism of the final product.
+	
+	Another useful part of my work was helping with the dataset. The raw data was not in a form that could be directly used in the project, so I helped clean part of it and organise sample data that was easier for the frontend to display. This made me understand that in a real project, the gap between raw data and usable system data is often larger than expected. Even if the final interface looks simple, a lot of supporting work is needed behind it.
+	
+	From a teamwork perspective, this project also taught me a lot. I learned that not every contribution has to be the “main technical core” in order to be valuable. In a group project, different members naturally take responsibility for different parts, and what matters is whether each person helps move the project forward. In my case, improving the UI, preparing data, and helping with presentation materials were practical contributions that supported the overall result. I also became more aware of the importance of communication, especially when multiple people are editing code, updating files, and trying to keep the project consistent.
+	
+	Overall, this project was a meaningful experience for me. It not only improved my understanding of blockchain-based application development, but also gave me more confidence in contributing to a technical team project in my own way. I learned that building a complete product requires not only backend logic and smart contracts, but also design, data preparation, usability, and coordination. This experience helped me better understand how a group project comes together as a whole.
 	
 	\subsubsection{Tianwei Yu}
 
@@ -645,4 +670,4 @@ Overall, EcoPassEU was much more than just a coding assignment; it was a chance 
 		// Insert modified/relevant frontend files (e.g., page.js) here
 	\end{verbatim}
 	
-\end{document}
+	\end{document}
