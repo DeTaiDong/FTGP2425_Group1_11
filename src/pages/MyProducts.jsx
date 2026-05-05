@@ -31,7 +31,7 @@ function MyProducts() {
       }
       const myEvents = await queryPassportIssuedEventsWithFallback(
         provider,
-        contract => contract.filters.PassportIssued(null, account)
+        contract => contract.filters.PassportIssued(null, null, null, account)
       )
 
       const iface = new ethers.Interface(CONTRACT_ABI)

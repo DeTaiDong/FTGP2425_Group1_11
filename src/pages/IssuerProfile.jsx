@@ -81,7 +81,7 @@ function IssuerProfile() {
 
       const issuerEvents = await queryPassportIssuedEventsWithFallback(
         provider,
-        contract => contract.filters.PassportIssued(null, address)
+        contract => contract.filters.PassportIssued(null, null, null, address)
       )
 
       const iface = new ethers.Interface(CONTRACT_ABI)
