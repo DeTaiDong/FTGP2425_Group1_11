@@ -2,6 +2,7 @@ import { ethers } from 'ethers'
 
 export const CONTRACT_ADDRESS = '0x0617635eA34a7835807EbC6D0A7aECC9de8E1Cf0'
 const EVENT_QUERY_CHUNK_SIZE = 45000
+const DEFAULT_EVENT_LOOKBACK_BLOCKS = 300000
 
 export const CONTRACT_ABI = [
   {
@@ -72,16 +73,16 @@ export const getContract = (providerOrSigner) => {
 export const queryPassportIssuedEvents = async (provider, filter, options = {}) => {
   const contract = getContract(provider)
   const latest = await provider.getBlockNumber()
-  const fromBlock = options.fromBlock ?? 0
+  const fromBlock = options.fromBlock ?? Math.max(0, latest - DEFAULT_EVENT_LOOKBACK_BLOCKS)
   const events = []
 
-  for (let start = fromBlock; start <= latest; start += EVENT_QUERY_CHUNK_SIZE + 1) {
-    const end = Math.min(start + EVENT_QUERY_CHUNK_SIZE, latest)
+  for (let end = latest; end >= fromBlock; end -= EVENT_QUERY_CHUNK_SIZE + 1) {
+    const start = Math.max(fromBlock, end - EVENT_QUERY_CHUNK_SIZE)
     const chunk = await contract.queryFilter(filter || contract.filters.PassportIssued(), start, end)
     events.push(...chunk)
   }
 
-  return events
+  return events.sort((a, b) => a.blockNumber - b.blockNumber || a.index - b.index)
 }
 
 export const getProviderAndSigner = async () => {
