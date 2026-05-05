@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EcoPassEU Presentation</title>
+<style>
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  color-scheme: dark;
+  --accent: #52b788;
+  --accent-2: #d8f3dc;
+  --panel: rgba(14, 18, 16, 0.78);
+  --panel-border: rgba(255, 255, 255, 0.16);
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background:
+    radial-gradient(circle at 14% 14%, rgba(82, 183, 136, 0.22), transparent 28%),
+    linear-gradient(135deg, #0c1110 0%, #17211d 52%, #0f1312 100%);
+  color: #f7f7f7;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  overflow: hidden;
+}
+
+.presentation {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 42px 34px 92px;
+}
+
+.stage-glow {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(82, 183, 136, 0.12), transparent 26%, transparent 74%, rgba(216, 243, 220, 0.08)),
+    radial-gradient(circle at 50% 90%, rgba(82, 183, 136, 0.18), transparent 34%);
+}
+
+.topbar {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  z-index: 30;
+  width: min(1100px, calc(100vw - 28px));
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0;
+  pointer-events: none;
+}
+
+.deck-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.timer {
+  min-width: 46px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.deck {
+  position: relative;
+  width: min(100%, calc((100vh - 146px) * 16 / 9));
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.52);
+  transform-origin: center;
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+.deck.is-changing {
+  transform: scale(0.992);
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.46);
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: block;
+  opacity: 0;
+  visibility: hidden;
+  background: #fff;
+  transform: translateX(5%) scale(0.985);
+  transition: opacity 380ms ease, transform 380ms ease, visibility 380ms;
+}
+
+.slide.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0) scale(1);
+  z-index: 3;
+}
+
+.slide.leaving-left {
+  opacity: 0;
+  transform: translateX(-5%) scale(0.985);
+}
+
+.slide.leaving-right {
+  opacity: 0;
+  transform: translateX(5%) scale(0.985);
+}
+
+.slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.progress {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 35;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.progress-bar {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  transition: width 300ms ease;
+}
+
+.controls {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  z-index: 40;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100vw - 20px);
+  padding: 8px;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  backdrop-filter: blur(14px);
+}
+
+.controls button {
+  min-width: 42px;
+  height: 36px;
+  border: 0;
+  background: rgba(255, 255, 255, 0.92);
+  color: #152018;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.controls button:hover:not(:disabled),
+.thumb:hover,
+.thumb:focus-visible {
+  outline: 2px solid rgba(82, 183, 136, 0.95);
+  outline-offset: 2px;
+}
+
+.controls button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.controls button.is-active {
+  background: var(--accent);
+  color: #07110b;
+}
+
+.slide-indicator {
+  min-width: 62px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.thumb-rail {
+  position: fixed;
+  left: 50%;
+  bottom: 72px;
+  z-index: 28;
+  width: min(1080px, calc(100vw - 28px));
+  transform: translateX(-50%) translateY(12px);
+  display: flex;
+  gap: 8px;
+  padding: 9px;
+  overflow-x: auto;
+  background: rgba(9, 13, 12, 0.72);
+  border: 1px solid var(--panel-border);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 180ms ease;
+  backdrop-filter: blur(12px);
+  scrollbar-width: thin;
+}
+
+body.show-thumbs .thumb-rail {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.thumb {
+  position: relative;
+  flex: 0 0 116px;
+  aspect-ratio: 16 / 9;
+  padding: 0;
+  border: 0;
+  background: #fff;
+  cursor: pointer;
+  opacity: 0.68;
+}
+
+.thumb.active {
+  opacity: 1;
+  outline: 3px solid var(--accent);
+}
+
+.thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumb span {
+  position: absolute;
+  left: 4px;
+  bottom: 4px;
+  min-width: 20px;
+  padding: 2px 5px;
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.overview {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: none;
+  padding: 42px;
+  background: rgba(6, 10, 9, 0.94);
+  overflow: auto;
+}
+
+body.overview-open .overview {
+  display: block;
+}
+
+.overview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin: 0 auto 22px;
+  width: min(1260px, 100%);
+}
+
+.overview-header h1 {
+  margin: 0;
+  font-size: 20px;
+  letter-spacing: 0;
+}
+
+.overview-close {
+  height: 36px;
+  border: 0;
+  padding: 0 14px;
+  background: #fff;
+  color: #172019;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.overview-grid {
+  width: min(1260px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 16px;
+}
+
+.overview-card {
+  position: relative;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: #fff;
+  cursor: pointer;
+}
+
+.overview-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.overview-card span {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  padding: 3px 7px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.hint {
+  position: fixed;
+  right: 18px;
+  bottom: 24px;
+  z-index: 30;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 12px;
+  pointer-events: none;
+}
+
+@media (max-width: 760px) {
+  .presentation {
+    padding: 52px 10px 96px;
+  }
+
+  .topbar {
+    top: 10px;
+    width: calc(100vw - 20px);
+  }
+
+  .deck {
+    width: min(100%, calc((100vh - 154px) * 16 / 9));
+  }
+
+  .controls {
+    bottom: 14px;
+    gap: 5px;
+  }
+
+  .controls button {
+    min-width: 36px;
+    padding: 0 8px;
+    font-size: 12px;
+  }
+
+  .hint {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deck,
+  .slide,
+  .progress-bar,
+  .thumb-rail {
+    transition: none;
+  }
+}
+
+@media print {
+  body {
+    overflow: visible;
+    background: #fff;
+  }
+
+  .stage-glow,
+  .topbar,
+  .controls,
+  .progress,
+  .thumb-rail,
+  .overview,
+  .hint {
+    display: none;
+  }
+
+  .presentation {
+    display: block;
+    width: auto;
+    height: auto;
+    padding: 0;
+  }
+
+  .deck {
+    width: 100%;
+    height: auto;
+    aspect-ratio: auto;
+    overflow: visible;
+    border: 0;
+    box-shadow: none;
+  }
+
+  .slide {
+    position: relative;
+    display: block;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    break-after: page;
+    page-break-after: always;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+  }
+}
+</style>
+</head>
+<body>
+<div class="stage-glow" aria-hidden="true"></div>
+
+<header class="topbar" aria-hidden="true">
+  <div class="deck-title">EcoPassEU Presentation</div>
+  <div class="timer" id="timer">00:00</div>
+</header>
+
+<main class="presentation" aria-label="EcoPassEU presentation">
+  <div class="deck" id="deck">
+    <section class="slide active" data-slide="1"><img src="html_assets/slides/slide_01.png" alt="Slide 1"></section>
+    <section class="slide" data-slide="2"><img src="html_assets/slides/slide_02.png" alt="Slide 2"></section>
+    <section class="slide" data-slide="3"><img src="html_assets/slides/slide_03.png" alt="Slide 3"></section>
+    <section class="slide" data-slide="4"><img src="html_assets/slides/slide_04.png" alt="Slide 4"></section>
+    <section class="slide" data-slide="5"><img src="html_assets/slides/slide_05.png" alt="Slide 5"></section>
+    <section class="slide" data-slide="6"><img src="html_assets/slides/slide_06.png" alt="Slide 6"></section>
+    <section class="slide" data-slide="7"><img src="html_assets/slides/slide_07.png" alt="Slide 7"></section>
+    <section class="slide" data-slide="8"><img src="html_assets/slides/slide_08.png" alt="Slide 8"></section>
+    <section class="slide" data-slide="9"><img src="html_assets/slides/slide_09.png" alt="Slide 9"></section>
+    <section class="slide" data-slide="10"><img src="html_assets/slides/slide_10.png" alt="Slide 10"></section>
+    <section class="slide" data-slide="11"><img src="html_assets/slides/slide_11.png" alt="Slide 11"></section>
+    <section class="slide" data-slide="12"><img src="html_assets/slides/slide_12.png" alt="Slide 12"></section>
+    <section class="slide" data-slide="13"><img src="html_assets/slides/slide_13.png" alt="Slide 13"></section>
+    <section class="slide" data-slide="14"><img src="html_assets/slides/slide_14.png" alt="Slide 14"></section>
+    <section class="slide" data-slide="15"><img src="html_assets/slides/slide_15.png" alt="Slide 15"></section>
+    <section class="slide" data-slide="16"><img src="html_assets/slides/slide_16.png" alt="Slide 16"></section>
+    <section class="slide" data-slide="17"><img src="html_assets/slides/slide_17.png" alt="Slide 17"></section>
+    <section class="slide" data-slide="18"><img src="html_assets/slides/slide_18.png" alt="Slide 18"></section>
+    <section class="slide" data-slide="19"><img src="html_assets/slides/slide_19.png" alt="Slide 19"></section>
+    <section class="slide" data-slide="20"><img src="html_assets/slides/slide_20.png" alt="Slide 20"></section>
+  </div>
+</main>
+
+<div class="thumb-rail" id="thumbRail" aria-label="Slide thumbnails"></div>
+
+<nav class="controls" aria-label="Slide controls">
+  <button type="button" id="prevBtn" title="Previous slide">Prev</button>
+  <output class="slide-indicator" id="slideIndicator" aria-live="polite">1 / 20</output>
+  <button type="button" id="nextBtn" title="Next slide">Next</button>
+  <button type="button" id="thumbBtn" title="Show thumbnail rail">Thumbs</button>
+  <button type="button" id="overviewBtn" title="Open overview">Grid</button>
+  <button type="button" id="autoBtn" title="Autoplay every 6 seconds">Auto</button>
+  <button type="button" id="fullBtn" title="Fullscreen">Full</button>
+</nav>
+
+<div class="progress" aria-hidden="true">
+  <div class="progress-bar" id="progressBar"></div>
+</div>
+
+<section class="overview" id="overview" aria-label="Slide overview" aria-modal="true">
+  <div class="overview-header">
+    <h1>Slide Overview</h1>
+    <button type="button" class="overview-close" id="overviewClose">Close</button>
+  </div>
+  <div class="overview-grid" id="overviewGrid"></div>
+</section>
+
+<div class="hint">Arrows: navigate | T: thumbnails | O: overview | F: fullscreen</div>
+
+<script>
+const slides = Array.from(document.querySelectorAll('.slide'));
+const deck = document.getElementById('deck');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const thumbBtn = document.getElementById('thumbBtn');
+const overviewBtn = document.getElementById('overviewBtn');
+const autoBtn = document.getElementById('autoBtn');
+const fullBtn = document.getElementById('fullBtn');
+const overview = document.getElementById('overview');
+const overviewClose = document.getElementById('overviewClose');
+const overviewGrid = document.getElementById('overviewGrid');
+const thumbRail = document.getElementById('thumbRail');
+const indicator = document.getElementById('slideIndicator');
+const progressBar = document.getElementById('progressBar');
+const timer = document.getElementById('timer');
+let current = 0;
+let autoplay = null;
+let lastDirection = 1;
+const startedAt = Date.now();
+
+function clampSlide(index) {
+  return Math.max(0, Math.min(slides.length - 1, index));
+}
+
+function setChangingPulse() {
+  deck.classList.add('is-changing');
+  window.setTimeout(() => deck.classList.remove('is-changing'), 220);
+}
+
+function showSlide(index, updateHash = true) {
+  const next = clampSlide(index);
+  lastDirection = next >= current ? 1 : -1;
+
+  slides.forEach((slide, slideIndex) => {
+    slide.classList.remove('active', 'leaving-left', 'leaving-right');
+    if (slideIndex === current && slideIndex !== next) {
+      slide.classList.add(lastDirection > 0 ? 'leaving-left' : 'leaving-right');
+    }
+    if (slideIndex === next) {
+      slide.classList.add('active');
+    }
+  });
+
+  current = next;
+  prevBtn.disabled = current === 0;
+  nextBtn.disabled = current === slides.length - 1;
+  indicator.value = `${current + 1} / ${slides.length}`;
+  indicator.textContent = indicator.value;
+  progressBar.style.width = `${((current + 1) / slides.length) * 100}%`;
+  syncThumbs();
+  setChangingPulse();
+
+  if (updateHash) {
+    history.replaceState(null, '', `#${current + 1}`);
+  }
+}
+
+function go(step) {
+  showSlide(current + step);
+}
+
+function buildNavigation() {
+  slides.forEach((slide, index) => {
+    const src = slide.querySelector('img').getAttribute('src');
+
+    const thumb = document.createElement('button');
+    thumb.className = 'thumb';
+    thumb.type = 'button';
+    thumb.title = `Go to slide ${index + 1}`;
+    thumb.dataset.index = String(index);
+    thumb.innerHTML = `<img src="${src}" alt=""><span>${index + 1}</span>`;
+    thumb.addEventListener('click', () => showSlide(index));
+    thumbRail.appendChild(thumb);
+
+    const card = document.createElement('button');
+    card.className = 'overview-card';
+    card.type = 'button';
+    card.title = `Open slide ${index + 1}`;
+    card.innerHTML = `<img src="${src}" alt=""><span>${index + 1}</span>`;
+    card.addEventListener('click', () => {
+      closeOverview();
+      showSlide(index);
+    });
+    overviewGrid.appendChild(card);
+  });
+}
+
+function syncThumbs() {
+  document.querySelectorAll('.thumb').forEach((thumb, index) => {
+    thumb.classList.toggle('active', index === current);
+    if (index === current && document.body.classList.contains('show-thumbs')) {
+      thumb.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+  });
+}
+
+function toggleThumbs() {
+  document.body.classList.toggle('show-thumbs');
+  thumbBtn.classList.toggle('is-active', document.body.classList.contains('show-thumbs'));
+  syncThumbs();
+}
+
+function openOverview() {
+  document.body.classList.add('overview-open');
+}
+
+function closeOverview() {
+  document.body.classList.remove('overview-open');
+}
+
+function toggleAutoplay() {
+  if (autoplay) {
+    window.clearInterval(autoplay);
+    autoplay = null;
+    autoBtn.classList.remove('is-active');
+    return;
+  }
+
+  autoBtn.classList.add('is-active');
+  autoplay = window.setInterval(() => {
+    if (current === slides.length - 1) {
+      showSlide(0);
+    } else {
+      showSlide(current + 1);
+    }
+  }, 6000);
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen?.();
+  } else {
+    document.exitFullscreen?.();
+  }
+}
+
+function updateTimer() {
+  const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+  const minutes = String(Math.floor(elapsed / 60)).padStart(2, '0');
+  const seconds = String(elapsed % 60).padStart(2, '0');
+  timer.textContent = `${minutes}:${seconds}`;
+}
+
+prevBtn.addEventListener('click', () => go(-1));
+nextBtn.addEventListener('click', () => go(1));
+thumbBtn.addEventListener('click', toggleThumbs);
+overviewBtn.addEventListener('click', openOverview);
+overviewClose.addEventListener('click', closeOverview);
+autoBtn.addEventListener('click', toggleAutoplay);
+fullBtn.addEventListener('click', toggleFullscreen);
+
+deck.addEventListener('dblclick', toggleFullscreen);
+
+document.addEventListener('keydown', (event) => {
+  if (document.body.classList.contains('overview-open') && event.key !== 'Escape') {
+    return;
+  }
+
+  if (['ArrowRight', 'PageDown', ' '].includes(event.key)) {
+    event.preventDefault();
+    go(1);
+  }
+  if (['ArrowLeft', 'PageUp', 'Backspace'].includes(event.key)) {
+    event.preventDefault();
+    go(-1);
+  }
+  if (event.key === 'Home') {
+    event.preventDefault();
+    showSlide(0);
+  }
+  if (event.key === 'End') {
+    event.preventDefault();
+    showSlide(slides.length - 1);
+  }
+  if (event.key.toLowerCase() === 't') {
+    event.preventDefault();
+    toggleThumbs();
+  }
+  if (event.key.toLowerCase() === 'o') {
+    event.preventDefault();
+    openOverview();
+  }
+  if (event.key.toLowerCase() === 'f') {
+    event.preventDefault();
+    toggleFullscreen();
+  }
+  if (event.key === 'Escape') {
+    closeOverview();
+    document.body.classList.remove('show-thumbs');
+    thumbBtn.classList.remove('is-active');
+  }
+});
+
+window.addEventListener('hashchange', () => {
+  const hashSlide = Number.parseInt(location.hash.replace('#', ''), 10);
+  if (Number.isFinite(hashSlide)) {
+    showSlide(hashSlide - 1, false);
+  }
+});
+
+buildNavigation();
+window.setInterval(updateTimer, 1000);
+updateTimer();
+
+const initialSlide = Number.parseInt(location.hash.replace('#', ''), 10);
+showSlide(Number.isFinite(initialSlide) ? initialSlide - 1 : 0, false);
+</script>
+</body>
+</html>

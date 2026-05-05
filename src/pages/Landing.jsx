@@ -7,6 +7,7 @@ function Landing() {
   const [connected, setConnected] = useState(false)
   const [account, setAccount] = useState(null)
   const [error, setError] = useState(null)
+  const presentationUrl = `${import.meta.env.BASE_URL}presentation/EcoPassEU_Presentation.html`
 
   const connect = async () => {
     setError(null)
@@ -77,6 +78,15 @@ function Landing() {
             </span>
           </p>
         )}
+
+        <a
+          href={presentationUrl}
+          target="_blank"
+          rel="noreferrer"
+          style={styles.infoBtn}
+        >
+          More info / About us
+        </a>
       </div>
     </div>
   )
@@ -179,12 +189,27 @@ const styles = {
   readOnly: {
     color: 'rgba(255, 255, 255, 0.7)',
     fontSize: '0.85rem',
-    margin: 0,
+    margin: '0 0 1rem',
   },
   link: {
     color: 'white',
     cursor: 'pointer',
     textDecoration: 'underline',
+  },
+  infoBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    padding: '0.78rem',
+    color: 'white',
+    border: '1px solid rgba(255, 255, 255, 0.46)',
+    borderRadius: '10px',
+    background: 'rgba(255, 255, 255, 0.1)',
+    fontSize: '0.92rem',
+    fontWeight: '700',
+    textDecoration: 'none',
+    boxSizing: 'border-box',
   },
 }
 
