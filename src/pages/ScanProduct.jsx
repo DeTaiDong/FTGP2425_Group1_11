@@ -5,12 +5,25 @@ import { getContract } from '../utils/contract'
 import { ScanSearch, Search, ShieldCheck, CircleCheck, CircleX, Loader, FileText, Copy, User, Calendar, Package, Hash, Leaf } from 'lucide-react'
 import backgroundImg from '../assets/background.png'
 
+const DEMO_IDS = ['DTEU-GPU-2025-5090', 'DTEU-SP-2025-002', 'DTEU-TX-2025-001']
+const RECENT_KEY = 'recentSearches'
+
+function getRecentSearches() {
+  try { return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]') } catch { return [] }
+}
+
+function addRecentSearch(id) {
+  const prev = getRecentSearches().filter(x => x !== id)
+  localStorage.setItem(RECENT_KEY, JSON.stringify([id, ...prev].slice(0, 3)))
+}
+
 function ScanProduct() {
   const [productId, setProductId] = useState('')
   const [result, setResult] = useState(null)
   const [status, setStatus] = useState(null)
   const [loading, setLoading] = useState(false)
   const [toast, setToast] = useState(null)
+  const [recentSearches, setRecentSearches] = useState(getRecentSearches)
   const navigate = useNavigate()
 
   const showToast = (msg) => {
@@ -48,6 +61,8 @@ function ScanProduct() {
         ipfsCID, metadataHash, issuer,
         timestamp: new Date(Number(timestamp) * 1000).toLocaleString()
       })
+      addRecentSearch(productId.trim())
+      setRecentSearches(getRecentSearches())
       setStatus(null)
     } catch (err) {
       setStatus({ type: 'error', msg: 'Error: ' + err.message })
@@ -58,7 +73,8 @@ function ScanProduct() {
 
   const getIpfsUrl = (cid) => 'https://ipfs.io/ipfs/' + cid.replace('ipfs://', '')
 
-  const quickSearchIds = ['ECO-TX-2025-001', 'ECO-EL-2025-001', 'ECO-FN-2025-001']
+  const quickSearchIds = recentSearches.length > 0 ? recentSearches : DEMO_IDS
+  const quickLabel = recentSearches.length > 0 ? 'Recent:' : 'Try:'
 
   return (
     <div style={styles.page}>
@@ -147,7 +163,7 @@ function ScanProduct() {
 
           {/* Quick Search Tags */}
           <div style={styles.quickRow}>
-            <span style={styles.quickLabel}>Quick search:</span>
+            <span style={styles.quickLabel}>{quickLabel}</span>
             {quickSearchIds.map(id => (
               <span
                 key={id}

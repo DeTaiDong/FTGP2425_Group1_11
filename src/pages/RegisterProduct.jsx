@@ -47,6 +47,12 @@ function RegisterProduct() {
     setForm({ ...form, materials: updated })
   }
 
+  const handleMaterialOriginChange = (i, locationStr) => {
+    const updated = [...form.materials]
+    updated[i].origin = locationStr
+    setForm({ ...form, materials: updated })
+  }
+
   const handleStageChange = (i, e) => {
     const updated = [...form.provenance]
     updated[i][e.target.name] = e.target.value
@@ -338,7 +344,10 @@ function RegisterProduct() {
                     </div>
                     <div style={styles.field}>
                       <label style={styles.labelSm}>Origin</label>
-                      <input className="field-input" style={styles.input} name="origin" value={mat.origin} onChange={(e) => handleMaterialChange(i, e)} placeholder="e.g. India" />
+                      <LocationPicker
+                        value={mat.origin}
+                        onChange={(locationStr) => handleMaterialOriginChange(i, locationStr)}
+                      />
                     </div>
                     <div style={styles.field}>
                       <label style={styles.labelSm}>Certification</label>
