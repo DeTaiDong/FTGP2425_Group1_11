@@ -2,7 +2,7 @@ const STORAGE_KEY = 'issuerProfiles'
 
 export const issuerProfiles = {
   '0xd3d3f56d21342ecaa19d21a7e6ee155352a2e8dc': {
-    name: 'SunTech EU',
+    name: 'DetaiTech EU',
     role: 'Manufacturer',
     country: 'Germany',
     verification: 'Self-declared',
