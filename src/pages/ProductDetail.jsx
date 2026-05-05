@@ -4,7 +4,8 @@ import { ethers } from 'ethers'
 import { getContract } from '../utils/contract'
 import { getIssuerProfile, getShortAddress } from '../utils/issuerProfiles'
 import SupplyChainMap from '../components/SupplyChainMap'
-import { Link2, Tag, Layers, Route, Map, MapPin, Calendar, Loader, ShieldCheck, TriangleAlert, Building2 } from 'lucide-react'
+import { Link2, Tag, Layers, Route, Map, MapPin, Calendar, Loader, ShieldCheck, TriangleAlert, Building2, ChevronDown, ChevronUp } from 'lucide-react'
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Sector } from 'recharts'
 
 function ProductDetail() {
   const { id } = useParams()
@@ -14,6 +15,10 @@ function ProductDetail() {
   const [integrityCheck, setIntegrityCheck] = useState(null)
   const [status, setStatus] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [showMaterialDetail, setShowMaterialDetail] = useState(false)
+  const [showProvenanceDetail, setShowProvenanceDetail] = useState(false)
+  const [activeMaterial, setActiveMaterial] = useState(null)
+  const [hoveredSlice, setHoveredSlice] = useState(null)
 
   useEffect(() => {
     fetchPassport()
@@ -291,38 +296,140 @@ function ProductDetail() {
             )}
           </div>
 
-          {/* Material Composition */}
-          {ipfsData.materials && ipfsData.materials.length > 0 && (
-            <div className="pd-section" style={styles.section}>
-              <h3 className="pd-section-title" style={styles.sectionTitle}>
-                <Layers size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Material Composition
-              </h3>
-              {ipfsData.materials.map((mat, i) => (
-                <div className="pd-material-card" key={i} style={styles.materialCard}>
-                  <div className="pd-row">
-                    <span className="pd-key" style={styles.key}>{mat.name}</span>
-                    <span style={styles.badge}>{mat.percentage}%</span>
-                  </div>
-                  <div className="pd-row">
-                    <span className="pd-key" style={styles.subKey}>Origin</span>
-                    <span className="pd-value" style={styles.value}>{mat.origin}</span>
-                  </div>
-                  <div className="pd-row" style={{ borderBottom: 'none' }}>
-                    <span className="pd-key" style={styles.subKey}>Certified</span>
-                    <span style={styles.certBadge}>{mat.certified}</span>
+          {/* Material Composition — Pie Chart + collapsible detail */}
+          {ipfsData.materials && ipfsData.materials.length > 0 && (() => {
+            const PIE_COLORS = ['#2d6a4f','#40916c','#52b788','#74c69d','#95d5b2','#b7e4c7','#d8f3dc']
+            const total = ipfsData.materials.reduce((s, m) => s + (parseFloat(m.percentage) || 0), 0)
+            const pieData = [
+              ...ipfsData.materials.map((m, i) => ({
+                name: m.name, value: parseFloat(m.percentage) || 0,
+                origin: m.origin, certified: m.certified, colorIndex: i,
+              })),
+              ...(total < 100 ? [{ name: 'Unknown', value: 100 - total, unknown: true }] : []),
+            ]
+
+            const hovered = hoveredSlice !== null ? pieData[hoveredSlice] : null
+            const centerLabel = hovered || { name: 'Total', value: Math.min(total, 100) }
+
+            const handlePieClick = (_, index) => {
+              setActiveMaterial(activeMaterial === index ? null : index)
+            }
+
+            return (
+              <div className="pd-section" style={styles.section}>
+                <h3 className="pd-section-title" style={styles.sectionTitle}>
+                  <Layers size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Material Composition
+                </h3>
+
+                <div style={{ position: 'relative' }}>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={pieData}
+                        cx="50%" cy="50%"
+                        innerRadius={72}
+                        outerRadius={110}
+                        dataKey="value"
+                        onClick={handlePieClick}
+                        onMouseEnter={(_, i) => setHoveredSlice(i)}
+                        onMouseLeave={() => setHoveredSlice(null)}
+                        style={{ cursor: 'pointer' }}
+                        activeIndex={hoveredSlice ?? -1}
+                        activeShape={(props) => {
+                          const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props
+                          return (
+                            <Sector cx={cx} cy={cy} innerRadius={innerRadius} outerRadius={outerRadius + 10}
+                              startAngle={startAngle} endAngle={endAngle} fill={fill} />
+                          )
+                        }}
+                      >
+                        {pieData.map((entry, i) => (
+                          <Cell
+                            key={i}
+                            fill={entry.unknown ? '#d0d0d0' : PIE_COLORS[entry.colorIndex % PIE_COLORS.length]}
+                            stroke={activeMaterial === i ? '#1b4332' : 'white'}
+                            strokeWidth={activeMaterial === i ? 3 : 1}
+                            opacity={hoveredSlice !== null && hoveredSlice !== i ? 0.45 : 1}
+                          />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div style={styles.donutCenter}>
+                    <div style={styles.donutCenterPct}>{centerLabel.value.toFixed(0)}%</div>
+                    <div style={styles.donutCenterName}>{hovered ? hovered.name.split(' ')[0] : 'Total'}</div>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
 
-          {/* Supply Chain Provenance */}
+                {/* Legend */}
+                <div style={styles.legend}>
+                  {pieData.map((entry, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        ...styles.legendItem,
+                        opacity: hoveredSlice !== null && hoveredSlice !== i ? 0.4 : 1,
+                        fontWeight: activeMaterial === i ? '700' : '400',
+                      }}
+                      onMouseEnter={() => setHoveredSlice(i)}
+                      onMouseLeave={() => setHoveredSlice(null)}
+                      onClick={() => handlePieClick(null, i)}
+                    >
+                      <span style={{ ...styles.legendDot, backgroundColor: entry.unknown ? '#d0d0d0' : PIE_COLORS[entry.colorIndex % PIE_COLORS.length] }} />
+                      <span style={styles.legendName}>{entry.name}</span>
+                      <span style={styles.legendPct}>{entry.value.toFixed(0)}%</span>
+                    </div>
+                  ))}
+                </div>
+
+                {activeMaterial !== null && !pieData[activeMaterial]?.unknown && (
+                  <div style={styles.activeCard}>
+                    <div style={styles.activeName}>{pieData[activeMaterial].name}</div>
+                    <div style={styles.activeRow}><span style={styles.subKey}>Percentage</span><span style={styles.badge}>{pieData[activeMaterial].value.toFixed(1)}%</span></div>
+                    {pieData[activeMaterial].origin && <div style={styles.activeRow}><span style={styles.subKey}>Origin</span><span style={styles.value}>{pieData[activeMaterial].origin}</span></div>}
+                    {pieData[activeMaterial].certified && <div style={styles.activeRow}><span style={styles.subKey}>Certification</span><span style={styles.certBadge}>{pieData[activeMaterial].certified}</span></div>}
+                  </div>
+                )}
+
+                <button style={styles.toggleBtn} onClick={() => setShowMaterialDetail(v => !v)}>
+                  {showMaterialDetail ? <ChevronUp size={15} style={{ marginRight: '0.3rem' }} /> : <ChevronDown size={15} style={{ marginRight: '0.3rem' }} />}
+                  {showMaterialDetail ? 'Hide detail' : 'More detail'}
+                </button>
+
+                {showMaterialDetail && ipfsData.materials.map((mat, i) => (
+                  <div className="pd-material-card" key={i} style={styles.materialCard}>
+                    <div className="pd-row">
+                      <span className="pd-key" style={styles.key}>{mat.name}</span>
+                      <span style={styles.badge}>{mat.percentage}%</span>
+                    </div>
+                    <div className="pd-row">
+                      <span className="pd-key" style={styles.subKey}>Origin</span>
+                      <span className="pd-value" style={styles.value}>{mat.origin}</span>
+                    </div>
+                    <div className="pd-row" style={{ borderBottom: 'none' }}>
+                      <span className="pd-key" style={styles.subKey}>Certified</span>
+                      <span style={styles.certBadge}>{mat.certified}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )
+          })()}
+
+          {/* Supply Chain Map (default open) + collapsible provenance list */}
           {ipfsData.provenance && ipfsData.provenance.length > 0 && (
             <div className="pd-section" style={styles.section}>
               <h3 className="pd-section-title" style={styles.sectionTitle}>
-                <Route size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Supply Chain Provenance
+                <Map size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Supply Chain Map
               </h3>
-              {ipfsData.provenance.map((step, i) => (
+              <SupplyChainMap provenance={ipfsData.provenance} />
+
+              <button style={{ ...styles.toggleBtn, marginTop: '1rem' }} onClick={() => setShowProvenanceDetail(v => !v)}>
+                {showProvenanceDetail ? <ChevronUp size={15} style={{ marginRight: '0.3rem' }} /> : <ChevronDown size={15} style={{ marginRight: '0.3rem' }} />}
+                {showProvenanceDetail ? 'Hide stages' : 'More detail'}
+              </button>
+
+              {showProvenanceDetail && ipfsData.provenance.map((step, i) => (
                 <div key={i} style={styles.provenanceRow}>
                   <div style={styles.stepNumber}>{i + 1}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -337,16 +444,6 @@ function ProductDetail() {
                   </div>
                 </div>
               ))}
-            </div>
-          )}
-
-          {/* Supply Chain Map */}
-          {ipfsData.provenance && ipfsData.provenance.length > 0 && (
-            <div className="pd-section" style={styles.section}>
-              <h3 className="pd-section-title" style={styles.sectionTitle}>
-                <Map size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Supply Chain Map
-              </h3>
-              <SupplyChainMap provenance={ipfsData.provenance} />
             </div>
           )}
         </>
@@ -489,6 +586,42 @@ const styles = {
   materialCard: { backgroundColor: 'white', borderRadius: '8px', padding: '0.8rem', marginBottom: '0.8rem' },
   provenanceRow: { display: 'flex', alignItems: 'flex-start', gap: '0.8rem', padding: '0.8rem 0', borderBottom: '1px solid #d0e8d8' },
   stepNumber: { backgroundColor: '#2d6a4f', color: 'white', width: '28px', height: '28px', minWidth: '28px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 'bold', flexShrink: 0, marginTop: '2px' },
+  donutCenter: {
+    position: 'absolute', top: '50%', left: '50%',
+    transform: 'translate(-50%, -50%)',
+    textAlign: 'center', pointerEvents: 'none',
+  },
+  donutCenterPct: { fontSize: '1.8rem', fontWeight: '800', color: '#2d6a4f', lineHeight: 1 },
+  donutCenterName: { fontSize: '0.75rem', fontWeight: '600', color: '#888', marginTop: '3px' },
+  legend: { display: 'flex', flexDirection: 'column', gap: '0.4rem', margin: '0.5rem 0 0.8rem' },
+  legendItem: {
+    display: 'flex', alignItems: 'center', gap: '0.6rem',
+    padding: '0.4rem 0.6rem', borderRadius: '8px', cursor: 'pointer',
+    transition: 'opacity 0.15s ease',
+  },
+  legendDot: { width: '12px', height: '12px', borderRadius: '3px', flexShrink: 0 },
+  legendName: { flex: 1, fontSize: '0.88rem', color: '#333' },
+  legendPct: { fontSize: '0.88rem', fontWeight: '600', color: '#2d6a4f' },
+  toggleBtn: {
+    display: 'flex', alignItems: 'center', marginTop: '0.8rem',
+    padding: '0.45rem 1rem', backgroundColor: 'white',
+    border: '1.5px solid #a5d6a7', borderRadius: '20px',
+    color: '#2d6a4f', fontSize: '0.85rem', fontWeight: '600',
+    cursor: 'pointer', transition: 'all 0.15s ease',
+  },
+  tooltip: {
+    backgroundColor: 'white', border: '1px solid #a5d6a7',
+    borderRadius: '8px', padding: '0.6rem 0.9rem',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.12)', fontSize: '0.85rem',
+  },
+  tooltipName: { fontWeight: '700', color: '#1b4332', marginBottom: '0.3rem' },
+  tooltipRow: { color: '#555', marginTop: '0.15rem' },
+  activeCard: {
+    backgroundColor: 'white', borderRadius: '10px', padding: '0.9rem 1rem',
+    border: '2px solid #52b788', marginTop: '0.5rem',
+  },
+  activeName: { fontWeight: '700', color: '#1b4332', fontSize: '1rem', marginBottom: '0.5rem' },
+  activeRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.3rem 0', borderBottom: '1px solid #e8f5e9' },
 }
 
 export default ProductDetail

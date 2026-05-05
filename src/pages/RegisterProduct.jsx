@@ -359,6 +359,13 @@ function RegisterProduct() {
               <button className="btn-outline" style={styles.btnOutline} onClick={addMaterial}>
                 <Plus size={14} style={{ marginRight: '0.3rem', verticalAlign: 'middle' }} />Add Material
               </button>
+              {(() => {
+                const total = form.materials.reduce((sum, m) => sum + (parseFloat(m.percentage) || 0), 0)
+                if (total > 100) return (
+                  <div style={styles.warnBox}>⚠️ Total material percentage is {total.toFixed(1)}%, which exceeds 100%.</div>
+                )
+                return null
+              })()}
             </div>
 
             {/* Supply Chain */}
@@ -495,6 +502,11 @@ const styles = {
   qrUrl: { color: '#888', fontSize: '0.78rem', fontFamily: 'monospace', wordBreak: 'break-all', marginBottom: '1rem', marginTop: 0 },
   downloadBtn: { display: 'inline-flex', alignItems: 'center', padding: '0.5rem 1.2rem', backgroundColor: 'white', color: '#2d6a4f', border: '1.5px solid #2d6a4f', borderRadius: '8px', cursor: 'pointer', fontWeight: '600', fontSize: '0.9rem' },
   etherscanLink: { display: 'inline-flex', alignItems: 'center', color: '#2d6a4f', fontSize: '0.9rem', fontWeight: '600', textDecoration: 'none', backgroundColor: '#e8f5e9', padding: '0.5rem 1.2rem', borderRadius: '8px', border: '1px solid #a5d6a7', marginBottom: '2rem' },
+  warnBox: {
+    marginTop: '0.8rem', padding: '0.7rem 1rem',
+    backgroundColor: '#fff8e1', border: '1px solid #ffe082',
+    borderRadius: '8px', color: '#f57f17', fontSize: '0.88rem', fontWeight: '500',
+  },
   walletWarning: {
     backgroundColor: '#fffbeb',
     border: '1px solid #fcd34d',
