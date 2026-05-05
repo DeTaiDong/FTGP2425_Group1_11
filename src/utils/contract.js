@@ -1,8 +1,13 @@
 import { ethers } from 'ethers'
 
 export const CONTRACT_ADDRESS = '0x0617635eA34a7835807EbC6D0A7aECC9de8E1Cf0'
-const EVENT_QUERY_CHUNK_SIZE = 45000
-const DEFAULT_EVENT_LOOKBACK_BLOCKS = 300000
+const EVENT_QUERY_CHUNK_SIZE = 20000
+const DEFAULT_EVENT_LOOKBACK_BLOCKS = 180000
+const READ_ONLY_RPC_URLS = [
+  'https://ethereum-sepolia-rpc.publicnode.com',
+  'https://rpc.sepolia.org',
+  'https://sepolia.drpc.org',
+]
 
 export const CONTRACT_ABI = [
   {
@@ -83,6 +88,24 @@ export const queryPassportIssuedEvents = async (provider, filter, options = {}) 
   }
 
   return events.sort((a, b) => a.blockNumber - b.blockNumber || a.index - b.index)
+}
+
+export const queryPassportIssuedEventsWithFallback = async (provider, filterBuilder, options = {}) => {
+  const providers = [provider, ...READ_ONLY_RPC_URLS.map(url => new ethers.JsonRpcProvider(url))]
+  let lastError = null
+
+  for (const candidate of providers) {
+    try {
+      const contract = getContract(candidate)
+      const filter = filterBuilder(contract)
+      return await queryPassportIssuedEvents(candidate, filter, options)
+    } catch (err) {
+      lastError = err
+      console.log('PassportIssued event query failed, trying next provider:', err.message)
+    }
+  }
+
+  throw lastError
 }
 
 export const getProviderAndSigner = async () => {

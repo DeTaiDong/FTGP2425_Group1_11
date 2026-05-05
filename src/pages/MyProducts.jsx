@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ethers } from 'ethers'
-import { getContract, CONTRACT_ABI, queryPassportIssuedEvents } from '../utils/contract'
+import { CONTRACT_ABI, queryPassportIssuedEventsWithFallback } from '../utils/contract'
 import { getConnectedAccount } from '../components/WalletConnect'
 import { QRCodeCanvas } from 'qrcode.react'
 import { QrCode, Download, X, Loader } from 'lucide-react'
@@ -29,11 +29,9 @@ function MyProducts() {
       } else {
         provider = new ethers.JsonRpcProvider('https://ethereum-sepolia-rpc.publicnode.com')
       }
-      const contract = getContract(provider)
-
-      const myEvents = await queryPassportIssuedEvents(
+      const myEvents = await queryPassportIssuedEventsWithFallback(
         provider,
-        contract.filters.PassportIssued(null, account)
+        contract => contract.filters.PassportIssued(null, account)
       )
 
       const iface = new ethers.Interface(CONTRACT_ABI)
@@ -49,7 +47,7 @@ function MyProducts() {
       setProducts(list.reverse())
     } catch (err) {
       console.log('My products lookup failed:', err)
-      setError('Unable to load products from the public RPC right now. Please try again later or connect a wallet provider.')
+      setError('Unable to load your issued products from the blockchain RPC right now. Please try again later.')
     } finally {
       setLoading(false)
     }

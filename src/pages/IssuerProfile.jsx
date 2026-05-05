@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ethers } from 'ethers'
 import { Building2, Globe, Loader, ShieldCheck, WalletCards } from 'lucide-react'
-import { CONTRACT_ABI, getContract, queryPassportIssuedEvents } from '../utils/contract'
+import { CONTRACT_ABI, queryPassportIssuedEventsWithFallback } from '../utils/contract'
 import { getIssuerProfile, getShortAddress, saveIssuerProfile } from '../utils/issuerProfiles'
 import { getConnectedAccount } from '../components/WalletConnect'
 
@@ -79,10 +79,9 @@ function IssuerProfile() {
         provider = new ethers.JsonRpcProvider('https://ethereum-sepolia-rpc.publicnode.com')
       }
 
-      const contract = getContract(provider)
-      const issuerEvents = await queryPassportIssuedEvents(
+      const issuerEvents = await queryPassportIssuedEventsWithFallback(
         provider,
-        contract.filters.PassportIssued(null, address)
+        contract => contract.filters.PassportIssued(null, address)
       )
 
       const iface = new ethers.Interface(CONTRACT_ABI)
@@ -102,7 +101,7 @@ function IssuerProfile() {
       setProducts(issued.reverse())
     } catch (err) {
       console.log('Issuer product lookup failed:', err)
-      setError('Unable to load this issuer product list from the public RPC right now. The issuer profile above is still valid.')
+      setError('Unable to load this issuer product list from the blockchain RPC right now. The issuer profile above is still valid.')
     } finally {
       setLoading(false)
     }
