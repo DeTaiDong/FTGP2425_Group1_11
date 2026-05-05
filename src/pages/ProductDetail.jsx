@@ -16,7 +16,6 @@ function ProductDetail() {
   const [status, setStatus] = useState(null)
   const [loading, setLoading] = useState(true)
   const [showMaterialDetail, setShowMaterialDetail] = useState(false)
-  const [showProvenanceDetail, setShowProvenanceDetail] = useState(false)
   const [activeMaterial, setActiveMaterial] = useState(null)
   const [hoveredSlice, setHoveredSlice] = useState(null)
 
@@ -423,27 +422,6 @@ function ProductDetail() {
                 <Map size={16} style={{ marginRight: '0.4rem', verticalAlign: 'middle' }} />Supply Chain Map
               </h3>
               <SupplyChainMap provenance={ipfsData.provenance} />
-
-              <button style={{ ...styles.toggleBtn, marginTop: '1rem' }} onClick={() => setShowProvenanceDetail(v => !v)}>
-                {showProvenanceDetail ? <ChevronUp size={15} style={{ marginRight: '0.3rem' }} /> : <ChevronDown size={15} style={{ marginRight: '0.3rem' }} />}
-                {showProvenanceDetail ? 'Hide stages' : 'More detail'}
-              </button>
-
-              {showProvenanceDetail && ipfsData.provenance.map((step, i) => (
-                <div key={i} style={styles.provenanceRow}>
-                  <div style={styles.stepNumber}>{i + 1}</div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 'bold', fontSize: '0.95rem', wordBreak: 'break-word' }}>{step.stage}</div>
-                    <div className="pd-provenance-meta">
-                      <MapPin size={13} style={{ flexShrink: 0 }} />
-                      <span style={{ wordBreak: 'break-word' }}>{step.location}</span>
-                      <span style={{ color: '#ccc' }}>·</span>
-                      <Calendar size={13} style={{ flexShrink: 0 }} />
-                      <span>{step.date}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
             </div>
           )}
         </>
