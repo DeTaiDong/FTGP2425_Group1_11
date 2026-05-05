@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ethers } from 'ethers'
 import { Building2, Globe, Loader, ShieldCheck, WalletCards } from 'lucide-react'
-import { CONTRACT_ABI, getContract } from '../utils/contract'
+import { CONTRACT_ABI, getContract, queryPassportIssuedEvents } from '../utils/contract'
 import { getIssuerProfile, getShortAddress, saveIssuerProfile } from '../utils/issuerProfiles'
 import { getConnectedAccount } from '../components/WalletConnect'
 
@@ -80,7 +80,7 @@ function IssuerProfile() {
       }
 
       const contract = getContract(provider)
-      const events = await contract.queryFilter(contract.filters.PassportIssued(), 0, 'latest')
+      const events = await queryPassportIssuedEvents(provider, contract.filters.PassportIssued())
       const issuerEvents = events.filter(
         e => e.args.issuer.toLowerCase() === address.toLowerCase()
       )

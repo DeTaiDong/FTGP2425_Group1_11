@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ethers } from 'ethers'
-import { getContract, CONTRACT_ABI } from '../utils/contract'
+import { getContract, CONTRACT_ABI, queryPassportIssuedEvents } from '../utils/contract'
 import { getConnectedAccount } from '../components/WalletConnect'
 import { QRCodeCanvas } from 'qrcode.react'
 import { QrCode, Download, X, Loader } from 'lucide-react'
@@ -31,7 +31,7 @@ function MyProducts() {
       }
       const contract = getContract(provider)
 
-      const events = await contract.queryFilter(contract.filters.PassportIssued(), 0, 'latest')
+      const events = await queryPassportIssuedEvents(provider, contract.filters.PassportIssued())
       const myEvents = events.filter(
         e => e.args.issuer.toLowerCase() === account.toLowerCase()
       )

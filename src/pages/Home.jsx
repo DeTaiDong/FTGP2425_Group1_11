@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { ethers } from 'ethers'
-import { getContract } from '../utils/contract'
+import { getContract, queryPassportIssuedEvents } from '../utils/contract'
 import heroBg from '../assets/background.png'
 import {
   ShieldCheck, BadgeCheck, Landmark, CircleDollarSign,
@@ -42,7 +42,7 @@ function Home() {
 
       // Fix： update function： real registered products number
       const filter = contract.filters.PassportIssued()
-      const events = await contract.queryFilter(filter, 0, 'latest')
+      const events = await queryPassportIssuedEvents(provider, filter)
       setProductCount(events.length)
     } catch (err) {
       console.log('Stats fetch failed:', err.message)
