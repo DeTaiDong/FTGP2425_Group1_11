@@ -220,7 +220,7 @@ function ProductDetail() {
               <div>
                 <div style={styles.issuerName}>{issuerProfile?.name || 'Unknown Issuer'}</div>
                 <div style={styles.issuerMeta}>
-                  {issuerProfile ? `${issuerProfile.role} - ${issuerProfile.country}` : 'Wallet address only'}
+                  {issuerProfile ? [issuerProfile.role, issuerProfile.country].filter(Boolean).join(' - ') : 'Wallet address only'}
                 </div>
               </div>
               <span style={issuerProfile ? styles.issuerVerifiedBadge : styles.issuerUnknownBadge}>
