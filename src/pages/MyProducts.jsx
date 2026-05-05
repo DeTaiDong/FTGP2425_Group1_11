@@ -31,9 +31,9 @@ function MyProducts() {
       }
       const contract = getContract(provider)
 
-      const events = await queryPassportIssuedEvents(provider, contract.filters.PassportIssued())
-      const myEvents = events.filter(
-        e => e.args.issuer.toLowerCase() === account.toLowerCase()
+      const myEvents = await queryPassportIssuedEvents(
+        provider,
+        contract.filters.PassportIssued(null, account)
       )
 
       const iface = new ethers.Interface(CONTRACT_ABI)
@@ -48,7 +48,8 @@ function MyProducts() {
 
       setProducts(list.reverse())
     } catch (err) {
-      setError('Failed to load products: ' + err.message)
+      console.log('My products lookup failed:', err)
+      setError('Unable to load products from the public RPC right now. Please try again later or connect a wallet provider.')
     } finally {
       setLoading(false)
     }

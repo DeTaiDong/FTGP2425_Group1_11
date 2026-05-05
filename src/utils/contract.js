@@ -2,7 +2,6 @@ import { ethers } from 'ethers'
 
 export const CONTRACT_ADDRESS = '0x0617635eA34a7835807EbC6D0A7aECC9de8E1Cf0'
 const EVENT_QUERY_CHUNK_SIZE = 45000
-const DEPLOYMENT_BLOCK_CACHE_KEY = `deploymentBlock:${CONTRACT_ADDRESS.toLowerCase()}`
 
 export const CONTRACT_ABI = [
   {
@@ -70,35 +69,10 @@ export const getContract = (providerOrSigner) => {
   return new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, providerOrSigner)
 }
 
-export const getContractDeploymentBlock = async (provider) => {
-  const cached = Number(localStorage.getItem(DEPLOYMENT_BLOCK_CACHE_KEY))
-  if (Number.isFinite(cached) && cached > 0) return cached
-
-  const latest = await provider.getBlockNumber()
-  let low = 0
-  let high = latest
-  let deploymentBlock = latest
-
-  while (low <= high) {
-    const mid = Math.floor((low + high) / 2)
-    const code = await provider.getCode(CONTRACT_ADDRESS, mid)
-
-    if (code && code !== '0x') {
-      deploymentBlock = mid
-      high = mid - 1
-    } else {
-      low = mid + 1
-    }
-  }
-
-  localStorage.setItem(DEPLOYMENT_BLOCK_CACHE_KEY, String(deploymentBlock))
-  return deploymentBlock
-}
-
-export const queryPassportIssuedEvents = async (provider, filter) => {
+export const queryPassportIssuedEvents = async (provider, filter, options = {}) => {
   const contract = getContract(provider)
   const latest = await provider.getBlockNumber()
-  const fromBlock = await getContractDeploymentBlock(provider)
+  const fromBlock = options.fromBlock ?? 0
   const events = []
 
   for (let start = fromBlock; start <= latest; start += EVENT_QUERY_CHUNK_SIZE + 1) {

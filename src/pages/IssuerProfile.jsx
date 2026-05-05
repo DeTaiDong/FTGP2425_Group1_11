@@ -80,9 +80,9 @@ function IssuerProfile() {
       }
 
       const contract = getContract(provider)
-      const events = await queryPassportIssuedEvents(provider, contract.filters.PassportIssued())
-      const issuerEvents = events.filter(
-        e => e.args.issuer.toLowerCase() === address.toLowerCase()
+      const issuerEvents = await queryPassportIssuedEvents(
+        provider,
+        contract.filters.PassportIssued(null, address)
       )
 
       const iface = new ethers.Interface(CONTRACT_ABI)
@@ -101,7 +101,8 @@ function IssuerProfile() {
 
       setProducts(issued.reverse())
     } catch (err) {
-      setError('Failed to load issuer products: ' + err.message)
+      console.log('Issuer product lookup failed:', err)
+      setError('Unable to load this issuer product list from the public RPC right now. The issuer profile above is still valid.')
     } finally {
       setLoading(false)
     }
