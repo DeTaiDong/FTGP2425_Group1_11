@@ -8,6 +8,7 @@ import ScanProduct from './pages/ScanProduct'
 import ProductDetail from './pages/ProductDetail'
 import MyProducts from './pages/MyProducts'
 import IssuerProfile from './pages/IssuerProfile'
+import Presentation from './pages/Presentation'
 
 function Layout({ children }) {
   const location = useLocation()
@@ -31,6 +32,7 @@ function AppRoutes() {
       <Route path="/product/:id" element={<Layout><ProductDetail /></Layout>} />
       <Route path="/issuer/:address" element={<Layout><IssuerProfile /></Layout>} />
       <Route path="/my-products" element={<Layout><MyProducts /></Layout>} />
+      <Route path="/presentation" element={<Presentation />} />
     </Routes>
   )
 }

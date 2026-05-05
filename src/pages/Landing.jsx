@@ -7,7 +7,6 @@ function Landing() {
   const [connected, setConnected] = useState(false)
   const [account, setAccount] = useState(null)
   const [error, setError] = useState(null)
-  const presentationUrl = `${import.meta.env.BASE_URL}presentation/EcoPassEU_Presentation.html`
 
   const connect = async () => {
     setError(null)
@@ -79,14 +78,13 @@ function Landing() {
           </p>
         )}
 
-        <a
-          href={presentationUrl}
-          target="_blank"
-          rel="noreferrer"
+        <button
+          type="button"
+          onClick={() => navigate('/presentation')}
           style={styles.infoBtn}
         >
           More info / About us
-        </a>
+        </button>
       </div>
     </div>
   )

@@ -6,7 +6,7 @@ import heroBg from '../assets/background.png'
 import {
   ShieldCheck, BadgeCheck, Landmark, CircleDollarSign,
   Smartphone, MapPin, Globe, Zap,
-  PackagePlus, Search, RefreshCw
+  PackagePlus, Search, RefreshCw, Info
 } from 'lucide-react'
 
 function Home() {
@@ -94,6 +94,12 @@ function Home() {
           transform: translateY(-2px);
         }
         .cta-secondary-btn { transition: all 0.2s ease !important; }
+        .cta-info-btn:hover {
+          background-color: #d8f3dc !important;
+          color: #1b4332 !important;
+          transform: translateY(-2px);
+        }
+        .cta-info-btn { transition: all 0.2s ease !important; }
         .step-card:hover {
           transform: translateY(-3px);
           box-shadow: 0 8px 25px rgba(45,106,79,0.15) !important;
@@ -283,6 +289,10 @@ function Home() {
             Search Product
           </button>
         </div>
+        <button className="cta-info-btn" style={styles.ctaInfoBtn} onClick={() => navigate('/presentation')}>
+          <Info size={17} style={{ marginRight: '0.45rem', verticalAlign: 'middle' }} />
+          About us
+        </button>
       </div>
     </div>
   )
@@ -363,6 +373,17 @@ const styles = {
     backgroundColor: 'transparent', color: '#2d6a4f', border: '2px solid #2d6a4f',
     padding: '0.9rem 2rem', borderRadius: '8px', fontSize: '1rem',
     fontWeight: 'bold', cursor: 'pointer',
+  },
+  ctaInfoBtn: {
+    marginTop: '1.1rem',
+    backgroundColor: 'transparent',
+    color: '#2d6a4f',
+    border: '1px solid rgba(45, 106, 79, 0.35)',
+    padding: '0.72rem 1.5rem',
+    borderRadius: '8px',
+    fontSize: '0.95rem',
+    fontWeight: 'bold',
+    cursor: 'pointer',
   },
 }
 
