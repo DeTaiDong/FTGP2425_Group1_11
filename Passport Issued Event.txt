@@ -1,0 +1,15 @@
+After each successful passport registration, the smart contract emits a PassportIssued 
+event containing the productId, IPFS CID, keccak256 metadata hash, issuer address, 
+and block timestamp.
+
+The productId and issuer fields are marked as indexed. In the EVM, indexed parameters 
+are stored in the Bloom filter of the transaction receipt rather than in the standard 
+ABI-encoded log data. This allows off-chain clients to efficiently filter logs by a 
+specific product or manufacturer address without scanning the computational overhead 
+of every block.
+
+This design follows best practice for building queryable audit trails in Ethereum DApps. 
+Any external service — a regulator dashboard, a compliance tool, or a manufacturer's 
+own analytics — can subscribe to PassportIssued events and filter by issuer to retrieve 
+a complete, tamper-evident history of every passport that wallet has ever registered, 
+without requiring direct contract state queries.
