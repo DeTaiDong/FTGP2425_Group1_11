@@ -1,0 +1,17 @@
+IPFS stands for InterPlanetary File System. It's a decentralised, peer-to-peer storage network where files are identified not by where they are (like a URL pointing to a server) but by what they are — specifically, a cryptographic hash of their contents called a **Content Identifier (CID)**. This means if the file changes even by one character, the CID changes entirely, making it inherently tamper-evident.
+
+The key difference from a normal web server: if you host a file at `https://myserver.com/product.json`, that server can silently swap the file for different content and you'd never know. With IPFS, the CID *is* the content — any node serving that CID is provably serving the exact same data.
+
+**How EcoPassEU uses it**
+
+The architecture splits data across two layers deliberately:
+
+When a manufacturer registers a product, the complete product JSON — material composition, supply chain stages, recycling instructions, everything — gets uploaded to IPFS via Pinata (a managed pinning service that guarantees the file stays available). IPFS returns a CID for that document.
+
+Simultaneously, the browser computes a keccak256 hash of that same JSON locally. Then only four lightweight fields are written to the Ethereum smart contract: the CID, the keccak256 hash, the issuer's wallet address, and a timestamp. The full data never touches the blockchain.
+
+When a consumer verifies a product, the frontend fetches the JSON from IPFS using the CID, recomputes the keccak256 hash in the browser, and compares it against the immutable on-chain value. Match → green badge. Mismatch → tampered warning.
+
+The reason for two separate hashes (CID and keccak256) is that they serve different purposes — the CID is IPFS's internal routing mechanism, while the keccak256 is the Ethereum contract's independent integrity anchor. Together they create a cryptographic binding between the off-chain data and the on-chain record that neither layer could provide alone.
+
+This design brings storage costs down from potentially millions of gas (if you stored the full JSON on-chain) to around 125,000 gas per registration — making it viable for SMEs — while keeping the same integrity guarantees.
