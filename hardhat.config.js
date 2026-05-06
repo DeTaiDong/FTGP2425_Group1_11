@@ -11,7 +11,7 @@ const config = {
     },
     
     sepolia: {
-      url: "https://rpc.ankr.com/eth_sepolia", // (或者你之前测试跑通的那个URL)
+      url: "https://rpc.ankr.com/eth_sepolia", 
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : []
     }
   },
