@@ -1,0 +1,15 @@
+EcoPassEU separates data across two layers to balance transparency with cost efficiency.
+
+Full product lifecycle data — material composition, supply chain provenance, recycling 
+instructions — is serialised into a JSON object and stored on IPFS via Pinata. This 
+keeps heavy data off-chain where storage is essentially free.
+
+Only four lightweight fields are written to the Ethereum smart contract: the IPFS 
+Content Identifier (CID), a keccak256 integrity hash of the JSON, the issuer wallet 
+address, and a block timestamp. This reduces each registration to approximately 125,000 
+gas, compared to the millions it would cost to store a full product record on-chain.
+
+The keccak256 hash cryptographically binds the on-chain record to the off-chain 
+document. If the IPFS file is tampered with, the recomputed hash will not match the 
+immutable on-chain value, immediately flagging the passport as compromised. This gives 
+the system the integrity guarantees of full on-chain storage at a fraction of the cost.
