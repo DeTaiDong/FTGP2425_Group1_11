@@ -1,1028 +1,152 @@
-% This is samplepaper.tex, a sample chapter demonstrating the
-% LLNCS macro package for Springer Computer Science proceedings;
-% Version 2.21 of 2022/01/12
-%
-\documentclass[runningheads]{llncs}
-%
-\usepackage[T1]{fontenc}
-% T1 fonts will be used to generate the final print and online PDFs,
-% so please use T1 fonts in your manuscript whenever possible.
-% Other font encondings may result in incorrect characters.
-%
-\usepackage{graphicx}
-\usepackage{hyperref}
-\usepackage{listings}
-\usepackage{xcolor}
-\usepackage{float}
-\usepackage{xurl}
-\usepackage{pdfpages}
+\begin{lstlisting}[caption={Hardhat unit testing suite for PassportRegistry.sol}, label={listing:hardhat_tests}]
+import { expect } from "chai";
+import hre from "hardhat";
 
+describe("PassportRegistry Smart Contract", function () {
+  let contract;
+  let owner;
+  let addr1;
 
-\lstdefinelanguage{Solidity}{
-	morekeywords={pragma, solidity, contract, struct, mapping, 
-		address, uint256, bytes32, string, bool, 
-		function, public, private, view, returns, 
-		emit, event, require, memory, storage},
-	sensitive=true,
-	morecomment=[l]{//},
-	morecomment=[s]{/*}{*/},
-	morestring=[b]{"}
-}
+  const PRODUCT_ID = "ECO-TX-2025-001";
+  const IPFS_CID   = "QmTestCID123456789";
+  const META_HASH  = hre.ethers.keccak256(hre.ethers.toUtf8Bytes("test-metadata"));
 
-\lstset{
-	basicstyle=\ttfamily\small,
-	keywordstyle=\color{blue}\bfseries,
-	commentstyle=\color{gray}\itshape,
-	stringstyle=\color{orange},
-	breaklines=true,
-	showstringspaces=false,
-	frame=single
-}
+  beforeEach(async function () {
+    [owner, addr1] = await hre.ethers.getSigners();
+    const Factory = await hre.ethers.getContractFactory("PassportRegistry");
+    contract = await Factory.deploy();
+  });
 
+  // 1. Deployment
+  describe("Deployment", function () {
+    it("should deploy with a valid contract address", async function () {
+      expect(contract.target).to.be.a("string");
+      expect(contract.target).to.match(/^0x[0-9a-fA-F]{40}$/);
+    });
+  });
 
-\lstdefinelanguage{JavaScript}{
-	keywords={import, from, describe, it, async, function, await, const, let},
-	sensitive=true,
-	comment=[l]{//},
-	morecomment=[s]{/*}{*/},
-	morestring=[b]",
-	morestring=[b]'
-}
+  // 2. registerPassport
+  describe("registerPassport", function () {
+    it("should register a new passport successfully", async function () {
+      await expect(
+        contract.registerPassport(PRODUCT_ID, IPFS_CID, META_HASH)
+      ).to.emit(contract, "PassportIssued");
+    });
 
+    it("should store the correct issuer address", async function () {
+      await contract.registerPassport(PRODUCT_ID, IPFS_CID, META_HASH);
+      const [, , issuer] = await contract.getPassport(PRODUCT_ID);
+      expect(issuer).to.equal(owner.address);
+    });
 
+    it("should store the correct IPFS CID and metadata hash", async function () {
+      await contract.registerPassport(PRODUCT_ID, IPFS_CID, META_HASH);
+      const [cid, hash] = await contract.getPassport(PRODUCT_ID);
+      expect(cid).to.equal(IPFS_CID);
+      expect(hash).to.equal(META_HASH);
+    });
 
+    it("should record a non-zero timestamp", async function () {
+      await contract.registerPassport(PRODUCT_ID, IPFS_CID, META_HASH);
+      const [, , , timestamp] = await contract.getPassport(PRODUCT_ID);
+      expect(Number(timestamp)).to.be.greaterThan(0);
+    });
 
+    it("should revert when registering a duplicate product ID", async function () {
+      await contract.registerPassport(PRODUCT_ID, IPFS_CID, META_HASH);
+      await expect(
+        contract.registerPassport(PRODUCT_ID, IPFS_CID, META_HASH)
+      ).to.be.revertedWith("Passport already exists");
+    });
+  });
 
-\renewcommand{\theHsection}{\thepart.\thesection} 
+  // 3. passportExists
+  describe("passportExists", function () {
+    it("should return false for an unregistered product", async function () {
+      expect(await contract.passportExists("NONEXISTENT-ID")).to.equal(false);
+    });
 
+    it("should return true after registration", async function () {
+      await contract.registerPassport(PRODUCT_ID, IPFS_CID, META_HASH);
+      expect(await contract.passportExists(PRODUCT_ID)).to.equal(true);
+    });
+  });
 
+  // 4. getPassport
+  describe("getPassport", function () {
+    it("should revert when querying a non-existent product", async function () {
+      await expect(
+        contract.getPassport("NO-SUCH-PRODUCT")
+      ).to.be.revertedWith("Passport not found");
+    });
 
-\begin{document}
-	%
-	\title{EcoPassEU: A Hybrid Blockchain Architecture for ESPR-Compliant Digital Product Passports}
-	
-	\titlerunning{EcoPassEU: A Hybrid Blockchain DApp for Digital Product Passports}
-	
-	\author{Fuyu Cao\inst{1} \and
-		Luxiao Cao\inst{1} \and
-		Detai Dong\inst{1} \and
-		Akshansh Rajora\inst{1} \and
-		Tianwei Yu\inst{1}}
-	
-	\authorrunning{F. Cao et al.}
-	
-	\institute{University of Bristol, Bristol, UK \\
-		\email{\{1d25515, ne25392, mz25325, tk25240, np25024\}@bristol.ac.uk}}
-	%
-	\maketitle              % typeset the header of the contribution
-	%
+    it("should return all four fields correctly", async function () {
+      await contract.registerPassport(PRODUCT_ID, IPFS_CID, META_HASH);
+      const [cid, hash, issuer, timestamp] = await contract.getPassport(PRODUCT_ID);
+      expect(cid).to.equal(IPFS_CID);
+      expect(hash).to.equal(META_HASH);
+      expect(issuer).to.equal(owner.address);
+      expect(Number(timestamp)).to.be.greaterThan(0);
+    });
+  });
 
-	%
-	%
-	\section{Introduction}
-	Billions of products enter the European market with sustainability labels every year, and consumers have little reliable means of verification for the information included, such as ``low carbon'' or ``ethically sourced'' \cite{Silva2021The}.
-	A study commissioned by European Commission found more than half green environmental declarations without verifiable evidence to confirm them, eroding public confidence in environmental commitments \cite{Silva2021The}.
-	
-	To address the credibility gap, the Ecodesign for Sustainable Products Regulation (ESPR) now mandates Digital Product Passports (DPPs) -standardised records of a products' lifecycle- for most EU products \cite{circularise_dpp_2025}.With the implementation of compliance in 2027, reliable DPP solutions have become a market urgent need.
-	
-	Our product EcoPassEU is a blockchain-based DPP platform which  allows manufacturers to record product information as permanent, publicly verifiable entries on the Ethereum blockchain. 
-	Unlike traditional databases, the immutability of blockchain records means that once the data is released, it cannot be altered retrospectively, eliminating the possibility of post-hoc falsification \cite{Casino2019Systematic}. 
-	Any user can obtain a complete and encrypted product history by entering the product ID or scanning the QR code.
-	
-	EcoPassEU serves four key stakeholders. 
-	It provides SME manufacturers with a cost-effective ESPR compliance channel through a web for batch data entry and automated QR code generation. 
-	At the same time, consumers, regulators and retailers can also get open and wallet-free access. 
-	Just search for the product ID to immediately obtain the blockchain-verified product passport and supply chain map, enabling the independent verification of environmental claims without prior technical expertise.
-	
-	The value of EcoPassEU is threefold.
-	It gives manufacturers a practical pathway to meet ESPR deadlines, 
-	reducing the risk of market exclusion.
-	The platform also combats greenwashing: securing product records 
-	via cryptographic hashing replaces brand self-reporting with 
-	independent, third-party verification.
-	Finally, it supports the circular economy by equipping recyclers 
-	with precise material data necessary to recover resources at 
-	end-of-life.
-	
-	
-	
-	
-	
-	
-	\section{Background}
-	\subsection{Digital Product Passports and the Regulatory Context}
-	A Digital Product Passport (DPP) is a structured digital record encompassing lifecycle data—such as material composition, provenance, and end-of-life guidance—designed to inform stakeholders and support more sustainable design choices, efficient resource use, and the transition towards circular business models
-	\cite{Adisorn2021Towards,Basal2024Digital,VanCapelleveen2023The,Jansen2023Stop}.
-	
-	
-	The regulatory foundation for DPPs comes from the European Green Deal and Circular Economy Action Plan \cite{eu_green_deal_2019,ceap_2020}. Building on these two frameworks, the Ecodesign for Sustainable Products Regulation (ESPR) has come into force from 18 July 2024 for products in the scope of the regulation, mandating DPPs for almost all physical goods sold in the EU, regardless of where the goods are sold \cite{circularise_dpp_2025}.
-	
-	\subsection{The Problem: Trust in Sustainability Claims}
-	Despite regulatory momentum, most DPP implementations rely on centralised, proprietary databases \cite{Psarommatis2024Digital}. This architecture encourages selective concealment of data, hindering aftermarket participants such as independent repairers \cite{Ducuing2023Data}. Managing large volumes of lifecycle data centrally also raises important concerns regarding its storage efficiency, data integrity, and vulnerability to breaches \cite{Voulgaridis2024Digital}.
-	As such, downstream actors, including importers, recyclers and end consumers, are left with no reliable means to independently verify product information.
-	
-	Greenwashing compounds this problem. Broadly understood as false, 
-	vague, or unsubstantiated environmental claims 
-	\cite{Kundi2024The}, it is widespread: a 2020--2021 EU sweep of 
-	344 online claims found that nearly half were potentially 
-	deceptive---often substituting verifiable details with vague terms 
-	like ``conscious''---and 59\% lacked accessible evidence 
-	\cite{Silva2021The}. A separate EU website screening found that 
-	42\% of sustainability claims were misleading enough to constitute 
-	improper commercial behaviour \cite{Silva2021The}.
+  // 5. batchRegisterPassports
+  describe("batchRegisterPassports", function () {
+    const ids    = ["BATCH-001", "BATCH-002", "BATCH-003"];
+    const cids   = ["QmCID1", "QmCID2", "QmCID3"];
+    const hashes = [
+      hre.ethers.keccak256(hre.ethers.toUtf8Bytes("hash1")),
+      hre.ethers.keccak256(hre.ethers.toUtf8Bytes("hash2")),
+      hre.ethers.keccak256(hre.ethers.toUtf8Bytes("hash3")),
+    ];
 
-	
-	Blockchain technology offers a structural solution to this issue. Because 
-	records are replicated across a distributed network, no single party can 
-	tamper with the data without detection \cite{Casino2019Systematic,Nakamoto2008Bitcoin}. 
-	It is important to note that while blockchain cannot guarantee that the data 
-	is initially physically true (the ``oracle problem'') \cite{Egberts2017}, it 
-	can ensure strict tamper-evidence, meaning that upon the commitment of a 
-	manufacturer to a sustainability claim, they are held publicly accountable 
-	for that claim \cite{Wood2014Ethereum}.
-	
-	
-	\subsection{Related Work and Existing Platforms}
-	Blockchain-based product traceability uses its immutability and decentralised verification to improve supply chain transparency \cite{Casino2019Systematic}. 
-	Blockchain-based product traceability emerged as a research topic around 2015--2016, with early work concentrated in food and agriculture before spreading to pharmaceuticals, electronics, and textiles \cite{Ellahi2023Blockchain-Based,Tian2016Agri}. 
-	More recently, research has shifted from feasibility towards scale and efficiency: for instance, Walmart's use of IBM Food Trust — built on Hyperledger Fabric — to reduce food-item tracing time from six days to under three seconds \cite{Ellahi2023Blockchain-Based} .
-	
-	In the commercial field, Circularise is among the closest comparable 
-	platforms, offering DPPs with selective disclosure of sustainability data 
-	across supply chains, with applications spanning the automotive, battery, and textile sectors \cite{Circularise2026Platform}.
-	VeChain similarly deploys blockchain and smart contracts on its 
-	VeChainThor platform to achieve supply chain transparency, though 
-	it operates on a permissioned network with a restricted set of 
-	authority-approved validators \cite{VeChain2026}.
-	Both platforms share a common limitation: reliance on proprietary 
-	infrastructure or permissioned networks introduces vendor 
-	dependency and reduces interoperability 
-	\cite{Belchior2020A,Wang2023Exploring}.
-	
-	EcoPassEU takes a different approach. 
-	Rather than relying on a proprietary database, it is built on the public Ethereum blockchain and IPFS, with all rules encoded in open smart contracts. 
-	Product data is stored on IPFS, whilst only a small set of cryptographic identifiers is written on-chain, keeping costs low. 
-	The batch registration further reduces the cost of individual products and makes the platform more attractive to SMEs. Moreover, as an open source project, it does not have the risk of vendor lock-in.
-	
-	
-	\subsection{Business Viability}
-	EcoPassEU's revenue model rests on two foundations.
-	One is public funding: the EU's CIRPASS-2 Project (2024—2027) explicitly subsidise DPP deployment across textiles, electronics, and construction, with dedicated support for SMEs adopting ``DPP-as-a-Service'' models \cite{cirpass2_2024}.
-	As an open source platform, EcoPassEU is fully capable of benefitting from such grants.
-	
-	The other is subscription revenue. ESPR compliance is legally mandatory for any business selling physical goods in the EU, forming a captive market independent of voluntary commitments \cite{circularise_dpp_2025}.
-	The green technology and sustainability market is projected to grow from USD $25.47 billion in 2025 to USD $73.90 billion in 2030 \cite{marketsandmarkets2025}. EcoPassEU charges a graded subscription fee based on passport volume, with optional premium tiers for API integration and compliance reporting. The platform is built on public Ethereum, supporting payment with ETH or other ERC-20 tokens, providing international users a lower-friction settlement option and removing the need for traditional banking intermediaries.
-	
-	
-	
-	
-	
-	\section{Design Documentation}
-	\subsection{Design Philosophy and Architectural Choices}
-	EcoPassEU is a digital product passport (DPP) designed to provide an ESPR-compliant digital product passport and contains independently verifiable sustainability data. The design follows three design principles, each of which is aimed at specific product needs. 
-	
-	First, the hybrid storage model is adopted: the complete product data is fixed on IPFS through Pinata \cite{Benet2014IPFS}, and only the content identifier (CID), \texttt{keccak256} integrity hash, issuer address and timestamp \cite{Wood2014Ethereum} are recorded on the chain, thus reducing gas costs. 
-	Second, the system is privacy-aware and future-proof. While full data is currently stored off-chain on public network IPFS, this architecture sets the necessary foundation for data privacy. In future versions, manufacturers will also be able to easily encrypt commercially sensitive product data before uploading it. The on-chain hash will continue to function as an integrity anchor, proving the data has not been altered without exposing the full contents to the public ledger.
-	Third, all read queries use public RPC endpoints, allowing consumers and regulators to view any passport without holding wallets or paying gas fees.
+    it("should register multiple products in one transaction", async function () {
+      await contract.batchRegisterPassports(ids, cids, hashes);
+      for (const id of ids) {
+        expect(await contract.passportExists(id)).to.equal(true);
+      }
+    });
 
-	\subsection{System Architecture}
-	The user layer comprises 3 separate actor types: manufacturers, who connect to the platform via MetaMask and sign/submit transactions, and consumers/ regulators, who can query product records without holding a wallet. This is a non-exhaustive overview, as both actors must pass through the application layer — a React/Vite frontend deployed on the cloud platform Vercel that makes use of Ethers.js v6 for contract calls — to perform document uploads to IPFS, contract calls to the Sepolia network, and local integrity checks. These actor types, with differing requirements, are served by EcoPassEU (See Figure ~\ref{fig:architecture}).
-    
-    \vspace{-0.2cm}
-	\begin{figure}[h]
-		\centering
-		\includegraphics[width=\linewidth]{figures/1.png}
-		\caption{Overall system architecture.}
-		\label{fig:architecture}
-	\end{figure}
-    \vspace{-0.2cm}
-	
-	
-	
-	\subsection{Use Cases and Workflow}
-	EcoPassEU serves three actor types with differing technical needs, as illustrated in Figure~\ref{fig:usecase}. 
-	
-	Wallet connection via MetaMask on the Sepolia testnet (UC-01) is a common premise for all manufacturers and administrators, as each on-chain write must be signed by a wallet key pair and cryptographically linked to an accountable issuer \cite{Jorgensen2022Universal,Keršič2023Orchestrating}. To register a product, the manufacturer fills in a structured registration form (UC-02), including product details, material composition, and supply chain sources. Upon submission, the frontend serialises the form data to JSON and uploads it to IPFS via Pinata (UC-03) to receive a CID. 
-	
-	\vspace{-0.2cm}
-	\begin{figure}[h]
-		\centering
-		\includegraphics[width=0.75\linewidth]{figures/3.png}
-		\caption{EcoPassEU use case diagram.}
-		\label{fig:usecase}
-	\end{figure}
-	\vspace{-0.2cm}
-	
-	Next, the system calculates the \texttt{keccak256} hash of the JSON locally and passes it to the \texttt{registerPassport()} function on the smart contract alongside the CID and product ID (UC-04). After the user confirms the transaction in MetaMask, a \texttt{PassportIssued} event is emitted, and a QR code with an Etherscan link is provided for users to download (UC-05), which also accesses the product list view (UC-06). The admin role requires the same wallet connection but adds batch registration capabilities (UC-12) to reduce the unit gas cost for high-volume producers.
-	
-	At the read end, consumers and regulators can verify the product without a wallet. The user submits the product ID (UC-07), and the frontend queries the contract through the public RPC endpoint and jumps to the complete product passport page (UC-08). If the product passport exists, the system will obtain the complete JSON data from IPFS and recalculate its hash value on the client: if it matches, the green integrity badge will be displayed; if it does not match, a warning (UC-09) will be displayed. The product passport page will also display an interactive supply chain map (UC-10) and an optional issuer profile (UC-11). This separation between the write-gated and read-open flows supports the design goal of providing transparent information without setting financial or technical barriers to end users.
-	
-	
-	\subsection{Sequence and State Diagrams}
-	
-	Figure ~\ref{fig:sequence} outlines the technical details behind the core application flows, focussing on the strict execution order required for successful registration.
-	Specifically, the frontend must first obtain a valid CID from IPFS before prompting the wallet signature and triggering the smart contract. 
-	This ensures that the on-chain pointer never leads to data loss. 
-	Meanwhile, the verification flow demonstrates how the system relies entirely on the client logic to compare the acquired IPFS documents against the on-chain hash, ensuring trustless validation.
-	
-	\vspace{-0.2cm}
-	\begin{figure}[htbp]
-		\centering
-		\includegraphics[width=0.75\linewidth]{figures/2.png}
-		\caption{UML sequence diagram.}
-		\label{fig:sequence}
-	\end{figure}
-	\vspace{-0.2cm}
-	
-	Figure~\ref{fig:state} illustrates a state machine diagram that describes the lifecycle that a digital passport undergoes. At the beginning of the process, physical products were always entered as \texttt{Unregistered}.
-	The status of the digital document only changes to \texttt{IPFSStored} after the data is successfully uploaded to Pinata. Once the user signs the document, the status of the document changes to \texttt{TxPending}. After the block is mined on the Sepolia network, the digital document becomes immutable and is then marked as \texttt{Registered}.
-	During the final verification step, the client hash comparison will mark the record as either \texttt{Verified} when the hash is similar or \texttt{Compromised} when the data has been altered.
-	
-	\vspace{-0.2cm}
-	\begin{figure}[htbp]
-		\centering
-		\includegraphics[width=0.5\linewidth]{figures/4.png}
-		\caption{UML state machine diagram.}
-		\label{fig:state}
-	\end{figure}
-	\vspace{-0.2cm}
-	
-	
-	\subsection{User Interface Design}
-	To reflect the environmental theme, the search page adopts a dark green colour scheme (\#2d6a4f, \#1b4332).
-	Figure~\ref{fig:ui_search} shows that the search page is laid out with simple and consistent spacing.
-	It presents a user-focused interface with a clear flow.
-	Users can perform a search for a product by providing a product ID in the search box in the centre of the page or click on one of the pre-defined quick search buttons. No wallet connection is required.
-	The interface begins with an empty state and upon a search is then replaced by a verified product result card. The card contains the crucial information on-chain data, such as the product issuer address, timestamp of registration on-chain, and the hash of product metadata.
-	This allows users to instantly verify the authenticity of the product before accessing the full product passport.
+    it("should emit PassportIssued for each new product", async function () {
+      const tx = await contract.batchRegisterPassports(ids, cids, hashes);
+      const receipt = await tx.wait();
+      const events = receipt.logs.filter(
+        log => log.fragment && log.fragment.name === "PassportIssued"
+      );
+      expect(events.length).to.equal(ids.length);
+    });
 
+    it("should revert when array lengths do not match", async function () {
+      await expect(
+        contract.batchRegisterPassports(["ID-1"], ["CID-1", "CID-2"], [hashes[0]])
+      ).to.be.revertedWith("Array length mismatch");
+    });
 
-	\begin{figure}[htbp]
-		\centering
-		\includegraphics[width=0.75\linewidth]{figures/5.png}
-		\caption{Wireframe of the search interface.}
-		\label{fig:ui_search}
-	\end{figure}
+    it("should silently skip already-registered products in a batch", async function () {
+      await contract.registerPassport(ids[0], cids[0], hashes[0]);
+      await expect(
+        contract.batchRegisterPassports(ids, cids, hashes)
+      ).to.not.be.reverted;
+      expect(await contract.passportExists(ids[1])).to.equal(true);
+      expect(await contract.passportExists(ids[2])).to.equal(true);
+    });
+  });
 
-	
-	Figure~\ref{fig:ui_registers} displays the registration layout.
-	To provide a clear representation of the user's current state in the registration process, a simple tracker is included on the page with different steps: Fill Details $\to$ Upload IPFS $\to$ Register Chain $\to$ Done. 
-	There is no hidden section; all fields within the product detail, materials, and supply chain forms are presented on one scrollable page, which avoids confusion where the user does not know which section has not yet been completed or submitted. 
-	If the page is reached without having MetaMask connected, an amber coloured banner will appear under the details section. By doing this, we can stop users from uploading their data if they have not logged in yet.
-	
-
-	\begin{figure}[htbp]
-		\centering
-		\includegraphics[width=\linewidth]{figures/6.png}
-		\caption{Wireframe layout of the manufacturer registration form.}
-		\label{fig:ui_registers}
-	\end{figure}
-
-	
-	
-	
-	The result page is described in Figure~\ref{fig:ui_verif}, clearly differentiating information. The \emph{Blockchain Record} card displays on-chain data (issuer, time, and hash), while other cards display IPFS details. It is easy to see whether the information is valid by only considering the integrity badge. It will be presented as a green checkmark if the check can be passed, or as an amber triangle if an error occurs. If a user does not install MetaMask, the page will automatically use public RPC to load information.
-
-	\begin{figure}[htbp]
-		\centering
-		\includegraphics[width=\linewidth]{figures/7.png}
-		\caption{Wireframe detailing the structure of the product verification page.}
-		\label{fig:ui_verif}
-	\end{figure}
-
-	
-	We've implemented a CSS Grid and a Flexbox to ensure our site works perfectly on any device. At 600,px, forms will switch to a single-column layout to adapt to the mobile device screen. We had to use a 768,px breakpoint for the menu and interactive map size, to make it easier for users on a tablet.
-	
-	
-	
-	
-	
-	
-	\section{Project Execution}
-	
-	\subsection{Core Code Analysis and Data Structures}
-	EcoPassEU uses a hybrid architecture, separating on-chain and off-chain data to balance transparency with efficiency. The core data structure is divided across these two environments. 
-	
-	Off-chain, the complete lifecycle data---including category, brand, material composition, and supply chain provenance---is structured as JSON objects and pinned to IPFS via Pinata. On-chain, the \texttt{PassportRegistry.sol} smart contract uses a strictly typed \texttt{Passport} struct to store only the essential, immutable references:
-	
-	\begin{lstlisting}[language=Solidity, 
-		caption={Core Data Structure in PassportRegistry.sol}]
-		struct Passport {
-			string  ipfsCID;       // off-chain document pointer
-			bytes32 metadataHash;  // keccak256 of JSON for tamper-evidence
-			address issuer;
-			uint256 timestamp;
-			bool    exists;
-		}
-		
-		// productId => Passport
-		mapping(string => Passport) private passports;
-	\end{lstlisting}
-	
-	This private mapping directly associates a unique product ID with its corresponding 
-	passport data for O(1) retrieval. Initially, we considered using ERC-1155 tokens 
-	to represent these passports; however, we opted for this lightweight registry 
-	approach. Storing only the IPFS CID, a cryptographic hash, the issuer address, 
-	and a block timestamp on-chain significantly reduces deployment complexity and 
-	gas costs per registration, whilst keeping the full product lifecycle data 
-	off-chain on IPFS.
-	
-	
-	Listing 1.2 outlines the core registration functions and reflects a number of optimisations for Solidity:
-	\newpage
-	\begin{lstlisting}[language=Solidity, caption=registerPassport function]
-		function registerPassport(
-		string calldata productId,
-		string calldata ipfsCID,
-		bytes32 metadataHash
-		) external {
-			require(!passports[productId].exists, "Passport already exists");
-			passports[productId] = Passport({
-				ipfsCID:      ipfsCID,
-				metadataHash: metadataHash,
-				issuer:       msg.sender,
-				timestamp:    block.timestamp,
-				exists:       true
-			});
-			emit PassportIssued(productId, ipfsCID, metadataHash,
-			msg.sender, block.timestamp);
-		}
-	\end{lstlisting}
-	
-	Passing string parameters as \texttt{calldata} instead of 
-	\texttt{memory} avoids redundant data copying and reduces gas 
-	consumption. The \texttt{external} visibility modifier further 
-	improves efficiency by allowing direct argument access from 
-	calldata, compared with a \texttt{public} declaration. 
-	What is more, binding \texttt{issuer} to \texttt{msg.sender}---a 
-	secure EVM primitive---provides unforgeable cryptographic 
-	attribution for every passport without requiring supplementary 
-	access controls.
-	
-	As a supplement to the registration logic, the \texttt{PassportIssued}
-	event will be issued after each successful execution:
-	
-	\begin{lstlisting}[language=Solidity, caption=PassportIssued Event Definition]
-		event PassportIssued(
-		string  indexed productId,
-		string          ipfsCID,
-		bytes32         metadataHash,
-		address indexed issuer,
-		uint256         timestamp
-		);
-	\end{lstlisting}
-	
-	By designating \texttt{productId} and \texttt{issuer} as \texttt{indexed}, EVM stores these parameters in the Bloom filter of the transaction receipt.
-	This mechanism allows off-chain clients to efficiently filter logs by specific product or manufacturer without scanning the computing overhead of each block, which represents  best-practice model of establishing queryable audit tracking in Ethereum DApps \cite{Wood2014Ethereum}.
-	
-	
-	
-	
-	
-	\subsection{Testing Strategy}
-	
-	To validate the reliability of \texttt{PassportRegistry}, a unit-testing
-	suite was implemented using the Hardhat environment alongside the Chai
-	assertion library~\cite{nomic2024hardhat}, following established practices
-	for smart contract validation~\cite{ferreira2020smartbugs}.
-	Listing~\ref{lst:test-setup} shows the shared test fixture; a fresh contract
-	instance is deployed via \texttt{beforeEach}, ensuring full isolation between
-	cases.
-	
-	\begin{lstlisting}[
-		language=JavaScript,
-		caption={Hardhat test fixture -- shared setup},
-		label={lst:test-setup}
-		]
-		beforeEach(async function () {
-			[owner, addr1] = await hre.ethers.getSigners();
-			const Factory =
-			await hre.ethers.getContractFactory("PassportRegistry");
-			contract = await Factory.deploy();
-		});
-	\end{lstlisting}
-	
-	The most critical tests concern \texttt{registerPassport}, seen in Listing~\ref{lst:test-register}. The first case confirms that \texttt{msg.sender} is persisted as the issuer, which is the foundation of the platform's unforgeable attribution model. The second verifies that attempting to re-register an existing product ID triggers the \texttt{require} guard and reverts with the expected reason string, guaranteeing passport immutability.
-	
-	\begin{lstlisting}[
-		language=JavaScript,
-		caption={Unit tests -- registerPassport: issuer storage and duplicate
-			guard},
-		label={lst:test-register}
-		]
-		it("should store the correct issuer address", async function () {
-			await contract.registerPassport(PRODUCT_ID, IPFS_CID, META_HASH);
-			const [, , issuer] = await contract.getPassport(PRODUCT_ID);
-			expect(issuer).to.equal(owner.address);
-		});
-		
-		it("should revert on duplicate product ID", async function () {
-			await contract.registerPassport(PRODUCT_ID, IPFS_CID, META_HASH);
-			await expect(
-			contract.registerPassport(PRODUCT_ID, IPFS_CID, META_HASH)
-			).to.be.revertedWith("Passport already exists");
-		});
-	\end{lstlisting}
-	
-	
-	\subsection{Final UI Showcase}
-	
-	
-    Figures~\ref{fig:ui_register} and~\ref{fig:ui_verify} show the deployed interface of EcoPassEU.The registration portal guides manufacturers through a structured form (with step indicator), whilst the public verification page shows the passport details, integrity status and IPFS document link (without wallet requirement).
-	
-	\vspace{-0.2cm}
-	\begin{figure}[H]
-		\centering
-		\begin{minipage}{\linewidth}
-			\centering
-			\includegraphics[width=0.85\linewidth]{figures/8.png}
-			\caption{Deployed EcoPassEU interface: manufacturer registration portal.}
-			\label{fig:ui_register}
-		\end{minipage}
-		\vspace{0.3cm}
-		\begin{minipage}{\linewidth}
-			\centering
-			\includegraphics[width=0.85\linewidth]{figures/9.png}
-			\caption{Deployed EcoPassEU interface: public product verification page.}
-			\label{fig:ui_verify}
-		\end{minipage}
-		\vspace{0.3cm}
-		\begin{minipage}{\linewidth}
-			\centering
-			\includegraphics[width=0.6\linewidth]{figures/10.png}
-			\caption{Interactive supply chain map rendered on the public product verification page (UC-10).}
-			\label{fig:ui_supplychain}
-		\end{minipage}
-	\end{figure}
-	\vspace{-0.2cm}
-	
-	Figure~\ref{fig:ui_supplychain} illustrates the interactive supply chain 
-	map that displays every registered stage of the supply chain from a 
-	geographic perspective. By doing this, we enable consumers and regulators to follow the product's provenance, from the sourcing of raw materials to its final assembly.
-	
-
-	
-	
-	
-	\subsection{User Manual}
-	The application is designed to be intuitive for two distinct user groups. 
-	
-	\textbf{For Manufacturers (Registration):}
-	\begin{enumerate}
-		\item Connect your MetaMask wallet to the Sepolia testnet using the top navigation bar.
-		\item Navigate to the 'Register' page and complete the product detail forms, including material and supply chain data.
-		\item Click 'Upload to IPFS'. The system will generate a unique CID.
-		\item Click 'Register on Blockchain' and approve the transaction in the MetaMask pop-up.
-		\item Once confirmed, download the generated QR code to attach to your physical products.
-	\end{enumerate}
-	
-	\textbf{For Consumers and Regulators (Verification):}
-	\begin{enumerate}
-		\item No wallet connection needed. Open the EcoPassEU homepage.
-		\item Enter the Product ID into the central search bar, or scan the product's QR code.
-		\item Review the product's lifecycle data. There will be a green `Blockchain Verified' badge, indicating that the IPFS data matches the immutable blockchain record.
-	\end{enumerate}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	\section{Critical Evaluation}
-	
-	A per-transaction cost analysis of this DApp's operation reveals highly 
-	optimised gas efficiency. The transaction cost can be rigorously decomposed based on standard EVM opcode pricing \cite{Wood2014Ethereum}. Each registration transaction has a base cost of 21,000 gas, with an additional cost of approximately 20,000 gas per \texttt{SSTORE} opcode for each new storage slot written. By storing heavy string data (e.g., repair guides) off-chain on IPFS, the on-chain state changes can be kept extremely lightweight. Moreover, it's important to note that the \texttt{Passport} struct can write 5 fields, however, using \texttt{bytes32} type for \texttt{metadataHash} instead of a hex string halves the storage cost for this one field, since it fits perfectly into one 32-byte EVM storage word. The testnet deployment reveals that conducting a single registration 
-	transaction would use approximately 125,430 gas. However, it is critical to mention that there can be very high operational scalability provided by the \texttt{batchRegisterPassports} function. Since the contract iterates an array of products in one transaction, it effectively amortises the fixed 21,000-gas base cost across multiple registration transactions. Based on the test data, it has been shown that registering 10 products in bulk reduces the average per-product cost to roughly 92,100 gas. This in turn explains the 26\% per-unit cost reduction, and gives the platform potential to be economically viable for SMEs.
-	
-	In terms of security, the implementation has successfully reduced the risk of tampering and unauthorised modification, which is a central concern in Ethereum smart contract security \cite{Luu2016Making,Tsankov2018Securify}. In smart contracts, the explicit \texttt{require} check provides a strict tamperability detection guarantee by making the registered passport immutable. In addition, the stored metadata hash establishes a cryptographic commitment between the on-chain registry and the off-chain IPFS load. If the malicious actor tries to intercept and tamper with the IPFS document, the cryptographic hash of the tampered document will no longer match the immutable record saved on the chain, thus immediately invalidating the passport. Unlike existing solutions that rely on permissioned nodes or proprietary databases, EcoPassEU achieves enterprise-level privacy protection on a fully open network through the IPFS hash pairing mechanism.
-
-	The contract structurally avoids several common loopholes in Ethereum. 
-	The re-entry attack \cite{Luu2016Making} is not applicable because the contract neither accepts nor transfers Ether, eliminating the external call path used by reentrancy attack. 
-	Integer overflow has been mitigated by Solidity 0.8.x's 
-	built-in checked arithmetic, which reverts automatically on 
-	overflow without requiring the SafeMath library 
-	\cite{SolidityDocs2024}.
-	The \texttt{private} visibility of \texttt{passports} mapping prevents direct external enumeration; all reading are controlled by the typed \texttt{getPassport()} and \texttt{passportExists()} view functions, which are declared as \texttt{view}, therefore cost zero gas when called off-chain.
-	
-	
-	
-	Although the proposed EcoPassEU system presents strong advantages, it does 
-	have some limitations that arise from the decentralised architecture. While 
-	the on-chain verification process is extremely fast, obtaining the complete 
-	JSON from public IPFS gateways can have some longer latency compared to 
-	centralised servers.
-	First and most importantly, even though the batch registration function is 
-	very affordable on a testnet, executing such loop-based operations directly 
-	on the Ethereum mainnet will get immensely pricey during congested networks, 
-	so the production version of EcoPassEU is intended primarily for deployment 
-	on Layer-2 networks (Polygon, for example, or Arbitrum). This approach will still allow EVM compatibility and security while also making near-zero transaction fees for long-term financial viability of SMEs 
-	\cite{Radomski2018ERC1155}.
-	
-	
-	\section{Conclusion}
-	
-	In this work, we show that a proof-of-concept implementation (EcoPassEU) 
-	builds a workably tamper-proof infrastructure for Digital Product Passports 
-	according to the ESPR. By integrating Ethereum smart contracts 
-	\cite{Antonopoulos2018Mastering} with the off-chain system, IPFS, we create 
-	independently verifiable sustainability records that do not compel end users 
-	to handle crypto wallets. Further, a combination of a \texttt{keccak256} 
-	hash pairing system \cite{NIST2015SHA3} with Ethereum's Proof-of-Stake 
-	consensus \cite{EthereumMerge2022} solves the fundamental integrity problem 
-	without the high carbon footprint that typically accompanies blockchains. 
-	Finally, the feature of batch registration results in a 26\% reduction in 
-	gas costs, bringing much greater access for small and medium-sized 
-	enterprises (SMEs).
-	
-	Nonetheless, the prototype has several limitations in practical use that 
-	must be overcome before launch to the public. First, using the testnet 
-	exclusively to test on the Sepolia testnet means that gas costs are untested 
-	in practice. Specifically, this is true for the loop-based 
-	\texttt{batchRegisterPassports} function, which in mainnet congestion could 
-	become prohibitively expensive. Another crucial problem lies in the off-chain 
-	storage, where, at the moment, it is purely dependent on Pinata. In the case 
-	of this single gateway being unavailable, the documents it links to will 
-	become inaccessible, leaving the passport cryptographically correct, but 
-	useless in use. As well, the whole system is completely open; there are no 
-	identity checks, allowing any wallet address to issue a passport, so 
-	providing no confidence that it came from the genuine manufacturer. Finally 
-	and most crucially, the strict immutability of the blockchain does not allow 
-	users to fix mistakes they make in good faith or to withdraw invalidated 
-	entries. This is a large issue for regulators, as, at present, there is also 
-	no upgradeable proxy pattern in the current smart contract design.
-	
-	EcoPassEU will need a clear roadmap to transition from a proof-of-concept into a production-ready environment. As outlined earlier, the platform needs to be migrated into a Layer-2 solution to ensure costs are affordable when scaled. Additionally, the current proof-of-concept is not set up to have a formal identity verification mechanism. In future versions, W3C Decentralised Identifiers (DIDs) and 
-	Verifiable Credentials \cite{W3C2025DID,W3C2025VC} should be included in the system. Not only will this link a manufacturer's wallet to a legally verified entity, but it solves the ``oracle problem'' without sacrificing corporate privacy.
-	
-	Finally, addressing the strict immutability of the blockchain, an upgradeable and controlled proxy pattern should be considered. This would give regulators and manufacturers the ability to amend honest errors or update compliance requirements, without compromising historical passport records.
-	
-	
-
-	
-	
-	
-	
-	\newpage
-	%
-	% ---- Bibliography ----
-	%
-	% BibTeX users should specify bibliography style 'splncs04'.
-	% References will then be sorted and formatted in the correct style.
-	%
-	\bibliographystyle{splncs04}
-	\bibliography{mybibliography}
-	
-	\newpage
-	\appendix
-	\section{Appendix}
-	% The appendix has no page limit and must include specific items in order.
-	This appendix includes the mandatory materials required for the FTGP summative assessment.
-	
-	
-	
-	\subsection{Smart Contract Address}
-	\begin{itemize}
-		\item  \url{https://sepolia.etherscan.io/address/0x0617635eA34a7835807EbC6D0A7aECC9de8E1Cf0}
-	\end{itemize}
-	
-	
-	
-	\subsection{Deployed Website Link}
-	\begin{itemize}
-		\item \url{https://ftgp-2526-group1-11.vercel.app/home}
-    \end{itemize}
-	
-	
-
-	\subsection{Transaction Hashes}
-	\begin{itemize}
-		\item \textbf{Test Registration TX:} \url{https://sepolia.etherscan.io/tx/0xe371e32fe81af2087170b43d88234883b1577c12e6be347b54f7728d3ed64c46} \\
-		\textbf{Explanation:} This transaction demonstrates a successful test execution of the \texttt{registerPassport} function. It securely anchors a test product's IPFS CID, cryptographic metadata hash, and the manufacturer's wallet address to the blockchain, subsequently emitting the \texttt{PassportIssued} event.
-		
-		\item \textbf{Deployment TX:} \url{https://sepolia.etherscan.io/tx/
-			0x7925b3d7062d77f911b7614feeb15337ee7be0c31dc748ed216be717a2b433e8} \\
-		\textbf{Explanation:} This transaction represents the initial successful deployment of the \texttt{PassportRegistry} smart contract onto the Sepolia testnet, establishing the immutable registry for EcoPassEU.
-	\end{itemize}
-	
-	
-	
-	\subsection{GitHub Repository Link}
-	\begin{itemize}
-		\item \url{https://github.com/DeTaiDong/FTGP2526_Group1_11/tree/main}
-	\end{itemize}
-	
-	\subsection{Equity Shares}
-	\begin{itemize}
-		\item Luxiao Cao: 1.01
-		\item Akshansh Rajora: 1.01
-		\item Fuyu Cao: 0.98
-		\item Tianwei Yu: 0.97
-		\item Detai Dong: 1.03
-	\end{itemize}
-
-	
-	
-	\newpage
-	\subsection{Screenshot of GitHub – Insights - Contributor}
-	\begin{figure}[htbp]
-		\centering
-		\includegraphics[width=0.8\linewidth]{figures/101.png}
-		\caption{Screenshot of GitHub – Insights - Contributor}
-		\label{fig:github-insights}
-	\end{figure}
-	
-	\newpage
-	\subsection{Project Management and Collaboration}
-	
-	The team adopted a dual-platform approach to project management. We utilised a JIRA Scrum board for high-level sprint tracking and task status monitoring. Simultaneously, GitHub Issues were employed for detailed technical discussions and managing repository-specific milestones. 
-	
-	\begin{figure}[H]
-		\centering
-		\begin{minipage}{0.7\textwidth}
-			\centering
-			\includegraphics[width=\linewidth]{figures/102.png}
-			\caption{JIRA Summary Board.}
-		\end{minipage}
-		
-		\vspace{1em} 
-		
-
-		\begin{minipage}{0.7\textwidth}
-			\centering
-			\includegraphics[width=\linewidth]{figures/103.png}
-			\caption{GitHub Issue Tracking.}
-		\end{minipage}
-	\end{figure}
-	
-	
-	\newpage
-	\subsection{Individual Reflection Essays}
-	% Each group member's individual reflection essay.
-	\subsubsection{Luxiao Cao}
-	Ruminating on my experience with the EcoPassEU group project, I served mainly as the lead technical writer and systems architect. My chief role included summarizing our team's technical development in a cohesive academic narrative, as well as describing the structural designs for our decentralised application (DApp). The project delivered a precious opportunity to blend theoretical blockchain concepts and practical, regulatory-driven software engineering approaches.
-	
-	I was primarily involved in writing around 80\% of the final project report. This involved undertaking thorough initial research into the current regulatory environment, particularly the Ecodesign for Sustainable Products Regulation (ESPR) and the widespread problem of corporate `greenwashing' within the European Union. Through a rigorous literature review and carefully aggregating relevant academic references, I came to a deep understanding of Europe's strict commitment towards environmental sustainability and the circular economy. Synthesizing this contextual background was essential for articulating the intellectual and commercial motivations behind the EcoPassEU platform.
-	
-	In addition to the academic writing, I led the visual systems modelling for the design documentation. I was responsible for carefully creating and producing the full suite of architectural diagrams, covering the overall system architecture, use case diagrams, UML sequence and state machine diagrams, and the user interface wireframes. The development of these models was extremely instructive; it forced me to systematically record the cross-cutting hybrid storage interactions between the React frontend, the IPFS off-chain storage and the Ethereum Sepolia testnet. Upon reflection, I realised that transforming the abstract interactions of the blockchain into clear, standardised visual workflows was necessary in aligning the team's development objectives and ensuring smooth integration.
-	
-	In terms of the technical execution, I actively contributed to the Hardhat smart contract testing to ensure the robustness, immutability, and security of our Solidity code. Identifying vulnerabilities in the logic of our registry greatly deepened my knowledge of smart contract attack vectors and testing frameworks with a real-world case study. In addition, I contributed to the GitHub project documentation, making sure our repository was accessible, professionally presented, and well-structured.
-	
-	Ultimately, this project has been an extremely transformative academic experience. Before this module, my understanding of distributed ledger technology and smart contracts was largely abstract. However, through the rigorous process of testing smart contracts, designing UML frameworks and communicating our technical findings, I have developed my understanding of blockchain ecosystems significantly. More generally, this project highlighted how new financial technologies could be effectively utilised to ensure transparency and accountability in global supply chains, ideal for and supporting modern European environmental pursuits.
-	
-	\subsubsection{Akshansh Rajora}
-	For the EcoPassEU group project, I focused on two main technical areas: the Solidity smart contract that serves as the foundation of the platform, and the
-	IPFS integration that supports hybrid storage. Looking back, I can say it was one of the most technically challenging and rewarding tasks I have taken on
-	during my degree. My first major task was designing and building `PassportRegistry.sol`. The main challenge was not just to write a functioning contract but
-	to create one that was secure, gas-efficient, and appropriate for real-world regulations. Instead of using the ERC-1155 token standard we initially
-	considered, I chose a lighter registry pattern. This pattern involved a private mapping from product ID to a `Passport` structure. This choice simplified
-	deployment and cut per-registration gas costs since we only needed to store a CID, a `bytes32` hash, an issuer address, and a timestamp on-chain rather than
-	minting a full token. Every design decision had a direct financial impact, which helped me understand how software engineering on Ethereum differs from
-	traditional backend development. The optimizations I made were very instructive. Declaring function parameters as `calldata` instead of `memory` prevents
-	unnecessary data copying in the EVM. Using `external` visibility instead of `public` lowers call overhead for functions that are only accessed from outside the
-	contract. Opting for `bytes32` for the metadata hash instead of a hex string cut the storage cost for that field in half since it fits neatly into one 32-byte
-	EVM storage slot. These details might seem minor, but together they added up to a significant 26 percent reduction in per-unit costs when combined with the
-	`batchRegisterPassports` function, which spreads the fixed 21,000-gas base cost across multiple products within a single transaction. I also devoted a lot of
-	time to security. I examined the contract for common Ethereum vulnerabilities. Re-entrancy attacks were not a concern since the contract does not hold or
-	transfer Ether. Integer overflow issues were automatically handled by Solidity 0.8.x's built-in checked arithmetic, eliminating the need for the SafeMath
-	library. The `require(!passports[productId].exists)` check ensures that every registered passport remains permanently unchanged, which aligns with ESPR
-	compliance—meaning a manufacturer cannot simply overwrite a verified sustainability claim. Associating the issuer with `msg.sender` guarantees unforgeable
-	attribution without needing an additional access control layer. The IPFS integration required a different approach. I set up the workflow so that the frontend
-	serializes product data into JSON, uploads it to IPFS via Pinata to get a CID, and computes the keccak256 hash of that JSON locally before writing both to the
-	contract. This sequence is essential as the CID must exist before requesting a wallet signature to ensure that the on-chain pointer cannot lead to a lost-data
-	situation. The hash-binding mechanism means that if an attacker modifies the IPFS document, the new hash will not match the unchangeable on-chain record,
-	immediately indicating that the passport has been compromised. Working on this project showed me the limits of the architecture I created. The strict
-	immutability makes correcting honest mistakes impossible without using an upgradeable proxy pattern. These are the issues I would focus on in a future
-	version. Overall, this project provided me with real experience in production-level smart contract engineering, and I now have a much clearer understanding o
-	the trade-offs between decentralization, cost, and accuracy.
-	
-	\subsubsection{Fuyu Cao}
-	During the FTGP group project, I mainly contributed to the frontend presentation, visual refinement, and part of the data preparation for our DApp, EcoPassEU. Our project focused on building a privacy-aware Digital Product Passport platform for sustainable consumer goods in Europe. Compared with some of my teammates who worked more on the smart contract logic or report writing, my role was more related to improving how the project was presented and how users would interact with it. I helped optimise the page design, adjust the layout of several pages, improve the homepage background and visual consistency, and design the project logo. In addition, I also processed part of the dataset so that it could be used more clearly in the frontend demonstration.
-	
-	At the beginning of the project, I did not have a very strong background in frontend development, so some tasks seemed unfamiliar to me. For example, when I first looked at the project files, I was not very confident about how to modify the UI, replace images, or update components correctly. However, through this project I gradually became more comfortable with reading the code structure, locating the relevant files, and making direct changes to the interface. I learned how the React frontend was organised, how local changes could be previewed on the browser, and how visual elements such as logos, banners, and page sections could be integrated into the project. Although these may seem like small tasks compared with blockchain deployment, I realised that they are still very important because they directly affect the clarity, usability, and professionalism of the final product.
-	
-	Another useful part of my work was helping with the dataset. The raw data was not in a form that could be directly used in the project, so I helped clean part of it and organise sample data that was easier for the frontend to display. This made me understand that in a real project, the gap between raw data and usable system data is often larger than expected. Even if the final interface looks simple, a lot of supporting work is needed behind it.
-	
-	From a teamwork perspective, this project also taught me a lot. I learned that not every contribution has to be the “main technical core” in order to be valuable. In a group project, different members naturally take responsibility for different parts, and what matters is whether each person helps move the project forward. In my case, improving the UI, preparing data, and helping with presentation materials were practical contributions that supported the overall result. I also became more aware of the importance of communication, especially when multiple people are editing code, updating files, and trying to keep the project consistent.
-	
-	Overall, this project was a meaningful experience for me. It not only improved my understanding of blockchain-based application development, but also gave me more confidence in contributing to a technical team project in my own way. I learned that building a complete product requires not only backend logic and smart contracts, but also design, data preparation, usability, and coordination. This experience helped me better understand how a group project comes together as a whole.
-	
-	\subsubsection{Tianwei Yu}
-	
-	Reflecting on the EcoPassEU project, I am incredibly proud of what our team accomplished. Our goal was to build a Digital Product Passport (DPP) platform to help European consumers verify if products are truly sustainable, fighting back against deceptive "greenwashing". From the begining, I actively participated in our group discussions, brainstorming ideas and helping shape the direction of our hybrid blockchain solution. This vibrant, collaborative energy was the driving force behind our success.
-	
-	To build a reliable system, we first needed solid data. I teamed up with Fuyu to handle the critical task of data collection and cleaning. We worked carefully to ensure that the product lifecycle and supply chain data feeding into our system was accurate, well-structured, and ready for deployment. But a great backend also needs a great frontend. I wanted our platform to look as good as it works, so I collaborated closely with Fuyu again to beautify the website's user interface. We polished the page backgrounds, refined the text descriptions to make them highly readable, and carefully selected intuitive icons. By focusing on a clean, nature-inspired green theme, we ensured that anyone—whether a factory manager or an everyday shopper—could easily use our platform without needing any prior technical expertise[cite: 1].
-	
-	On the technical side, I took charge of making sure our blockchain logic was bulletproof. A decentralized app is only as good as its security, so I conducted rigorous Hardhat smart contract testing. I wrote detailed test cases to guarantee that our `registerPassport` function worked flawlessly, correctly recording the manufacturer's address and preventing duplicate product registrations. Beyond testing, I also conducted the Etherscan contract verification. This was a vital step for transparency, as it allowed anyone to publicly view and verify our smart contract code on the network. It felt incredibly rewarding to bridge the gap between our secure on-chain Ethereum records and our off-chain IPFS data storage. 
-	
-	Finally, bringing a complex project to life requires excellent documentation. I worked hand-in-hand with Fuyu, Luxiao, and the rest of the team to draft, supplement, and heavily refine our final project report. We combined our insights to ensure that every architectural choice we made was explained clearly and professionally.
-	
-	Overall, EcoPassEU was much more than just a coding assignment; it was a chance to use cutting-edge technology to create real-world environmental impact. Whether I was cleaning data, polishing the visual UI, testing smart contracts, or writing the report, I learned how to build robust, user-centric decentralized applications. This journey has deeply strengthened both my software engineering skills and my appreciation for great teamwork.
-	
-	
-	\subsubsection{Detai Dong}
-	In this project, I developed the GitHub repository and performed full-stack front-end development work. I laid out the overall framework  comprising of the Home, Register, and Product Detail pages and defined the layout, visual theme, and interactive feedback components (e.g., the navigation bar, search bar and product list cards) used for all pages. The primary background artwork was provided by Fu Yu Cao. I developed the wallet connection component and designed the Landing page, connected to the smart contract developed by Akshansh, and — with his help — finished implementing the whole pipeline of uploading product metadata to IPFS and attaching the obtained CID to the blockchain. Subsequent to the DApp testing conducted by Tianwei Yu, I proceeded with the implementation of product search and the detail page, covering: issuer profile viewing and editing, per-product QR code generation, IPFS-based data integrity verification, supply chain visualisation on the world map, and composition of product materials. Moving into the future, I intend to improve on the functionality and layout of the Product Detail page constantly, always looking for ways to further enhance it.
-	
-	This was my first time working with React and JSX. As compared to previous development experience, I noticed that component-based development allows for much higher modularity and reusability than plain HTML (which notably helped iteration speed when project scope grew). The most difficult component for me to comprehend was how the front end interacts with a smart contract — querying on-chain events, transaction data parsing and the asynchronous nature of blockchain responses all required careful consideration. Beyond this, debugging infuriating errors was equally challenging, but troubleshooting each of these errors contributed meaningfully to my development experience. Witnessing each feature working end-to-end provided tremendous motivation to me; I often would code myself for innumerable hours without even noticing the passage of time, which can certainly be seen in the bursts of focused activity carried out in GitHub. The motivation this project provided me with helped me to regain my passion for development and allowed me to accumulate hands-on Web3 experience which theoretical education could not provide.
-	
-	Finally, I would like to express my heartfelt appreciation to the lecturers and supervisors of SEMTM0029\_2025\_TB-2, as well as my team members, for providing me with the opportunity to perform full-stack development tasks---an experience that significantly helped me strengthen both my technical skills and my understanding of Web3.
-	
-	
-	
-	
-	\newpage
-
-	\subsection{Team Sprint Reports}
-
-	\includepdf[pages=-, scale=0.85, pagecommand={\thispagestyle{plain}}]{sprint reports/Formative Assessment - Project Ideation Report.pdf}
-	
-	\includepdf[pages=-, scale=0.85, pagecommand={\thispagestyle{plain}}]{sprint reports/W21 Sprint Report.pdf}
-	
-	\includepdf[pages=-, scale=0.85, pagecommand={\thispagestyle{plain}}]{sprint reports/W22 Sprint Report.pdf}
-	
-	\includepdf[pages=-, scale=0.85, pagecommand={\thispagestyle{plain}}]{sprint reports/W23 Sprint Report.pdf}
-	
-	\includepdf[pages=-, scale=0.85, pagecommand={\thispagestyle{plain}}]{sprint reports/W24 Sprint Report.pdf}
-	
-	
-	
-	
-	
-	\subsection{Smart Contract and Test Codes}
-	\begin{lstlisting}[
-		language=Solidity,
-		caption={Complete PassportRegistry Smart Contract Code},
-		label={lst:contract_code},
-		breaklines=true,
-		frame=single,
-		basicstyle=\small\ttfamily,
-		numbers=left,
-		numberstyle=\tiny,
-		keywordstyle=\color{blue},
-		commentstyle=\color{gray},
-		stringstyle=\color{red},
-		tabsize=4,
-		gobble=0
-		]
-		// SPDX-License-Identifier: MIT
-		pragma solidity ^0.8.20;
-		
-		contract PassportRegistry {
-			
-			struct Passport {
-				string  ipfsCID;       // off-chain document pointer
-				bytes32 metadataHash;  // sha256 of the JSON for tamper-proof verify
-				address issuer;
-				uint256 timestamp;
-				bool    exists;
-			}
-			
-			// productId => Passport
-			mapping(string => Passport) private passports;
-			
-			event PassportIssued(
-			string indexed productId,
-			string ipfsCID,
-			bytes32 metadataHash,
-			address indexed issuer,
-			uint256 timestamp
-			);
-			
-			// Single register
-			function registerPassport(
-			string calldata productId,
-			string calldata ipfsCID,
-			bytes32 metadataHash
-			) external {
-				require(!passports[productId].exists, "Passport already exists");
-				passports[productId] = Passport({
-					ipfsCID:      ipfsCID,
-					metadataHash: metadataHash,
-					issuer:       msg.sender,
-					timestamp:    block.timestamp,
-					exists:       true
-				});
-				emit PassportIssued(productId, ipfsCID, metadataHash, msg.sender, block.timestamp);
-			}
-			
-			// Batch register (gas efficient for SMEs uploading product ranges)
-			function batchRegisterPassports(
-			string[]   calldata productIds,
-			string[]   calldata ipfsCIDs,
-			bytes32[]  calldata metadataHashes
-			) external {
-				require(
-				productIds.length == ipfsCIDs.length &&
-				ipfsCIDs.length == metadataHashes.length,
-				"Array length mismatch"
-				);
-				for (uint256 i = 0; i < productIds.length; i++) {
-					if (!passports[productIds[i]].exists) {
-						passports[productIds[i]] = Passport({
-							ipfsCID:      ipfsCIDs[i],
-							metadataHash: metadataHashes[i],
-							issuer:       msg.sender,
-							timestamp:    block.timestamp,
-							exists:       true
-						});
-						emit PassportIssued(productIds[i], ipfsCIDs[i], metadataHashes[i], msg.sender, block.timestamp);
-					}
-				}
-			}
-			
-			// Public read - anyone can verify a product
-			function getPassport(string calldata productId)
-			external view
-			returns (string memory ipfsCID, bytes32 metadataHash, address issuer, uint256 timestamp)
-			{
-				Passport storage p = passports[productId];
-				require(p.exists, "Passport not found");
-				return (p.ipfsCID, p.metadataHash, p.issuer, p.timestamp);
-			}
-			
-			function passportExists(string calldata productId) external view returns (bool) {
-				return passports[productId].exists;
-			}
-		}
-	\end{lstlisting}
-	
-	
-	
-	\begin{lstlisting}[caption={Hardhat unit testing suite for PassportRegistry.sol}, label={listing:hardhat_tests}]
-		import { expect } from "chai";
-		import hre from "hardhat";
-		
-		describe("PassportRegistry Smart Contract", function () {
-			let contract;
-			let owner;
-			let addr1;
-			
-			const PRODUCT_ID = "ECO-TX-2025-001";
-			const IPFS_CID   = "QmTestCID123456789";
-			const META_HASH  = hre.ethers.keccak256(hre.ethers.toUtf8Bytes("test-metadata"));
-			
-			beforeEach(async function () {
-				[owner, addr1] = await hre.ethers.getSigners();
-				const Factory = await hre.ethers.getContractFactory("PassportRegistry");
-				contract = await Factory.deploy();
-			});
-			
-			// 1. Deployment
-			describe("Deployment", function () {
-				it("should deploy with a valid contract address", async function () {
-					expect(contract.target).to.be.a("string");
-					expect(contract.target).to.match(/^0x[0-9a-fA-F]{40}$/);
-				});
-			});
-			
-			// 2. registerPassport
-			describe("registerPassport", function () {
-				it("should register a new passport successfully", async function () {
-					await expect(
-					contract.registerPassport(PRODUCT_ID, IPFS_CID, META_HASH)
-					).to.emit(contract, "PassportIssued");
-				});
-				
-				it("should store the correct issuer address", async function () {
-					await contract.registerPassport(PRODUCT_ID, IPFS_CID, META_HASH);
-					const [, , issuer] = await contract.getPassport(PRODUCT_ID);
-					expect(issuer).to.equal(owner.address);
-				});
-				
-				it("should store the correct IPFS CID and metadata hash", async function () {
-					await contract.registerPassport(PRODUCT_ID, IPFS_CID, META_HASH);
-					const [cid, hash] = await contract.getPassport(PRODUCT_ID);
-					expect(cid).to.equal(IPFS_CID);
-					expect(hash).to.equal(META_HASH);
-				});
-				
-				it("should record a non-zero timestamp", async function () {
-					await contract.registerPassport(PRODUCT_ID, IPFS_CID, META_HASH);
-					const [, , , timestamp] = await contract.getPassport(PRODUCT_ID);
-					expect(Number(timestamp)).to.be.greaterThan(0);
-				});
-				
-				it("should revert when registering a duplicate product ID", async function () {
-					await contract.registerPassport(PRODUCT_ID, IPFS_CID, META_HASH);
-					await expect(
-					contract.registerPassport(PRODUCT_ID, IPFS_CID, META_HASH)
-					).to.be.revertedWith("Passport already exists");
-				});
-			});
-			
-			// 3. passportExists
-			describe("passportExists", function () {
-				it("should return false for an unregistered product", async function () {
-					expect(await contract.passportExists("NONEXISTENT-ID")).to.equal(false);
-				});
-				
-				it("should return true after registration", async function () {
-					await contract.registerPassport(PRODUCT_ID, IPFS_CID, META_HASH);
-					expect(await contract.passportExists(PRODUCT_ID)).to.equal(true);
-				});
-			});
-			
-			// 4. getPassport
-			describe("getPassport", function () {
-				it("should revert when querying a non-existent product", async function () {
-					await expect(
-					contract.getPassport("NO-SUCH-PRODUCT")
-					).to.be.revertedWith("Passport not found");
-				});
-				
-				it("should return all four fields correctly", async function () {
-					await contract.registerPassport(PRODUCT_ID, IPFS_CID, META_HASH);
-					const [cid, hash, issuer, timestamp] = await contract.getPassport(PRODUCT_ID);
-					expect(cid).to.equal(IPFS_CID);
-					expect(hash).to.equal(META_HASH);
-					expect(issuer).to.equal(owner.address);
-					expect(Number(timestamp)).to.be.greaterThan(0);
-				});
-			});
-			
-			// 5. batchRegisterPassports
-			describe("batchRegisterPassports", function () {
-				const ids    = ["BATCH-001", "BATCH-002", "BATCH-003"];
-				const cids   = ["QmCID1", "QmCID2", "QmCID3"];
-				const hashes = [
-				hre.ethers.keccak256(hre.ethers.toUtf8Bytes("hash1")),
-				hre.ethers.keccak256(hre.ethers.toUtf8Bytes("hash2")),
-				hre.ethers.keccak256(hre.ethers.toUtf8Bytes("hash3")),
-				];
-				
-				it("should register multiple products in one transaction", async function () {
-					await contract.batchRegisterPassports(ids, cids, hashes);
-					for (const id of ids) {
-						expect(await contract.passportExists(id)).to.equal(true);
-					}
-				});
-				
-				it("should emit PassportIssued for each new product", async function () {
-					const tx = await contract.batchRegisterPassports(ids, cids, hashes);
-					const receipt = await tx.wait();
-					const events = receipt.logs.filter(
-					log => log.fragment && log.fragment.name === "PassportIssued"
-					);
-					expect(events.length).to.equal(ids.length);
-				});
-				
-				it("should revert when array lengths do not match", async function () {
-					await expect(
-					contract.batchRegisterPassports(["ID-1"], ["CID-1", "CID-2"], [hashes[0]])
-					).to.be.revertedWith("Array length mismatch");
-				});
-				
-				it("should silently skip already-registered products in a batch", async function () {
-					await contract.registerPassport(ids[0], cids[0], hashes[0]);
-					await expect(
-					contract.batchRegisterPassports(ids, cids, hashes)
-					).to.not.be.reverted;
-					expect(await contract.passportExists(ids[1])).to.equal(true);
-					expect(await contract.passportExists(ids[2])).to.equal(true);
-				});
-			});
-			
-			// 6. PassportIssued event
-			describe("PassportIssued event", function () {
-				it("should emit correct values on single registration", async function () {
-					await expect(
-					contract.registerPassport(PRODUCT_ID, IPFS_CID, META_HASH)
-					)
-					.to.emit(contract, "PassportIssued")
-					.withArgs(
-					PRODUCT_ID,
-					IPFS_CID,
-					META_HASH,
-					owner.address,
-					(ts) => Number(ts) > 0
-					);
-				});
-			});
-		});
-	\end{lstlisting}
-
-
-
-
-
-
-
-	\subsubsection{Frontend Core Files}
-	
-	Due to the extensive nature of the React frontend architecture, the complete suite of source files---including all core components, modifications, and user interface logic---is hosted on our group's GitHub repository. 
-	
-	The full frontend implementation can be reviewed at the following link:
-	\begin{itemize}
-		\item \url{https://github.com/DeTaiDong/FTGP2526_Group1_11}
-	\end{itemize}
-	
-	
-	
-	
-	
-	
-	\end{document}
+  // 6. PassportIssued event
+  describe("PassportIssued event", function () {
+    it("should emit correct values on single registration", async function () {
+      await expect(
+        contract.registerPassport(PRODUCT_ID, IPFS_CID, META_HASH)
+      )
+        .to.emit(contract, "PassportIssued")
+        .withArgs(
+          PRODUCT_ID,
+          IPFS_CID,
+          META_HASH,
+          owner.address,
+          (ts) => Number(ts) > 0
+        );
+    });
+  });
+});
+\end{lstlisting}
