@@ -14,8 +14,8 @@
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{float}
-
-
+\usepackage{xurl}
+\usepackage{pdfpages}
 
 
 \lstdefinelanguage{Solidity}{
@@ -517,9 +517,7 @@
 	very affordable on a testnet, executing such loop-based operations directly 
 	on the Ethereum mainnet will get immensely pricey during congested networks, 
 	so the production version of EcoPassEU is intended primarily for deployment 
-	on Layer-2 networks (Polygon, for example, or Arbitrum). This approach will 
-	still allow EVM compatibility and security while also making near-zero 
-	transaction fees for long-term financial viability of SMEs 
+	on Layer-2 networks (Polygon, for example, or Arbitrum). This approach will still allow EVM compatibility and security while also making near-zero transaction fees for long-term financial viability of SMEs 
 	\cite{Radomski2018ERC1155}.
 	
 	
@@ -582,40 +580,84 @@
 	% The appendix has no page limit and must include specific items in order.
 	This appendix includes the mandatory materials required for the FTGP summative assessment.
 	
-	\subsection{Smart Contract Deployment}
+	
+	
+	\subsection{Smart Contract Address}
 	\begin{itemize}
-		\item \textbf{Smart Contract Address(es):} [Insert Sepolia testnet addresses here]
-		\item \textbf{Etherscan Links:} [Insert links to verified contracts on Etherscan]
+		\item  \url{https://sepolia.etherscan.io/address/0x0617635eA34a7835807EbC6D0A7aECC9de8E1Cf0}
 	\end{itemize}
 	
-	\subsection{Project Links}
-	\begin{itemize}
-		\item \textbf{Deployed Website:} 
-		\url{https://ftgp-2526-group1-11.vercel.app/home}
-		\item \textbf{GitHub Repository:} \url{https://github.com/DeTaiDong/FTGP2425_Group1_11} 
-	\end{itemize}
 	
+	
+	\subsection{Deployed Website Link}
+	\begin{itemize}
+		\item \url{https://ftgp-2526-group1-11.vercel.app/home}
+    \end{itemize}
+	
+	
+
 	\subsection{Transaction Hashes}
-	% Any deploy/test transaction hashes along with brief explanations.
 	\begin{itemize}
-		\item \textbf{Deployment TX:} [Insert Hash] - Explanation.
+		\item \textbf{Test Registration TX:} \url{https://sepolia.etherscan.io/tx/0xe371e32fe81af2087170b43d88234883b1577c12e6be347b54f7728d3ed64c46} \\
+		\textbf{Explanation:} This transaction demonstrates a successful test execution of the \texttt{registerPassport} function. It securely anchors a test product's IPFS CID, cryptographic metadata hash, and the manufacturer's wallet address to the blockchain, subsequently emitting the \texttt{PassportIssued} event.
+		
+		\item \textbf{Deployment TX:} \url{https://sepolia.etherscan.io/tx/
+			0x7925b3d7062d77f911b7614feeb15337ee7be0c31dc748ed216be717a2b433e8} \\
+		\textbf{Explanation:} This transaction represents the initial successful deployment of the \texttt{PassportRegistry} smart contract onto the Sepolia testnet, establishing the immutable registry for EcoPassEU.
 	\end{itemize}
 	
-	\subsection{Equity Shares \& Contributions}
-	% Distribution of equity shares and screenshot of GitHub Insights
+	
+	
+	\subsection{GitHub Repository Link}
 	\begin{itemize}
-		\item Luxiao Cao: [Weight]
-		\item Akshansh Rajora: [Weight]
-		\item Fuyu Cao: [Weight]
-		\item Tianwei Yu: [Weight]
-		\item Detai Dong: [Weight]
+		\item \url{https://github.com/DeTaiDong/FTGP2526_Group1_11/tree/main}
 	\end{itemize}
-	\noindent \textit{[Insert Screenshot of GitHub - Insights - Contributor here]}
 	
-	\subsection{JIRA Project Board}
-	% Required screenshot(s) for your JIRA project board.
-	\noindent \textit{[Insert screenshots of 'Summary', 'timeline', and 'backlog' pages here]}
+	\subsection{Equity Shares}
+	\begin{itemize}
+		\item Luxiao Cao: 1.01
+		\item Akshansh Rajora: 1.01
+		\item Fuyu Cao: 0.98
+		\item Tianwei Yu: 0.97
+		\item Detai Dong: 1.03
+	\end{itemize}
+
 	
+	
+	\newpage
+	\subsection{Screenshot of GitHub – Insights - Contributor}
+	\begin{figure}[htbp]
+		\centering
+		\includegraphics[width=0.8\linewidth]{figures/101.png}
+		\caption{Screenshot of GitHub – Insights - Contributor}
+		\label{fig:github-insights}
+	\end{figure}
+	
+	\newpage
+	\subsection{Project Management and Collaboration}
+	
+	The team adopted a dual-platform approach to project management. We utilised a JIRA Scrum board for high-level sprint tracking and task status monitoring. Simultaneously, GitHub Issues were employed for detailed technical discussions and managing repository-specific milestones. 
+	
+	\begin{figure}[H]
+		\centering
+		\begin{minipage}{0.7\textwidth}
+			\centering
+			\includegraphics[width=\linewidth]{figures/102.png}
+			\caption{JIRA Summary Board.}
+		\end{minipage}
+		
+		\vspace{1em} 
+		
+
+		\begin{minipage}{0.7\textwidth}
+			\centering
+			\includegraphics[width=\linewidth]{figures/103.png}
+			\caption{GitHub Issue Tracking.}
+		\end{minipage}
+	\end{figure}
+	
+	
+	\newpage
 	\subsection{Individual Reflection Essays}
 	% Each group member's individual reflection essay.
 	\subsubsection{Luxiao Cao}
@@ -690,27 +732,134 @@
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
+	\newpage
+
 	\subsection{Team Sprint Reports}
-	% All team sprint reports in chronological order.
-	[Insert chronological sprint reports here]
+
+	\includepdf[pages=-, scale=0.85, pagecommand={\thispagestyle{plain}}]{sprint reports/Formative Assessment - Project Ideation Report.pdf}
 	
-	\subsection{Complete Source Code}
-	% The complete DApp Solidity smart contract code and testing codes. All in text format.
-	\subsubsection{Smart Contracts}
-	\begin{verbatim}
-		// Insert complete Solidity code here
-	\end{verbatim}
+	\includepdf[pages=-, scale=0.85, pagecommand={\thispagestyle{plain}}]{sprint reports/W21 Sprint Report.pdf}
 	
+	\includepdf[pages=-, scale=0.85, pagecommand={\thispagestyle{plain}}]{sprint reports/W22 Sprint Report.pdf}
+	
+	\includepdf[pages=-, scale=0.85, pagecommand={\thispagestyle{plain}}]{sprint reports/W23 Sprint Report.pdf}
+	
+	\includepdf[pages=-, scale=0.85, pagecommand={\thispagestyle{plain}}]{sprint reports/W24 Sprint Report.pdf}
+	
+	
+	
+	
+	
+	\subsection{Smart Contract: PassportRegistry.sol}
+	\begin{lstlisting}[
+		language=Solidity,
+		caption={Complete PassportRegistry Smart Contract Code},
+		label={lst:contract_code},
+		breaklines=true,
+		frame=single,
+		basicstyle=\small\ttfamily,
+		numbers=left,
+		numberstyle=\tiny,
+		keywordstyle=\color{blue},
+		commentstyle=\color{gray},
+		stringstyle=\color{red},
+		tabsize=4,
+		gobble=0
+		]
+		// SPDX-License-Identifier: MIT
+		pragma solidity ^0.8.20;
+		
+		contract PassportRegistry {
+			
+			struct Passport {
+				string  ipfsCID;       // off-chain document pointer
+				bytes32 metadataHash;  // sha256 of the JSON for tamper-proof verify
+				address issuer;
+				uint256 timestamp;
+				bool    exists;
+			}
+			
+			// productId => Passport
+			mapping(string => Passport) private passports;
+			
+			event PassportIssued(
+			string indexed productId,
+			string ipfsCID,
+			bytes32 metadataHash,
+			address indexed issuer,
+			uint256 timestamp
+			);
+			
+			// Single register
+			function registerPassport(
+			string calldata productId,
+			string calldata ipfsCID,
+			bytes32 metadataHash
+			) external {
+				require(!passports[productId].exists, "Passport already exists");
+				passports[productId] = Passport({
+					ipfsCID:      ipfsCID,
+					metadataHash: metadataHash,
+					issuer:       msg.sender,
+					timestamp:    block.timestamp,
+					exists:       true
+				});
+				emit PassportIssued(productId, ipfsCID, metadataHash, msg.sender, block.timestamp);
+			}
+			
+			// Batch register (gas efficient for SMEs uploading product ranges)
+			function batchRegisterPassports(
+			string[]   calldata productIds,
+			string[]   calldata ipfsCIDs,
+			bytes32[]  calldata metadataHashes
+			) external {
+				require(
+				productIds.length == ipfsCIDs.length &&
+				ipfsCIDs.length == metadataHashes.length,
+				"Array length mismatch"
+				);
+				for (uint256 i = 0; i < productIds.length; i++) {
+					if (!passports[productIds[i]].exists) {
+						passports[productIds[i]] = Passport({
+							ipfsCID:      ipfsCIDs[i],
+							metadataHash: metadataHashes[i],
+							issuer:       msg.sender,
+							timestamp:    block.timestamp,
+							exists:       true
+						});
+						emit PassportIssued(productIds[i], ipfsCIDs[i], metadataHashes[i], msg.sender, block.timestamp);
+					}
+				}
+			}
+			
+			// Public read - anyone can verify a product
+			function getPassport(string calldata productId)
+			external view
+			returns (string memory ipfsCID, bytes32 metadataHash, address issuer, uint256 timestamp)
+			{
+				Passport storage p = passports[productId];
+				require(p.exists, "Passport not found");
+				return (p.ipfsCID, p.metadataHash, p.issuer, p.timestamp);
+			}
+			
+			function passportExists(string calldata productId) external view returns (bool) {
+				return passports[productId].exists;
+			}
+		}
+	\end{lstlisting}
+
 	\subsubsection{Frontend Core Files}
-	\begin{verbatim}
-		// Insert modified/relevant frontend files (e.g., page.js) here
-	\end{verbatim}
+	
+	Due to the extensive nature of the React frontend architecture, the complete suite of source files---including all core components, modifications, and user interface logic---is hosted on our group's GitHub repository. 
+	
+	The full frontend implementation can be reviewed at the following link:
+	\begin{itemize}
+		\item \url{https://github.com/DeTaiDong/FTGP2526_Group1_11}
+	\end{itemize}
+	
+	
+	
+	
+	
 	
 	\end{document}
